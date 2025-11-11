@@ -1,0 +1,26 @@
+backend/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+
+*.env
+.env
+backend/.env
+
+# Django static build artifacts
+staticfiles/
+media/
+
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+
+# JetBrains / VSCode
+**/.idea/
+.vscode/
+
+.DS_Store
+Thumbs.db
