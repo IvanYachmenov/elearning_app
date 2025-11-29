@@ -1,15 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import '../../styles/layout.css';
-import AppFooter from "./AppFooter";
-import menuIcon from "../../assets/icons/menu.png";
-import closeIcon from "../../assets/icons/close.png";
-
-
+import AppFooter from './AppFooter';
 
 function MainLayout({ user, onLogout }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const getLinkClassName = ({ isActive }) =>
@@ -34,8 +29,8 @@ function MainLayout({ user, onLogout }) {
   const getInitials = (username) =>
     username ? username.charAt(0).toUpperCase() : 'U';
 
-  const handleNavLinkClick = () => {
-    setIsMobileNavOpen(false);
+  const handleDropdownNavClick = () => {
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -45,61 +40,24 @@ function MainLayout({ user, onLogout }) {
           <div className="app-header__left">
             <div className="app-logo">E-Learning</div>
 
-            <button
-              className="app-mobile-toggle"
-              type="button"
-              aria-label="Toggle navigation"
-              onClick={() => setIsMobileNavOpen((prev) => !prev)}
-            >
-              <img
-                src={isMobileNavOpen ? closeIcon : menuIcon}
-                alt={isMobileNavOpen ? "Close navigation" : "Open navigation"}
-                className="app-mobile-toggle__icon"
-              />
-            </button>
-
-            <nav
-              className={
-                'app-nav' + (isMobileNavOpen ? ' app-nav--mobile' : '')
-              }
-            >
-              <NavLink
-                to="/home"
-                className={getLinkClassName}
-                onClick={handleNavLinkClick}
-              >
+            <nav className="app-nav">
+              <NavLink to="/home" className={getLinkClassName}>
                 Home
               </NavLink>
 
-              <NavLink
-                to="/courses"
-                className={getLinkClassName}
-                onClick={handleNavLinkClick}
-              >
+              <NavLink to="/courses" className={getLinkClassName}>
                 Courses
               </NavLink>
 
-              <NavLink
-                to="/learning"
-                className={getLinkClassName}
-                onClick={handleNavLinkClick}
-              >
+              <NavLink to="/learning" className={getLinkClassName}>
                 Learning
               </NavLink>
 
-              <NavLink
-                to="/shop"
-                className={getLinkClassName}
-                onClick={handleNavLinkClick}
-              >
+              <NavLink to="/shop" className={getLinkClassName}>
                 Shop
               </NavLink>
 
-              <NavLink
-                to="/settings"
-                className={getLinkClassName}
-                onClick={handleNavLinkClick}
-              >
+              <NavLink to="/settings" className={getLinkClassName}>
                 Settings
               </NavLink>
             </nav>
@@ -107,13 +65,11 @@ function MainLayout({ user, onLogout }) {
 
           <div className="app-header__right" ref={dropdownRef}>
             <button
-              className="profile-button"
               type="button"
+              className="profile-button"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
             >
-              <div className="profile-avatar">
-                {getInitials(user.username)}
-              </div>
+              <div className="profile-avatar">{getInitials(user.username)}</div>
               <span>{user.username}</span>
               <svg
                 className={
@@ -134,25 +90,81 @@ function MainLayout({ user, onLogout }) {
 
             {isDropdownOpen && (
               <div className="profile-dropdown">
+                <div className="profile-dropdown__nav">
+                  <NavLink
+                    to="/home"
+                    className="profile-dropdown__item"
+                    onClick={handleDropdownNavClick}
+                  >
+                    <img
+                        src={"../../../public/assets/icons/home.png"}
+                        alt="Home"
+                        className="profile-dropdown__icon"
+                    />
+                    Home
+                  </NavLink>
+                  <NavLink
+                    to="/courses"
+                    className="profile-dropdown__item"
+                    onClick={handleDropdownNavClick}
+                  >
+                  <img
+                    src={"../../../public/assets/icons/courses.png"}
+                    alt="Courses"
+                    className="profile-dropdown__icon"
+                  />
+                    Courses
+                  </NavLink>
+                  <NavLink
+                    to="/learning"
+                    className="profile-dropdown__item"
+                    onClick={handleDropdownNavClick}
+                  >
+                  <img
+                    src={"../../../public/assets/icons/learning.png"}
+                    alt="Learning"
+                    className="profile-dropdown__icon"
+                  />
+                    Learning
+                  </NavLink>
+                  <NavLink
+                    to="/shop"
+                    className="profile-dropdown__item"
+                    onClick={handleDropdownNavClick}
+                  >
+                    <img
+                      src={"../../../public/assets/icons/shop.png"}
+                      alt="Shop"
+                      className="profile-dropdown__icon"
+                    />
+                    Shop
+                  </NavLink>
+                  <NavLink
+                    to="/settings"
+                    className="profile-dropdown__item"
+                    onClick={handleDropdownNavClick}
+                  >
+                    <img
+                      src={"../../../public/assets/icons/settings.png"}
+                      alt="Settings"
+                      className="profile-dropdown__icon"
+                    />
+                    Settings
+                  </NavLink>
+                </div>
+
+                <div className="profile-dropdown__divider" />
+
                 <NavLink
                   to="/profile"
                   className="profile-dropdown__item"
-                  onClick={() => setIsDropdownOpen(false)}
+                  onClick={handleDropdownNavClick}
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    <img
+                      src={"../../../public/assets/icons/profile.png"}
+                      alt="Profile"
+                      className="profile-dropdown__icon"
                     />
-                  </svg>
                   Profile
                 </NavLink>
 
@@ -164,20 +176,11 @@ function MainLayout({ user, onLogout }) {
                     onLogout();
                   }}
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    <img
+                      src={"../../../public/assets/icons/logout.png"}
+                      alt="Logout"
+                      className="profile-dropdown__icon"
                     />
-                  </svg>
                   Logout
                 </button>
               </div>

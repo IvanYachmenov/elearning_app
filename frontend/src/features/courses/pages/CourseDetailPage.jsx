@@ -88,7 +88,7 @@ function CourseDetailPage() {
         <div className="course-detail-actions">
           {enrolled ? (
             <Link to="/learning" className="btn-primary">
-              Continue learning →
+              Go to learning →
             </Link>
           ) : (
             <button

@@ -5,6 +5,7 @@ from .courses import (
     EnrollCourseView,
     MyCoursesListView,
 )
+from .learning import LearningCourseDetailView
 
 __all__ = [
     "RegisterView",
@@ -13,4 +14,5 @@ __all__ = [
     "CourseDetailView",
     "EnrollCourseView",
     "MyCoursesListView",
+    "LearningCourseDetailView",
 ]

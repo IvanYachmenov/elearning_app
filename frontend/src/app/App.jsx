@@ -5,14 +5,23 @@ import '../styles/index.css';
 
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
+
 import HomePage from '../features/home/pages/HomePage';
 import ProfilePage from '../features/profile/pages/ProfilePage';
+import SettingsPage from '../features/settings/pages/SettingsPage';
+import ShopPage from '../features/shop/pages/ShopPage';
+
+import CreditsPage from '../features/credits/pages/CreditsPage';
+
 import CoursesPage from '../features/courses/pages/CoursesPage';
 import CourseDetailPage from '../features/courses/pages/CourseDetailPage';
+
 import LearningPage from '../features/learning/pages/LearningPage';
-import ShopPage from '../features/shop/pages/ShopPage';
-import SettingsPage from '../features/settings/pages/SettingsPage';
+import CourseLearningPage from '../features/learning/pages/CourseLearningPage';
+
 import MainLayout from '../shared/components/MainLayout';
+
+
 import { api, setAuthToken } from '../api/client';
 
 function App() {
@@ -105,8 +114,10 @@ function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           <Route path="/learning" element={<LearningPage />} />
+          <Route path="/learning/courses/:id" element={<CourseLearningPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/credits" element={<CreditsPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

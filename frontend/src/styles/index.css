@@ -21,6 +21,8 @@
   --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.14);
   --shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.16);
 
+--header-gradient: linear-gradient(90deg, #7c3aed, #8b5cf6);
+
   --transition-speed: 0.2s;
 }
 

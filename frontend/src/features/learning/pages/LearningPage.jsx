@@ -59,7 +59,7 @@ function LearningPage() {
                 </p>
               )}
               <div className="course-card__footer">
-                <Link to={`/courses/${course.id}`} className="btn-primary">
+                <Link to={`/learning/courses/${course.id}`} className="btn-primary">
                   Continue learning →
                 </Link>
               </div>

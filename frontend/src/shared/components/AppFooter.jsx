@@ -2,31 +2,25 @@ function AppFooter() {
   return (
     <footer
       style={{
-        padding: "16px 24px",
-        fontSize: "12px",
-        color: "var(--text-muted)",
-        textAlign: "center",
+        padding: '16px 24px',
+        fontSize: '12px',
+        color: 'var(--text-muted)',
+        textAlign: 'center',
       }}
     >
-      Icons:{" "}
+      Icons by{' '}
       <a
-        href="https://www.flaticon.com/free-icons/menu"
-        title="menu icons"
+        href="https://www.flaticon.com/"
         target="_blank"
         rel="noreferrer"
       >
-        Menu icon by Febrian Hidayat
-      </a>{" "}
-      and{" "}
-      <a
-        href="https://www.flaticon.com/free-icons/close"
-        title="close icons"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Close icon by Pixel perfect
-      </a>{" "}
-      from Flaticon.
+        Flaticon
+      </a>
+      {' '}· See full credits on the{' '}
+      <a href="/credits">
+        Credits page
+      </a>
+      .
     </footer>
   );
 }

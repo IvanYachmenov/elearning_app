@@ -5,12 +5,22 @@ from .course import (
     CourseListSerializer,
     CourseDetailSerializer,
 )
+from .learning import (
+    LearningTopicSerializer,
+    LearningModuleSerializer,
+    LearningCourseSerializer,
+)
 
 __all__ = [
     "UserSerializer",
     "RegisterSerializer",
+
     "TopicSerializer",
     "ModuleSerializer",
     "CourseListSerializer",
     "CourseDetailSerializer",
+
+    "LearningTopicSerializer",
+    "LearningModuleSerializer",
+    "LearningCourseSerializer",
 ]

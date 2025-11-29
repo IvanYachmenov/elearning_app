@@ -21,6 +21,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core.views import CourseDetailView, CourseListView, EnrollCourseView
 from core.views.auth import RegisterView, MeView
 from core.views.courses import MyCoursesListView
+from core.views.learning import LearningCourseDetailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +37,8 @@ urlpatterns = [
     path("api/courses/<int:pk>/", CourseDetailView.as_view(), name="course-detail"),
     path("api/courses/<int:pk>/enroll/", EnrollCourseView.as_view(), name="course-enroll"),
     path("api/my-courses/", MyCoursesListView.as_view(), name="my-courses"),
+
+    # learning
+    path("api/learning/courses/<int:pk>/", LearningCourseDetailView.as_view(), name="learning-course-detail"),
+
 ]

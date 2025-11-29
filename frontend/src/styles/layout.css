@@ -4,8 +4,14 @@
   flex-direction: column;
 }
 
+.profile-dropdown__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .app-header {
-  background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+  background: var(--header-gradient);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
   position: sticky;
@@ -50,44 +56,21 @@
   transition: all var(--transition-speed);
 }
 
-.app-nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+.app-nav-link:hover:not(.app-nav-link--active) {
+  background-color: #000;
   color: #ffffff;
 }
 
 .app-nav-link--active {
-  background-color: #7c3aed;
+  background-color: #fff;
   color: #111827;
 }
 
-.app-mobile-toggle {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background-color: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #ffffff;
-  cursor: pointer;
-  padding: 0;
-  transition: background-color var(--transition-speed),
-    transform var(--transition-speed),
-    box-shadow var(--transition-speed);
+.app-nav-link--active:hover {
+  background-color: #fff;
+  color: #111827;
 }
 
-.app-mobile-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.35);
-}
-
-.app-mobile-toggle__icon {
-  width: 22px;
-  height: 22px;
-  display: block;
-}
 
 .app-header__right {
   position: relative;
@@ -141,9 +124,19 @@
   border-radius: 12px;
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-lg);
-  min-width: 200px;
+  min-width: 220px;
   overflow: hidden;
   animation: dropdownFadeIn 0.18s ease-out;
+}
+
+.profile-dropdown__nav {
+  display: none;
+}
+
+.profile-dropdown__divider {
+  height: 1px;
+  margin: 4px 0;
+  background-color: var(--border-light);
 }
 
 @keyframes dropdownFadeIn {
@@ -204,31 +197,7 @@
     display: none;
   }
 
-  .app-nav.app-nav--mobile {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(180deg, #7c3aed, #6d28d9);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
-    padding: 8px 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    animation: dropdownFadeIn 0.2s ease-out;
-    z-index: 90;
-  }
-
-  .app-nav.app-nav--mobile .app-nav-link {
-    width: 100%;
-  }
-
-  .app-mobile-toggle {
-    display: flex;
-  }
-
-  .app-main {
-    padding-top: 8px;
+  .profile-dropdown__nav {
+    display: block;
   }
 }
