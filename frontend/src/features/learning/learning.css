@@ -391,6 +391,37 @@
     margin-top: 8px;
 }
 
+.topic-practice__completed-block {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.topic-practice__history-btn {
+    margin-top: 4px;
+}
+
+.topic-practice__history {
+    margin-top: 16px;
+}
+
+.topic-practice__history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.topic-practice__question-card--readonly .topic-practice__option-button {
+    cursor: default;
+}
+
+.topic-practice__question-card--readonly .topic-practice__option-button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 .topic-practice__controls {
     margin-top: 8px;
     margin-bottom: 12px;
@@ -455,6 +486,23 @@
 }
 
 .topic-practice__option-button {
+    width: 100%;
+    text-align: left;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    padding: 8px 10px;
+    background-color: rgba(148, 163, 184, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed),
+    border-color var(--transition-speed),
+    transform var(--transition-speed),
+    box-shadow var(--transition-speed);
+}
+
+.topic-practice__option-button_history{
     width: 100%;
     text-align: left;
     border-radius: 10px;

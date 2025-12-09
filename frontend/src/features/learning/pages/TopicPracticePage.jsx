@@ -23,6 +23,12 @@ function TopicPracticePage() {
     const [answeredCount, setAnsweredCount] = useState(0);
     const [totalQuestions, setTotalQuestions] = useState(0);
 
+    // review mode
+    const [isReviewMode, setIsReviewMode] = useState(false);
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [historyError, setHistoryError] = useState(null);
+    const [historyQuestions, setHistoryQuestions] = useState([]);
+
     // load topic meta data
     useEffect(() => {
         setLoadingTopic(true);
@@ -68,6 +74,14 @@ function TopicPracticePage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadingTopic, error, topic, totalQuestions, practiceCompleted]);
+
+    // load history when toggling review mode
+    useEffect(() => {
+        if (isReviewMode) {
+            fetchPracticeHistory();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isReviewMode, topicId]);
 
     const handleBackToTheory = () => {
         if (courseId) {
@@ -135,6 +149,29 @@ function TopicPracticePage() {
                 });
             })
             .finally(() => setPracticeLoading(false));
+    };
+
+    const fetchPracticeHistory = () => {
+        if (!topicId) return;
+
+        setHistoryLoading(true);
+        setHistoryError(null);
+
+        api
+            .get(`/api/learning/topics/${topicId}/history/`)
+            .then((resp) => {
+                const data = resp.data;
+                setHistoryQuestions(data.questions || []);
+            })
+            .catch((err) => {
+                console.error(err);
+                if (err.response && err.response.status === 400) {
+                    setHistoryError('History is available only after you finish this topic.');
+                } else {
+                    setHistoryError('Failed to load test history.');
+                }
+            })
+            .finally(() => setHistoryLoading(false));
     };
 
     const handleOptionToggle = (optionId) => {
@@ -291,13 +328,132 @@ function TopicPracticePage() {
                             <p className="topic-practice__empty">Loading question...</p>
                         )}
 
-                        {practiceCompleted && !practiceQuestion && !practiceLoading && (
-                            <p className="topic-practice__completed">
-                                You have completed all questions for this topic.
-                            </p>
+                        {practiceCompleted &&
+                            !practiceQuestion &&
+                            !practiceLoading &&
+                            !isReviewMode && (
+                                <div className="topic-practice__completed-block">
+                                    <p className="topic-practice__completed">
+                                        You have completed all questions for this topic.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        className="topic-practice__primary-btn topic-practice__history-btn"
+                                        onClick={() => setIsReviewMode(true)}
+                                    >
+                                        View test history
+                                    </button>
+                                </div>
+                            )}
+
+                        {practiceCompleted && isReviewMode && (
+                            <section className="topic-practice__history">
+                                {historyLoading && (
+                                    <p className="topic-practice__empty">
+                                        Loading test history...
+                                    </p>
+                                )}
+
+                                {historyError && (
+                                    <p style={{color: '#dc2626', marginTop: '8px'}}>
+                                        {historyError}
+                                    </p>
+                                )}
+
+                                {!historyLoading &&
+                                    !historyError &&
+                                    historyQuestions.length === 0 && (
+                                        <p className="topic-practice__empty">
+                                            No answered questions to display.
+                                        </p>
+                                    )}
+
+                                {!historyLoading &&
+                                    !historyError &&
+                                    historyQuestions.length > 0 && (
+                                        <div className="topic-practice__history-list">
+                                            {historyQuestions.map((q, index) => (
+                                                <div
+                                                    key={q.id}
+                                                    className="topic-practice__question-card topic-practice__question-card--readonly"
+                                                >
+                                                    <div className="topic-practice__question-meta">
+                                                        <span className="topic-practice__question-index">
+                                                            Question {index + 1} of{' '}
+                                                            {historyQuestions.length}
+                                                        </span>
+                                                        <span className="topic-practice__type">
+                                                            {q.question_type === 'single_choice'
+                                                                ? 'Single choice'
+                                                                : q.question_type ===
+                                                                'multiple_choice'
+                                                                    ? 'Multiple choice'
+                                                                    : 'Code'}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="topic-practice__question-text">
+                                                        {q.text}
+                                                    </div>
+
+                                                    <ul className="topic-practice__options">
+                                                        {q.options.map((opt) => {
+                                                            const selected =
+                                                                q.user_option_ids &&
+                                                                q.user_option_ids.includes(
+                                                                    opt.id,
+                                                                );
+                                                            return (
+                                                                <li key={opt.id}>
+                                                                    <button
+                                                                        type="button"
+                                                                        className={
+                                                                            'topic-practice__option-button_history' +
+                                                                            (selected
+                                                                                ? ' topic-practice__option-button--selected'
+                                                                                : '')
+                                                                        }
+                                                                        disabled
+                                                                    >
+                                                                        <span
+                                                                            className="topic-practice__option-indicator">
+                                                                            {selected
+                                                                                ? '●'
+                                                                                : '○'}
+                                                                        </span>
+                                                                        <span
+                                                                            className="topic-practice__option-text">
+                                                                            {opt.text}
+                                                                        </span>
+                                                                    </button>
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+
+                                                    {typeof q.is_correct === 'boolean' && (
+                                                        <div
+                                                            className={
+                                                                'topic-practice__feedback' +
+                                                                (q.is_correct
+                                                                    ? ' topic-practice__feedback--success'
+                                                                    : ' topic-practice__feedback--fail')
+                                                            }
+                                                            style={{marginTop: '8px'}}
+                                                        >
+                                                            {q.is_correct
+                                                                ? 'You answered this question correctly.'
+                                                                : 'You answered this question incorrectly.'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                            </section>
                         )}
 
-                        {practiceQuestion && (
+                        {!practiceCompleted && practiceQuestion && (
                             <div className="topic-practice__question-card">
                                 <div className="topic-practice__question-meta">
                                     <span/>
@@ -356,7 +512,6 @@ function TopicPracticePage() {
                                             }
                                         >
                                             {answerFeedback.message}
-
                                         </div>
                                     )}
 

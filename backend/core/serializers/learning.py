@@ -163,3 +163,36 @@ class TopicQuestionAnswerSubmitSerializer(serializers.Serializer):
         child=serializers.IntegerField(),
         allow_empty=False,
     )
+
+
+class TopicPracticeHistoryQuestionSerializer(TopicPracticeQuestionSerializer):
+    """
+    Question + options + id of option(s), selected by this user
+    """
+    user_option_ids = serializers.SerializerMethodField()
+    is_correct = serializers.SerializerMethodField()
+
+    class Meta(TopicPracticeQuestionSerializer.Meta):
+        fields = TopicPracticeQuestionSerializer.Meta.fields + ("user_option_ids", "is_correct", )
+
+    def get_user_option_ids(self, obj):
+        """
+        get a map from context and catch id of chosen variants
+        """
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        if not answer:
+            return []
+        return list(
+            answer.selected_options.values_list("id", flat=True)
+        )
+
+    def get_is_correct(self, obj):
+        """
+        Return is_correct for the question
+        """
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        if not answer:
+            return None
+        return answer.is_correct
