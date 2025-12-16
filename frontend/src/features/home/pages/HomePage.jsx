@@ -4,30 +4,28 @@ function HomePage({user}) {
     return (
         <div className="page page-enter">
             <div className="home-welcome">
-                <h1 className="page__title">Welcome back, {user.username}! 👋</h1>
+                <h1 className="page__title">Welcome back, {user.username}!</h1>
                 <p className="page__subtitle">
-                    Your personal learning platform for mastering programming and beyond.
+                    Your personal learning platform for mastering programming.
                 </p>
             </div>
 
             <section className="home-section">
                 <h2 className="home-section__title">
-                    <span className="home-section__icon">✨</span>
-                    What&apos;s E-Learning Platform?
+                    What's E-Learning Platform?
                 </h2>
                 <p className="home-section__text">
                     This is a modern, focused e-learning platform designed to help you connect
                     theory and practice for programming languages like Python and many other topics.
                 </p>
                 <p className="home-section__text">
-                    Instead of just watching long video courses, you&apos;ll read concise lessons and
+                    Instead of just watching long video courses, you'll read concise lessons and
                     immediately apply concepts through quizzes and coding tasks directly in the browser.
                 </p>
             </section>
 
             <section className="home-section">
                 <h2 className="home-section__title">
-                    <span className="home-section__icon">💻</span>
                     Interactive Learning Experience
                 </h2>
                 <p className="home-section__text">
@@ -41,7 +39,6 @@ function HomePage({user}) {
 
             <section className="home-section">
                 <h2 className="home-section__title">
-                    <span className="home-section__icon">🎓</span>
                     For Teachers &amp; Content Creators
                 </h2>
                 <p className="home-section__text">
