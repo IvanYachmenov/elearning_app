@@ -11,6 +11,8 @@ function PracticeQuestionCard({
     isAnswerLocked,
     disableSubmit,
     showNextButton,
+    showTimedNextButton,
+    timedAnswerSaved,
 }) {
     const renderFeedback = () => {
         if (!answerFeedback || isTimedMode) return null;
@@ -77,7 +79,11 @@ function PracticeQuestionCard({
 
             <div className="topic-practice__actions">
                 {renderFeedback()}
-
+                {isTimedMode && timedAnswerSaved && (
+                    <div className="topic-practice__feedback topic-practice__feedback--neutral">
+                        Answer accepted!
+                    </div>
+                )}
                 <div className="topic-practice__buttons-row">
                     {!isTimedMode && (!answerFeedback || answerFeedback.type !== 'success') && (
                         <button
@@ -94,18 +100,29 @@ function PracticeQuestionCard({
                         </button>
                     )}
 
-                    {isTimedMode && (
+                    {isTimedMode && !timedAnswerSaved && (
                         <button
                             type="button"
                             className="topic-practice__secondary-btn"
-                            onClick={onContinue}
+                            onClick={onSubmit}
                             disabled={submitLoading || practiceLoading}
                         >
-                            {submitLoading ? 'Saving...' : 'Continue'}
+                            {submitLoading ? 'Saving...' : 'Submit answer'}
                         </button>
                     )}
 
                     {showNextButton && !isTimedMode && (
+                        <button
+                            type="button"
+                            className="topic-practice__secondary-btn"
+                            onClick={onContinue}
+                            disabled={practiceLoading}
+                        >
+                            Next question
+                        </button>
+                    )}
+
+                    {showTimedNextButton && (
                         <button
                             type="button"
                             className="topic-practice__secondary-btn"

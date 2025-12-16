@@ -44,6 +44,8 @@ function TopicPracticePage() {
     const [historyError, setHistoryError] = useState(null);
     const [historyQuestions, setHistoryQuestions] = useState([]);
 
+    const [timedAnswerSaved, setTimedAnswerSaved] = useState(false);
+
     const timerExpiredRef = useRef(false);
 
     // load topic meta data
@@ -89,10 +91,12 @@ function TopicPracticePage() {
             .finally(() => setLoadingTopic(false));
     }, [topicId]);
 
-    const applyPracticePayload = useCallback((data) => {
-        setAnsweredCount(data.answered_questions ?? 0);
-        setCorrectAnswers(data.correct_answers ?? data.answered_questions ?? 0);
-        setTotalQuestions(data.total_questions ?? 0);
+    const applyPracticePayload = useCallback((data, options = {}) => {
+        const {preserveQuestion = false} = options;
+
+        setAnsweredCount((prev) => data.answered_questions ?? prev ?? 0);
+        setCorrectAnswers((prev) => data.correct_answers ?? data.answered_questions ?? prev ?? 0);
+        setTotalQuestions((prev) => data.total_questions ?? prev ?? 0);
 
         if (typeof data.progress_percent === 'number') {
             setTopicProgressPercent(data.progress_percent);
@@ -125,10 +129,11 @@ function TopicPracticePage() {
             setPracticeQuestion(null);
             setSelectedOptions([]);
             setAnswerFeedback(null);
+            setTimedAnswerSaved(false);
             return;
         }
 
-        setPracticeQuestion(data.question || null);
+        setPracticeQuestion((prev) => data.question || (preserveQuestion ? prev : null));
 
         // Only show feedback in non-timed mode
         if (data.last_answer && !timed) {
@@ -139,8 +144,9 @@ function TopicPracticePage() {
                 score: data.last_answer.score,
             });
         } else {
-            setSelectedOptions([]);
+            setSelectedOptions((prev) => (timed && preserveQuestion ? prev : []));
             setAnswerFeedback(null);
+            setTimedAnswerSaved(false);
         }
     }, []);
 
@@ -148,6 +154,7 @@ function TopicPracticePage() {
         if (!topicId) return;
 
         setPracticeLoading(true);
+        setTimedAnswerSaved(false);
 
         api
             .get(`/api/learning/topics/${topicId}/next-question/`)
@@ -257,6 +264,7 @@ function TopicPracticePage() {
 
     const handleOptionToggle = (optionId) => {
         if (!practiceQuestion) return;
+         if (isTimedMode && timedAnswerSaved) return;
 
         const locked = !!answerFeedback && answerFeedback.type === 'success' && !isTimedMode;
         if (locked) return;
@@ -282,19 +290,22 @@ function TopicPracticePage() {
             .then((resp) => {
                 const data = resp.data;
 
-                applyPracticePayload({
-                    ...data,
-                    completed: data.test_completed,
-                    question: null,
-                });
+                applyPracticePayload(
+                    {
+                        ...data,
+                        completed: data.test_completed,
+                    },
+                    {preserveQuestion: !data.test_completed && !data.timed_out},
+                );
 
                 if (data.test_completed || data.timed_out) {
                     setPracticeCompleted(true);
                     setTimedOut(Boolean(data.timed_out));
                     setPassed(Boolean(data.passed));
                     setPracticeQuestion(null);
+                    setTimedAnswerSaved(false);
                 } else {
-                    fetchNextQuestion();
+                    setTimedAnswerSaved(true);
                 }
             })
             .catch((err) => {
@@ -306,7 +317,6 @@ function TopicPracticePage() {
             })
             .finally(() => {
                 setSubmitLoading(false);
-                setSelectedOptions([]);
             });
     };
 
@@ -369,10 +379,10 @@ function TopicPracticePage() {
 
     const handleContinue = () => {
         if (isTimedMode) {
-            handleContinueTimed();
-        } else {
             fetchNextQuestion();
+            return;
         }
+        fetchNextQuestion();
     };
 
     const handleRetry = () => {
@@ -404,13 +414,15 @@ function TopicPracticePage() {
     };
 
     const canPractice = useMemo(() => totalQuestions > 0, [totalQuestions]);
-    const isAnswerLocked = !!answerFeedback && answerFeedback.type === 'success' && !isTimedMode;
+    const isAnswerLocked =
+        (!!answerFeedback && answerFeedback.type === 'success' && !isTimedMode) ||
+        (isTimedMode && timedAnswerSaved);
     const showNextButton =
         !isTimedMode &&
         !!answerFeedback &&
         answerFeedback.type === 'success' &&
         answeredCount <= totalQuestions;
-
+    const showTimedNextButton = isTimedMode && timedAnswerSaved;
     if (loadingTopic && !topic) {
         return <div className="page page-enter"/>;
     }
@@ -455,9 +467,6 @@ function TopicPracticePage() {
                         <div className="topic-practice__progress-info">
                             <span>
                                 {answeredCount}/{totalQuestions} questions
-                            </span>
-                            <span className="topic-practice__percent">
-                                ({Math.round(topicProgressPercent)}%)
                             </span>
                         </div>
                         <div className="learning-progress-bar">
@@ -526,9 +535,11 @@ function TopicPracticePage() {
                                 practiceLoading={practiceLoading}
                                 isTimedMode={isTimedMode}
                                 isAnswerLocked={isAnswerLocked}
+                                timedAnswerSaved={timedAnswerSaved}
                                 // important: in timed mode Continue must NOT be blocked by empty selection
                                 disableSubmit={!isTimedMode && selectedOptions.length === 0}
                                 showNextButton={showNextButton}
+                                showTimedNextButton={showTimedNextButton}
                             />
                         )}
                     </>

@@ -9,24 +9,17 @@ function formatTime(seconds) {
 function PracticeTimer({remainingSeconds, timeLimitSeconds, isActive, timedOut}) {
     const limit = timeLimitSeconds || 0;
     const remaining = remainingSeconds ?? limit;
-    const percent = limit > 0 ? Math.max(0, Math.min(100, (remaining / limit) * 100)) : 0;
+    let tone = 'practice-timer--safe';
+
+    if (timedOut) {
+        tone = 'practice-timer--danger';
+    } else if (limit > 0 && remaining <= 15 && isActive) {
+        tone = 'practice-timer--warning';
+    }
 
     return (
-        <div className="practice-timer" aria-live="polite">
-            <div
-                className="practice-timer__ring"
-                style={{
-                    background: `conic-gradient(var(--accent-blue) ${percent}%, #e5e7eb ${percent}% 100%)`,
-                }}
-            >
-                <div className="practice-timer__inner">
-                    <div className="practice-timer__label">Time left</div>
-                    <div className="practice-timer__value">{formatTime(remaining)}</div>
-                    <div className={`practice-timer__status${timedOut ? ' practice-timer__status--danger' : ''}`}>
-                        {timedOut ? 'Time is up' : isActive ? 'Counting down' : 'Paused'}
-                    </div>
-                </div>
-            </div>
+        <div className={`practice-timer ${tone}`} aria-live="polite">
+            <span className="practice-timer__value">{formatTime(remaining)}</span>
         </div>
     );
 }
