@@ -135,3 +135,10 @@ All endpoints are prefixed with `/api/`. Authenticated routes expect a JWT acces
 - Progress endpoints surface `progress_percent`, `score_percent`, and per-question correctness to drive the frontend UI.
 
 > Tip: enable CORS for your frontend origin in `backend/elearn_backend/settings.py` when testing from a different host.
+
+### Future plans
+>This platform is currently in development and will be expanded soon with the addition of:
+>	1.	`User discussions` under each theoretical question.
+>	2.	To `integrate an online Python interpreter` and the ability to answer not only single/multiple-choice questions, but also practice writing code in Python.
+>	3.	Adding small features such as an `in-app shop`, `settings`, a `profile`, and other minor details.
+>	4.	Adding animations, photos, and interactive components. The uniqueness of the app (although it’s almost achieved already) may include custom images.
