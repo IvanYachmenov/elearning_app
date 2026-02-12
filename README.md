@@ -169,9 +169,51 @@ The system features a responsive design that works on desktop and mobile devices
 
 ## Using the Application
 
-The application flow is: **Start page** (landing) → **Login** → then the rest of the app (courses, learning, profile, etc.). New users go from the start page to login (or sign up), then to the main content.
+The application flow is: **Start page** (landing) → **Login** → then the rest of the app (courses, learning, profile, etc.). Below is the flow in the order of screens.
 
-### Creating Courses
+### Application flow (screens in order)
+
+1. **Start page** — landing; from here you go to Login or Sign up.
+
+![Start page](screenshots/start_page.png)
+
+2. **Login** — sign in with Google, GitHub, or email/password.
+
+![Login page](screenshots/login_page.png)
+
+3. **Courses catalog** — browse all available courses with search and filters.
+
+![Courses list](screenshots/courses_page1.png)
+
+4. **Course detail** — view description, modules, topics, and enroll button.
+
+![Course detail](screenshots/courses_page2.png)
+
+From here you can enroll in a course, go to Learning, take tests, and use the rest of the app.
+
+### Student Workflow (after login)
+
+5. **Enroll in course**: Click "Enroll" on a course detail page to add it to your learning dashboard.
+
+6. **Learning** — open the Learning section, select a course, and see your progress. Click a topic to read theory or start practice.
+
+![Learning page after enrollment](screenshots/learning_page1.png)
+
+![Theory page](screenshots/theory_page.png)
+
+7. **Practice** — for each topic you can choose **Test** (untimed) or **Time test** (timed), then answer questions.
+
+![Timed test option](screenshots/time_test.png)
+
+8. **Results** — after completing a test, see your score, pass/fail status, and answer breakdown.
+
+![Results page](screenshots/results_page.png)
+
+9. **Test history** — review previous attempts and selected answers.
+
+![Test history](screenshots/test_history_page.png)
+
+### Creating Courses (Teacher's Cabinet)
 
 There are two ways to create courses:
 
@@ -212,36 +254,6 @@ There are two ways to create courses:
 
 ![Course edit page](screenshots/course_edit_page3.png)
 
-### Student Workflow
-
-1. **Browse Courses**: Visit the Courses page to see all available courses with search and filter options.
-
-![Courses list](screenshots/courses_page1.png)
-
-2. **View Course Details**: Click on any course to see its description, modules, topics, and enroll button. Course cover images are displayed prominently.
-
-![Course detail](screenshots/courses_page2.png)
-
-3. **Enroll in Course**: Click "Enroll" on a course detail page to add it to your learning dashboard.
-
-4. **Take Practice Test**: Navigate to the Learning section, select a course, and click on any topic to start answering questions. You can choose **Test** (untimed) or **Time test** (timed) if the topic supports both.
-
-![Learning page after enrollment](screenshots/learning_page1.png)
-
-![Timed test option](screenshots/time_test_option.png)
-
-6. **View Results**: After completing a test, see your score, pass/fail status, and detailed answer breakdown.
-
-![Results page](screenshots/results_page.png)
-
-7. **Review History**: Access your test history to review previous attempts and see which answers you selected.
-
-![Test history](screenshots/test_history_page.png)
-
-8. **Track Progress**: Monitor your learning progress with visual indicators showing which topics are completed, in progress, or failed.
-
-![Theory page](screenshots/theory_page.png)
-
 ### Additional Features
 
 - **Profile Customization**: Upload an avatar and choose from various background gradients for your profile page
@@ -251,10 +263,6 @@ There are two ways to create courses:
 - **Credits Page**: Dedicated page showing all technologies, libraries, and resources used
 
 ![Navigation links](screenshots/nav.png)
-
-![Login page](screenshots/login_page.png)
-
-![Register page](screenshots/register_page.png)
 
 ![Profile page](screenshots/profile_page.png)
 
