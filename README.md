@@ -17,7 +17,7 @@ The system features a responsive design that works on desktop and mobile devices
 - Public course catalog with search and filtering capabilities
 - Course enrollment system with JWT authentication (cookies-based)
 - Structured learning path: theory content followed by practice quizzes
-- Two types of practice tests: timed and untimed
+- Two types of practice tests: **Test** (untimed) and **Time test** (timed)
 - Progress tracking showing completion status and scores for each topic
 - Test history with detailed view of all previous attempts
 - Single-choice and multiple-choice question types
@@ -169,6 +169,8 @@ The system features a responsive design that works on desktop and mobile devices
 
 ## Using the Application
 
+The application flow is: **Start page** (landing) → **Login** → then the rest of the app (courses, learning, profile, etc.). New users go from the start page to login (or sign up), then to the main content.
+
 ### Creating Courses
 
 There are two ways to create courses:
@@ -208,6 +210,8 @@ There are two ways to create courses:
 
 ![Course edit with modules](screenshots/course_edit_page2.png)
 
+![Course edit page](screenshots/course_edit_page3.png)
+
 ### Student Workflow
 
 1. **Browse Courses**: Visit the Courses page to see all available courses with search and filter options.
@@ -220,9 +224,9 @@ There are two ways to create courses:
 
 3. **Enroll in Course**: Click "Enroll" on a course detail page to add it to your learning dashboard.
 
-4. **Take Practice Test**: Navigate to the Learning section, select a course, and click on any topic to start answering questions. You can choose between timed and untimed modes if the topic supports both.
+4. **Take Practice Test**: Navigate to the Learning section, select a course, and click on any topic to start answering questions. You can choose **Test** (untimed) or **Time test** (timed) if the topic supports both.
 
-![Learning page after enrollment](screenshots/learning_page1_after.png)
+![Learning page after enrollment](screenshots/learning_page1.png)
 
 ![Timed test option](screenshots/time_test_option.png)
 
@@ -236,7 +240,7 @@ There are two ways to create courses:
 
 8. **Track Progress**: Monitor your learning progress with visual indicators showing which topics are completed, in progress, or failed.
 
-![Learning progress](screenshots/learning_page2.png)
+![Theory page](screenshots/theory_page.png)
 
 ### Additional Features
 
@@ -246,7 +250,7 @@ There are two ways to create courses:
 - **Mobile Responsive**: The application adapts to different screen sizes
 - **Credits Page**: Dedicated page showing all technologies, libraries, and resources used
 
-![Mobile view](screenshots/mobile_devices.png)
+![Navigation links](screenshots/nav.png)
 
 ![Login page](screenshots/login_page.png)
 

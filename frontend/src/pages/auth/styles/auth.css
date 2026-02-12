@@ -449,6 +449,10 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+[data-theme="light"] .auth-theme-btn:hover {
+  background: rgba(11, 11, 13, 0.05);
+}
+
 .auth-theme-btn img {
   width: 24px;
   height: 24px;
