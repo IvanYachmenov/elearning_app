@@ -39,6 +39,7 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 
+screenshots/*.mp4
 
 #-----------------------------
 #--FRONTEND(Vite/React)-------

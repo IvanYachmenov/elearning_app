@@ -232,10 +232,9 @@ SOCIALACCOUNT_PROVIDERS = {
     
 }
 
-# Allauth Account Settings
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+# Allauth Account Settings (new names to avoid deprecation warnings)
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # We'll handle email verification separately
 ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'  # Custom adapter for user creation
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'  # Custom adapter for social accounts

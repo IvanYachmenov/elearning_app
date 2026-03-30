@@ -1,6 +1,7 @@
-import axios from "axios";
+﻿import axios from 'axios';
 
-export const API_URL = "http://127.0.0.1:8000";
+const DEFAULT_API_URL = 'http://127.0.0.1:8000';
+export const API_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/+$/, '');
 
 export const api = axios.create({
     baseURL: API_URL,
@@ -8,8 +9,8 @@ export const api = axios.create({
 
 export function setAuthToken(token) {
     if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        api.defaults.headers.common.Authorization = `Bearer ${token}`;
     } else {
-        delete api.defaults.headers.common["Authorization"];
+        delete api.defaults.headers.common.Authorization;
     }
 }

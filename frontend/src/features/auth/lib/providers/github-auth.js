@@ -1,5 +1,5 @@
-// GitHub OAuth integration - server-side redirect flow
-import {API_URL} from '../api';
+﻿// GitHub OAuth integration - server-side redirect flow
+import {API_URL} from '../../../../shared/api';
 
 // Initiate GitHub OAuth login by redirecting to backend
 export function initiateGitHubLogin(nextPath = '/home') {

@@ -1,9 +1,14 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+﻿import {useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {api, API_URL, setAuthToken} from '../../../../shared/api';
-import {setCookie} from '../../../../shared/lib/cookies';
-import {initializeGoogleSignIn} from '../../../../shared/lib/google-auth';
+import {api} from '../../../../shared/api';
+import {
+    applyAuthSession,
+    exchangeGoogleToken,
+    initializeGoogleSignIn,
+    initiateGitHubLogin,
+    triggerGoogleFedCmSignIn,
+} from '../../../../features/auth';
 import {useLanguage} from '../../../../shared/lib/i18n/LanguageContext';
 
 function SettingsAccountSection({user, onUserUpdate}) {
@@ -17,7 +22,7 @@ function SettingsAccountSection({user, onUserUpdate}) {
     const googleHiddenButtonRef = useRef(null);
 
     const createdAtLabel = useMemo(() => {
-        if (!user?.date_joined) return '—';
+        if (!user?.date_joined) return '-';
         try {
             return new Date(user.date_joined).toLocaleString();
         } catch {
@@ -30,7 +35,7 @@ function SettingsAccountSection({user, onUserUpdate}) {
         if (role === 'student') return t('pages.settings.roleStudent');
         if (role === 'teacher') return t('pages.settings.roleTeacher');
         if (role === 'admin') return t('pages.settings.roleAdmin');
-        return role ? String(role) : '—';
+        return role ? String(role) : '-';
     }, [user?.role, t]);
 
     const loadConnections = async () => {
@@ -49,7 +54,6 @@ function SettingsAccountSection({user, onUserUpdate}) {
 
     useEffect(() => {
         loadConnections();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleDisconnect = async (provider) => {
@@ -68,17 +72,38 @@ function SettingsAccountSection({user, onUserUpdate}) {
     };
 
     const handleConnectGitHub = () => {
-        // Goes through backend OAuth; then returns to /login?access=...&refresh=...&next=/settings
-        window.location.href = `${API_URL}/accounts/github/login/?next=/settings&select_account=1`;
+        initiateGitHubLogin('/settings');
+    };
+
+    const sendGoogleTokenToBackend = async (idToken) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const {access, refresh, user: userFromBackend} = await exchangeGoogleToken(idToken);
+            applyAuthSession(access, refresh);
+
+            if (onUserUpdate) {
+                onUserUpdate(userFromBackend);
+            }
+            await loadConnections();
+            navigate('/settings', {replace: true});
+        } catch (err) {
+            console.error('Google auth error:', err);
+            setError(err.response?.data?.detail || t('pages.auth.googleAuthFailed'));
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleGoogleCallback = async (response) => {
         if (response.credential) {
             await sendGoogleTokenToBackend(response.credential);
-        } else if (response.error) {
-            if (response.error !== 'popup_closed_by_user' && response.error !== 'popup_blocked') {
-                setError(t('pages.auth.googleAuthFailed'));
-            }
+            return;
+        }
+
+        if (response.error && response.error !== 'popup_closed_by_user' && response.error !== 'popup_blocked') {
+            setError(t('pages.auth.googleAuthFailed'));
         }
     };
 
@@ -95,72 +120,15 @@ function SettingsAccountSection({user, onUserUpdate}) {
             setIsLoading(true);
             await initializeGoogleSignIn(clientId, handleGoogleCallback);
 
-            if (window.google && window.google.accounts && window.google.accounts.id) {
-                let hiddenButtonContainer = googleHiddenButtonRef.current;
-                if (!hiddenButtonContainer) {
-                    hiddenButtonContainer = document.createElement('div');
-                    hiddenButtonContainer.style.position = 'fixed';
-                    hiddenButtonContainer.style.left = '-9999px';
-                    hiddenButtonContainer.style.opacity = '0';
-                    hiddenButtonContainer.style.pointerEvents = 'none';
-                    document.body.appendChild(hiddenButtonContainer);
-                    googleHiddenButtonRef.current = hiddenButtonContainer;
-                }
-
-                hiddenButtonContainer.innerHTML = '';
-                window.google.accounts.id.renderButton(hiddenButtonContainer, {
-                    type: 'standard',
-                    theme: 'outline',
-                    size: 'large',
-                    text: 'signin_with',
-                    width: 300,
-                    use_fedcm_for_button: true,
-                });
-
-                setTimeout(() => {
-                    const googleButton =
-                        hiddenButtonContainer.querySelector('[role="button"]') ||
-                        hiddenButtonContainer.querySelector('div[class*="SignInButton"]') ||
-                        hiddenButtonContainer.querySelector('button');
-                    if (googleButton) {
-                        googleButton.click();
-                    } else {
-                        setError('Failed to initialize Google Sign-In. Please try again.');
-                    }
-                }, 100);
-            } else {
-                setError('Google Sign-In failed to load. Please refresh the page.');
+            const didStart = await triggerGoogleFedCmSignIn(googleHiddenButtonRef);
+            if (!didStart) {
+                setError('Failed to initialize Google Sign-In. Please try again.');
             }
         } catch (err) {
             console.error('Google connect error:', err);
             if (err.name !== 'AbortError' && !err.message?.includes('aborted')) {
                 setError('Failed to initialize Google Sign-In. Please try again.');
             }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const sendGoogleTokenToBackend = async (idToken) => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const resp = await api.post('/api/auth/google/', {token: idToken});
-            const {access, refresh, user: userFromBackend} = resp.data;
-
-            setCookie('access', access, 365);
-            setCookie('refresh', refresh, 365);
-            setAuthToken(access);
-
-            if (onUserUpdate) {
-                onUserUpdate(userFromBackend);
-            }
-            await loadConnections();
-            navigate('/settings', {replace: true});
-        } catch (err) {
-            console.error('Google auth error:', err);
-            setError(err.response?.data?.detail || t('pages.auth.googleAuthFailed'));
         } finally {
             setIsLoading(false);
         }
@@ -189,11 +157,11 @@ function SettingsAccountSection({user, onUserUpdate}) {
                     </div>
                     <div className="settings-account__row">
                         <span className="settings-account__label">{t('pages.auth.username')}</span>
-                        <span className="settings-account__value">{user?.username || '—'}</span>
+                        <span className="settings-account__value">{user?.username || '-'}</span>
                     </div>
                     <div className="settings-account__row">
                         <span className="settings-account__label">{t('pages.auth.email')}</span>
-                        <span className="settings-account__value">{user?.email || '—'}</span>
+                        <span className="settings-account__value">{user?.email || '-'}</span>
                     </div>
                 </div>
 

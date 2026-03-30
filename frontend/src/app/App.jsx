@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+﻿import {useEffect, useState} from 'react';
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 
 import '../shared/styles/index.css';
@@ -27,8 +27,8 @@ import {
 import {MainLayout} from '../widgets/layout';
 
 import {api, setAuthToken} from '../shared/api';
-import {getCookie, deleteCookie} from '../shared/lib/cookies';
-import CookieConsent from '../shared/components/CookieConsent';
+import {getCookie, deleteCookie} from '../shared/lib/storage/cookies';
+import {CookieConsent} from '../features/cookie-consent';
 
 import {NavigationLockProvider} from '../shared/lib/navigation-lock';
 import {ThemeProvider} from '../shared/lib/theme/ThemeContext';
@@ -171,3 +171,5 @@ function App() {
 }
 
 export default App;
+
+

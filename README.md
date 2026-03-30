@@ -1,4 +1,4 @@
-# E-Learning Platform
+﻿# E-Learning Platform
 
 A full-stack web application for online education that allows students to enroll in courses, study structured theory content, and practice with both timed and untimed quizzes. The platform includes a teacher's cabinet where instructors can create, edit, and manage their courses. Built with Django REST Framework on the backend and React with Vite on the frontend.
 
@@ -158,8 +158,10 @@ The system features a responsive design that works on desktop and mobile devices
    ```
 
 3. Configure environment variables:
-   - Create `frontend/.env` file
-   - Add: `VITE_GOOGLE_CLIENT_ID=your-google-client-id`
+   - Copy `frontend/.env.example` to `frontend/.env`
+   - Set values:
+     - `VITE_API_URL=http://127.0.0.1:8000`
+     - `VITE_GOOGLE_CLIENT_ID=your-google-client-id`
 
 4. Start the development server:
    ```bash
@@ -169,23 +171,23 @@ The system features a responsive design that works on desktop and mobile devices
 
 ## Using the Application
 
-The application flow is: **Start page** (landing) → **Login** → then the rest of the app (courses, learning, profile, etc.). Below is the flow in the order of screens.
+The application flow is: **Start page** (landing) в†’ **Login** в†’ then the rest of the app (courses, learning, profile, etc.). Below is the flow in the order of screens.
 
 ### Application flow (screens in order)
 
-1. **Start page** — landing; from here you go to Login or Sign up.
+1. **Start page** вЂ” landing; from here you go to Login or Sign up.
 
 ![Start page](screenshots/start_page.png)
 
-2. **Login** — sign in with Google, GitHub, or email/password.
+2. **Login** вЂ” sign in with Google, GitHub, or email/password.
 
 ![Login page](screenshots/login_page.png)
 
-3. **Courses catalog** — browse all available courses with search and filters.
+3. **Courses catalog** вЂ” browse all available courses with search and filters.
 
 ![Courses list](screenshots/courses_page1.png)
 
-4. **Course detail** — view description, modules, topics, and enroll button.
+4. **Course detail** вЂ” view description, modules, topics, and enroll button.
 
 ![Course detail](screenshots/courses_page2.png)
 
@@ -195,21 +197,21 @@ From here you can enroll in a course, go to Learning, take tests, and use the re
 
 5. **Enroll in course**: Click "Enroll" on a course detail page to add it to your learning dashboard.
 
-6. **Learning** — open the Learning section, select a course, and see your progress. Click a topic to read theory or start practice.
+6. **Learning** вЂ” open the Learning section, select a course, and see your progress. Click a topic to read theory or start practice.
 
 ![Learning page after enrollment](screenshots/learning_page1.png)
 
 ![Theory page](screenshots/theory_page.png)
 
-7. **Practice** — for each topic you can choose **Test** (untimed) or **Time test** (timed), then answer questions.
+7. **Practice** вЂ” for each topic you can choose **Test** (untimed) or **Time test** (timed), then answer questions.
 
 ![Timed test option](screenshots/time_test.png)
 
-8. **Results** — after completing a test, see your score, pass/fail status, and answer breakdown.
+8. **Results** вЂ” after completing a test, see your score, pass/fail status, and answer breakdown.
 
 ![Results page](screenshots/results_page.png)
 
-9. **Test history** — review previous attempts and selected answers.
+9. **Test history** вЂ” review previous attempts and selected answers.
 
 ![Test history](screenshots/test_history_page.png)
 
@@ -406,54 +408,61 @@ Progress tracking includes:
 
 ```
 web_application_thesis/
-├── backend/
-│   ├── core/
-│   │   ├── models/
-│   │   │   ├── user.py          # User model with avatar and profile customization
-│   │   │   ├── course.py        # Course, Module models
-│   │   │   └── learning.py      # Topic, TopicQuestion models with timed test support
-│   │   ├── serializers/
-│   │   │   ├── user.py          # User serialization with avatar URLs
-│   │   │   ├── course.py        # Course serialization
-│   │   │   ├── learning.py      # Learning progress serialization
-│   │   │   └── teacher.py       # Teacher CRUD serializers
-│   │   ├── views/
-│   │   │   ├── auth.py          # Registration and profile endpoints
-│   │   │   ├── courses.py       # Public course endpoints
-│   │   │   ├── learning.py      # Learning and practice endpoints
-│   │   │   └── teacher.py       # Teacher CRUD endpoints
-│   │   ├── permissions.py       # IsTeacher permission class
-│   │   └── urls.py              # URL routing
-│   ├── elearn_backend/
-│   │   ├── settings.py          # Django settings including media configuration
-│   │   └── urls.py              # Root URL configuration
-│   ├── media/                   # Uploaded user avatars
-│   ├── manage.py
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   └── App.jsx          # Main app component with routing
-│   │   ├── pages/
-│   │   │   ├── auth/            # Login and registration pages
-│   │   │   ├── courses/         # Course catalog and detail pages
-│   │   │   ├── learning/        # Learning dashboard and practice pages
-│   │   │   ├── profile/         # User profile with customization
-│   │   │   ├── settings/        # Theme and language settings
-│   │   │   └── teacher/         # Teacher's cabinet pages
-│   │   ├── features/
-│   │   │   ├── courses/         # Course card component
-│   │   │   └── learning/        # Practice question and timer components
-│   │   ├── shared/
-│   │   │   ├── api/             # API client configuration
-│   │   │   ├── lib/             # Theme and language contexts
-│   │   │   └── styles/          # Global styles and theme variables
-│   │   └── widgets/
-│   │       └── layout/          # Main layout with navigation
-│   ├── public/
-│   └── package.json
-├── screenshots/                 # Application screenshots
-└── README.md
+|-- backend/
+|   |-- core/
+|   |   |-- models/
+|   |   |   |-- user.py          # User model with avatar and profile customization
+|   |   |   |-- course.py        # Course, Module models
+|   |   |   `-- learning.py      # Topic, TopicQuestion models with timed test support
+|   |   |-- serializers/
+|   |   |   |-- user.py          # User serialization with avatar URLs
+|   |   |   |-- course.py        # Course serialization
+|   |   |   |-- learning.py      # Learning progress serialization
+|   |   |   `-- teacher.py       # Teacher CRUD serializers
+|   |   |-- views/
+|   |   |   |-- auth.py          # Registration and profile endpoints
+|   |   |   |-- courses.py       # Public course endpoints
+|   |   |   |-- learning.py      # Learning and practice endpoints
+|   |   |   `-- teacher.py       # Teacher CRUD endpoints
+|   |   |-- permissions.py       # IsTeacher permission class
+|   |   `-- urls.py              # URL routing
+|   |-- elearn_backend/
+|   |   |-- settings.py          # Django settings including media configuration
+|   |   `-- urls.py              # Root URL configuration
+|   |-- media/                   # Uploaded media files
+|   |-- manage.py
+|   `-- requirements.txt
+|-- frontend/
+|   |-- src/
+|   |   |-- app/
+|   |   |   `-- App.jsx          # Main app component with routing
+|   |   |-- pages/
+|   |   |   |-- auth/            # Login and registration pages
+|   |   |   |-- courses/         # Course catalog and detail pages
+|   |   |   |-- learning/        # Learning dashboard and practice pages
+|   |   |   |-- profile/         # User profile with customization
+|   |   |   |-- settings/        # Theme and language settings
+|   |   |   `-- teacher/         # Teacher's cabinet pages
+|   |   |-- features/
+|   |   |   |-- auth/            # OAuth providers, auth session helpers, auth UI blocks
+|   |   |   |-- cookie-consent/  # Cookie consent feature
+|   |   |   |-- courses/         # Course card components
+|   |   |   `-- learning/        # Practice question and timer components
+|   |   |-- shared/
+|   |   |   |-- api/             # API client configuration
+|   |   |   |-- lib/
+|   |   |   |   |-- i18n/        # Language context
+|   |   |   |   |-- navigation-lock/
+|   |   |   |   |-- storage/     # Cookie storage helpers
+|   |   |   |   `-- theme/       # Theme context
+|   |   |   `-- styles/          # Global styles and theme variables
+|   |   `-- widgets/
+|   |       `-- layout/          # Main layout with navigation
+|   |-- public/
+|   |-- .env.example
+|   `-- package.json
+|-- screenshots/                 # Application screenshots
+`-- README.md
 ```
 
 ## Configuration
@@ -466,7 +475,11 @@ web_application_thesis/
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
 
 **Frontend (`frontend/.env`):**
+- `VITE_API_URL` - Backend base URL (default in this project: `http://127.0.0.1:8000`)
 - `VITE_GOOGLE_CLIENT_ID` - Google OAuth Client ID (same as backend)
+
+**Frontend template (`frontend/.env.example`):**
+- Contains non-secret placeholder values for quick onboarding
 
 **Important:** Never commit `.env` files to Git. They are already in `.gitignore`.
 
@@ -493,14 +506,13 @@ web_application_thesis/
 
 ## Next Steps After Setup
 
-1. Create `.env` files for backend and frontend (see Configuration section)
+1. Create `.env` files for backend and frontend (copy from `.env.example` where available)
 2. Configure Google OAuth in Google Cloud Console
 3. Run migrations: `python manage.py migrate`
 4. Start backend: `python manage.py runserver`
 5. Start frontend: `npm run dev`
 6. Test authentication: Register, Login, Google OAuth
 
-See `explaining_account_linking.md` for detailed explanation of how account linking works (in Russian).
 
 ## Recent Updates
 
@@ -544,3 +556,4 @@ This project is developed for educational purposes as part of a bachelor's thesi
 ## Credits
 
 See the Credits page in the application or `frontend/src/pages/credits/ui/CreditsPage.jsx` for a complete list of technologies, libraries, and resources used in this project.
+
