@@ -1,4 +1,23 @@
-import {createContext, useContext, useState, useEffect} from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from 'react';
+
+import type { LanguageCode } from '../../types';
+
+interface LanguageContextValue {
+  language: LanguageCode;
+  setLanguage: Dispatch<SetStateAction<LanguageCode>>;
+  t: (key: string) => string;
+}
+
+const DEFAULT_LANGUAGE: LanguageCode = 'en';
+const LANGUAGE_STORAGE_KEY = 'language';
 
 const translations = {
     en: {
@@ -637,40 +656,49 @@ const translations = {
             accept: 'Súhlasím'
         }
     }
-};
+} as const;
 
-const LanguageContext = createContext();
+const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
-export function LanguageProvider({children}) {
-    const [language, setLanguage] = useState(() => {
-        const saved = localStorage.getItem('language');
-        return saved || 'en';
-    });
-
-    useEffect(() => {
-        localStorage.setItem('language', language);
-    }, [language]);
-
-    const t = (key) => {
-        const keys = key.split('.');
-        let value = translations[language];
-        for (const k of keys) {
-            value = value?.[k];
-        }
-        return value || key;
-    };
-
-    return (
-        <LanguageContext.Provider value={{language, setLanguage, t}}>
-            {children}
-        </LanguageContext.Provider>
-    );
+function getStoredLanguage(): LanguageCode {
+  const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return savedLanguage === 'sk' ? 'sk' : DEFAULT_LANGUAGE;
 }
 
-export function useLanguage() {
-    const context = useContext(LanguageContext);
-    if (!context) {
-        throw new Error('useLanguage must be used within LanguageProvider');
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<LanguageCode>(getStoredLanguage);
+
+  useEffect(() => {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  }, [language]);
+
+  const t = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = translations[language];
+
+    for (const currentKey of keys) {
+      if (typeof value !== 'object' || value === null || !(currentKey in value)) {
+        return key;
+      }
+
+      value = (value as Record<string, unknown>)[currentKey];
     }
-    return context;
+
+    return typeof value === 'string' ? value : key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage(): LanguageContextValue {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within LanguageProvider');
+  }
+
+  return context;
 }
