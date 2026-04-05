@@ -102,7 +102,7 @@ function App() {
                   user ? <MainLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
                 }
               >
-                <Route path="/home" element={<HomePage user={user} />} />
+                <Route path="/home" element={<HomePage user={user!} />} />
                 <Route path="/profile" element={<ProfilePage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
@@ -147,4 +147,5 @@ function App() {
 }
 
 export default App;
+
 
