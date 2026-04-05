@@ -1,0 +1,106 @@
+import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
+import type { TeacherEditableModule } from '../../model/types';
+
+interface TeacherCourseModuleCardProps {
+  moduleItem: TeacherEditableModule;
+  moduleIndex: number;
+  onModuleTitleChange: (moduleIndex: number, value: string) => void;
+  onEditModule: (moduleIndex: number) => void;
+  onDeleteModule: (moduleIndex: number) => void;
+  onAddTopic: (moduleIndex: number) => void;
+  onTopicTitleChange: (moduleIndex: number, topicIndex: number, value: string) => void;
+  onEditTopic: (moduleIndex: number, topicIndex: number) => void;
+  onDeleteTopic: (moduleIndex: number, topicIndex: number) => void;
+}
+
+function TeacherCourseModuleCard({
+  moduleItem,
+  moduleIndex,
+  onModuleTitleChange,
+  onEditModule,
+  onDeleteModule,
+  onAddTopic,
+  onTopicTitleChange,
+  onEditTopic,
+  onDeleteTopic,
+}: TeacherCourseModuleCardProps) {
+  const { t } = useLanguage();
+
+  return (
+    <div className="teacher-module-item">
+      <div className="teacher-module-header">
+        <input
+          type="text"
+          className="teacher-form-input teacher-module-title-input"
+          value={moduleItem.title}
+          onChange={(event) => onModuleTitleChange(moduleIndex, event.target.value)}
+          placeholder={`Module ${moduleIndex + 1}`}
+        />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className="teacher-module-edit-btn"
+            type="button"
+            onClick={() => onEditModule(moduleIndex)}
+            disabled={!moduleItem.id}
+            title={!moduleItem.id ? t('pages.teacher.saveCourseFirst') : ''}
+          >
+            {t('pages.teacher.edit')}
+          </button>
+          <button className="teacher-module-delete-btn" type="button" onClick={() => onDeleteModule(moduleIndex)}>
+            {t('pages.teacher.delete')}
+          </button>
+        </div>
+      </div>
+
+      <div className="teacher-topics-section">
+        <div className="teacher-topics-header">
+          <h4 className="teacher-topics-title">{t('pages.teacher.topics')}</h4>
+          <button className="teacher-add-topic-btn" type="button" onClick={() => onAddTopic(moduleIndex)}>
+            + {t('pages.teacher.addTopic')}
+          </button>
+        </div>
+
+        {moduleItem.topics.length > 0 ? (
+          <div className="teacher-topics-list">
+            {moduleItem.topics.map((topic, topicIndex) => (
+              <div key={topic.id || topicIndex} className="teacher-topic-item">
+                <div className="teacher-topic-header">
+                  <input
+                    type="text"
+                    className="teacher-form-input teacher-topic-title-input"
+                    value={topic.title}
+                    onChange={(event) => onTopicTitleChange(moduleIndex, topicIndex, event.target.value)}
+                    placeholder={`Topic ${topicIndex + 1}`}
+                    style={{ flex: 1, marginRight: '8px' }}
+                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      className="teacher-topic-edit-btn"
+                      type="button"
+                      onClick={() => onEditTopic(moduleIndex, topicIndex)}
+                      disabled={!moduleItem.id || !topic.id}
+                      title={!moduleItem.id || !topic.id ? t('pages.teacher.saveCourseFirst') : ''}
+                    >
+                      {t('pages.teacher.edit')}
+                    </button>
+                    <button
+                      className="teacher-topic-delete-btn"
+                      type="button"
+                      onClick={() => onDeleteTopic(moduleIndex, topicIndex)}
+                    >
+                      {t('pages.teacher.delete')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="teacher-empty-text">{t('pages.teacher.noTopicsYet')}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default TeacherCourseModuleCard;

@@ -116,24 +116,24 @@ function App() {
                   path="/learning/courses/:courseId/topics/:topicId/practice"
                   element={<TopicPracticePage />}
                 />
-                <Route path="/teacher/courses" element={<TeacherCoursesPage user={user} />} />
-                <Route path="/teacher/courses/new" element={<TeacherCourseEditPage user={user} />} />
-                <Route path="/teacher/courses/:id/edit" element={<TeacherCourseEditPage user={user} />} />
+                <Route path="/teacher/courses" element={<TeacherCoursesPage user={user!} />} />
+                <Route path="/teacher/courses/new" element={<TeacherCourseEditPage user={user!} />} />
+                <Route path="/teacher/courses/:id/edit" element={<TeacherCourseEditPage user={user!} />} />
                 <Route
                   path="/teacher/courses/:courseId/modules/new"
-                  element={<TeacherModuleEditPage user={user} />}
+                  element={<TeacherModuleEditPage user={user!} />}
                 />
                 <Route
                   path="/teacher/courses/:courseId/modules/:moduleId/edit"
-                  element={<TeacherModuleEditPage user={user} />}
+                  element={<TeacherModuleEditPage user={user!} />}
                 />
                 <Route
                   path="/teacher/courses/:courseId/modules/:moduleId/topics/new"
-                  element={<TeacherTopicEditPage user={user} />}
+                  element={<TeacherTopicEditPage user={user!} />}
                 />
                 <Route
                   path="/teacher/courses/:courseId/modules/:moduleId/topics/:topicId/edit"
-                  element={<TeacherTopicEditPage user={user} />}
+                  element={<TeacherTopicEditPage user={user!} />}
                 />
               </Route>
 
@@ -147,5 +147,6 @@ function App() {
 }
 
 export default App;
+
 
 
