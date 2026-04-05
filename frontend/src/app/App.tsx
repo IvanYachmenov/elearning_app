@@ -103,13 +103,13 @@ function App() {
                 }
               >
                 <Route path="/home" element={<HomePage user={user} />} />
-                <Route path="/profile" element={<ProfilePage user={user} onUserUpdate={setUser} />} />
+                <Route path="/profile" element={<ProfilePage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
                 <Route path="/learning" element={<LearningPage />} />
                 <Route path="/learning/courses/:id" element={<CourseLearningPage />} />
                 <Route path="/shop" element={<ShopPage />} />
-                <Route path="/settings" element={<SettingsPage user={user} onUserUpdate={setUser} />} />
+                <Route path="/settings" element={<SettingsPage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/learning/courses/:courseId/topics/:topicId" element={<TopicTheoryPage />} />
                 <Route
@@ -147,3 +147,4 @@ function App() {
 }
 
 export default App;
+
