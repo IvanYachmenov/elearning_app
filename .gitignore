@@ -71,5 +71,4 @@ dist-ssr
 *.sln
 *.sw?
 
-typescript_migration_progress.md
-typescript_migration_stage_5_auth.md
+typescript_migration*.md

@@ -18,7 +18,9 @@ function SettingsThemeSection() {
             }
           }}
         >
-          <span className="settings-option__icon">SUN</span>
+          <span className="settings-option__icon">
+            <img src="/assets/icons/sun.png" alt={t('pages.settings.lightTheme')} />
+          </span>
           <span className="settings-option__label">{t('pages.settings.lightTheme')}</span>
         </button>
         <button
@@ -30,7 +32,9 @@ function SettingsThemeSection() {
             }
           }}
         >
-          <span className="settings-option__icon">MOON</span>
+          <span className="settings-option__icon">
+            <img src="/assets/icons/moon.png" alt={t('pages.settings.darkTheme')} />
+          </span>
           <span className="settings-option__label">{t('pages.settings.darkTheme')}</span>
         </button>
       </div>
