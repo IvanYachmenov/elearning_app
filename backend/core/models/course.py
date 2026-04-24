@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from .user import User
 
@@ -28,6 +28,37 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class CourseReview(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="course_reviews",
+    )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course", "user"],
+                name="unique_course_review_per_user",
+            )
+        ]
+        ordering = ["-updated_at", "-created_at"]
+
+    def __str__(self):
+        return f"{self.course.title} - {self.user.username}: {self.rating}/5"
 
 
 class Module(models.Model):

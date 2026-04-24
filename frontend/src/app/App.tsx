@@ -28,17 +28,19 @@ import {
 import { MainLayout } from '../widgets/layout';
 
 import { api, setAuthToken } from '../shared/api';
-import { deleteCookie, getCookie } from '../shared/lib/storage/cookies';
+import { getCookie } from '../shared/lib/storage/cookies';
 import { CookieConsent } from '../features/cookie-consent';
 
 import { NavigationLockProvider } from '../shared/lib/navigation-lock';
 import { ThemeProvider } from '../shared/lib/theme/ThemeContext';
 import { LanguageProvider } from '../shared/lib/i18n/LanguageContext';
+import { clearAuthSession, isGitHubCallbackInUrl } from '../features/auth';
 import type { AuthSuccessHandler, User } from '../shared/types';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(() => Boolean(getCookie('access')));
+  const hasGitHubCallback = isGitHubCallbackInUrl();
 
   useEffect(() => {
     const token = getCookie('access');
@@ -54,9 +56,7 @@ function App() {
         const status = isAxiosError(error) ? error.response?.status : undefined;
 
         if (status === 401 || status === 403) {
-          deleteCookie('access');
-          deleteCookie('refresh');
-          setAuthToken(null);
+          clearAuthSession();
           setUser(null);
         }
       })
@@ -69,9 +69,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    deleteCookie('access');
-    deleteCookie('refresh');
-    setAuthToken(null);
+    clearAuthSession();
     setUser(null);
   };
 
@@ -90,11 +88,11 @@ function App() {
 
               <Route
                 path="/register"
-                element={user ? <Navigate to="/home" replace /> : <RegisterPage onAuth={handleAuthSuccess} />}
+                element={user && !hasGitHubCallback ? <Navigate to="/home" replace /> : <RegisterPage onAuth={handleAuthSuccess} />}
               />
               <Route
                 path="/login"
-                element={user ? <Navigate to="/home" replace /> : <LoginPage onAuth={handleAuthSuccess} />}
+                element={user && !hasGitHubCallback ? <Navigate to="/home" replace /> : <LoginPage onAuth={handleAuthSuccess} />}
               />
 
               <Route
@@ -147,6 +145,3 @@ function App() {
 }
 
 export default App;
-
-
-

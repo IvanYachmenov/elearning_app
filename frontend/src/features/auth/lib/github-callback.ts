@@ -1,5 +1,5 @@
 import { handleGitHubCallback } from './providers/github-auth';
-import { applyAuthSession, fetchCurrentUser } from './session';
+import { applyAuthSession, clearAuthSession, fetchCurrentUser } from './session';
 
 import type { GitHubCallbackHandlerOptions } from '../types';
 
@@ -34,6 +34,7 @@ export async function processGitHubCallback({
 
     navigate(callback.nextPath, { replace: true });
   } catch (error) {
+    clearAuthSession();
     console.error('GitHub callback handling error:', error);
     setError(genericError);
   } finally {

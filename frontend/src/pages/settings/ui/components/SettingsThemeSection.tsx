@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
+﻿import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import { useTheme } from '../../../../shared/lib/theme/ThemeContext';
 
 function SettingsThemeSection() {
@@ -8,7 +8,7 @@ function SettingsThemeSection() {
   return (
     <div className="settings-section">
       <h2 className="settings-section__title">{t('pages.settings.theme')}</h2>
-      <div className="settings-options">
+      <div className="settings-options settings-options--theme">
         <button
           type="button"
           className={`settings-option ${theme === 'light' ? 'settings-option--active' : ''}`}

@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+﻿import { isAxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -271,8 +271,6 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
               )}
             </div>
           </div>
-
-          <div className="settings-account__note">{t('pages.settings.accountDeletionNote')}</div>
         </div>
       </div>
     </div>

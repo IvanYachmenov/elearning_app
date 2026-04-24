@@ -35,11 +35,6 @@ export function initializeGoogleSignIn(
         throw new Error('Google Identity Services not loaded');
       }
 
-      const currentOrigin = window.location.origin;
-      console.log('[Google Auth] Initializing with Client ID:', clientId);
-      console.log('[Google Auth] Current origin:', currentOrigin);
-      console.log('[Google Auth] Make sure this origin is added in Google Cloud Console!');
-
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: (response) => {
@@ -49,8 +44,6 @@ export function initializeGoogleSignIn(
           }
 
           if (response.error) {
-            console.log('Google Sign-In error:', response.error);
-
             if (
               response.error !== 'popup_closed_by_user' &&
               response.error !== 'popup_blocked' &&

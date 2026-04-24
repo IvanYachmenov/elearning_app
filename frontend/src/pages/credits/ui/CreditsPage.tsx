@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+﻿import type { CSSProperties } from 'react';
 
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 
@@ -49,6 +49,21 @@ function CreditsPage() {
           <li style={listItemStyle}>
             <a href="https://www.flaticon.com/free-icons/correct" title="correct icons" target="_blank" rel="noreferrer" style={linkStyle}>
               Correct icons created by Aldo Cervantes - Flaticon
+            </a>
+          </li>
+          <li style={listItemStyle}>
+            <a href="https://www.flaticon.com/free-icons/sun" title="sun icons" target="_blank" rel="noreferrer" style={linkStyle}>
+              Sun icons used for the light theme selector - Flaticon
+            </a>
+          </li>
+          <li style={listItemStyle}>
+            <a href="https://www.flaticon.com/free-icons/moon" title="moon icons" target="_blank" rel="noreferrer" style={linkStyle}>
+              Moon icons used for the dark theme selector - Flaticon
+            </a>
+          </li>
+          <li style={listItemStyle}>
+            <a href="https://www.flaticon.com/free-icons/connect" title="connection status icons" target="_blank" rel="noreferrer" style={linkStyle}>
+              Connected and disconnected status icons used in settings - Flaticon
             </a>
           </li>
         </ul>

@@ -2,11 +2,13 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
+from django.db.models import Avg, Count
 
 from ..models import Course
 from ..serializers import (
     CourseListSerializer,
-    CourseDetailSerializer
+    CourseDetailSerializer,
+    CourseReviewCreateSerializer,
 )
 
 
@@ -20,7 +22,11 @@ class CourseListView(generics.ListAPIView):
     ordering_fields = ["title", "id"]
     ordering = ["id"]
 
-    queryset = Course.objects.select_related("author")
+    queryset = (
+        Course.objects
+        .select_related("author")
+        .annotate(average_rating=Avg("reviews__rating"), reviews_count=Count("reviews"))
+    )
 
 # GET /api/courses/<id>/
 class CourseDetailView(generics.RetrieveAPIView):
@@ -30,8 +36,48 @@ class CourseDetailView(generics.RetrieveAPIView):
     queryset = (
         Course.objects
         .select_related("author")
-        .prefetch_related("modules__topics")
+        .prefetch_related("modules__topics", "reviews__user")
+        .annotate(average_rating=Avg("reviews__rating"), reviews_count=Count("reviews"))
     )
+
+
+# POST /api/courses/<id>/reviews/
+class CourseReviewView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response(
+                {"detail": "Course not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = CourseReviewCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        course.reviews.update_or_create(
+            user=request.user,
+            defaults={
+                "rating": serializer.validated_data["rating"],
+                "comment": serializer.validated_data.get("comment", ""),
+            },
+        )
+
+        course = (
+            Course.objects
+            .select_related("author")
+            .prefetch_related("modules__topics", "reviews__user")
+            .annotate(average_rating=Avg("reviews__rating"), reviews_count=Count("reviews"))
+            .get(pk=pk)
+        )
+        detail_serializer = CourseDetailSerializer(
+            course,
+            context={"request": request}
+        )
+        return Response(detail_serializer.data, status=HTTP_200_OK)
+
 
 # POST /api/courses/<id>/enroll/
 class EnrollCourseView(APIView):
@@ -62,4 +108,8 @@ class MyCoursesListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return user.enrolled_courses.select_related("author")
+        return (
+            user.enrolled_courses
+            .select_related("author")
+            .annotate(average_rating=Avg("reviews__rating"), reviews_count=Count("reviews"))
+        )

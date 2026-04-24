@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
@@ -6,6 +6,21 @@ import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { CourseDetail } from '../../../shared/types';
 import type { CourseDetailPageData } from '../model/types';
 import '../styles/courses.css';
+
+const MAX_RATING = 5;
+
+function formatReviewDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+}
+
+function getRatingStars(rating: number | null): string {
+  const roundedRating = Math.max(0, Math.min(MAX_RATING, Math.round(rating || 0)));
+  return `${'★'.repeat(roundedRating)}${'☆'.repeat(MAX_RATING - roundedRating)}`;
+}
 
 function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +31,11 @@ function CourseDetailPage() {
   const [enrolling, setEnrolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enrolled, setEnrolled] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -38,6 +58,9 @@ function CourseDetailPage() {
 
         setCourse(response.data);
         setEnrolled(Boolean(response.data.is_enrolled));
+        const ownReview = response.data.reviews?.find((review) => review.is_current_user);
+        setReviewRating(ownReview?.rating || 0);
+        setReviewComment(ownReview?.comment || '');
       } catch (requestError) {
         console.error(requestError);
         if (isActive) {
@@ -67,6 +90,14 @@ function CourseDetailPage() {
     return course.author_name || course.author?.username || course.author?.email || null;
   }, [course]);
 
+  const ratingText = useMemo(() => {
+    if (!course || !course.average_rating || course.reviews_count === 0) {
+      return t('pages.courses.noReviews');
+    }
+
+    return `${course.average_rating.toFixed(1)} / 5 (${course.reviews_count})`;
+  }, [course, t]);
+
   const handleEnroll = async () => {
     if (!id) {
       setError(t('pages.courses.failedToEnroll'));
@@ -85,6 +116,41 @@ function CourseDetailPage() {
       setError(t('pages.courses.failedToEnroll'));
     } finally {
       setEnrolling(false);
+    }
+  };
+
+  const handleReviewSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!id) {
+      setReviewError(t('pages.courses.failedToSaveReview'));
+      return;
+    }
+
+    if (reviewRating < 1 || reviewRating > MAX_RATING) {
+      setReviewError(t('pages.courses.selectRating'));
+      return;
+    }
+
+    setReviewError(null);
+    setReviewSuccess(null);
+    setReviewSubmitting(true);
+
+    try {
+      const response = await api.post<CourseDetailPageData>(`/api/courses/${id}/reviews/`, {
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+      setCourse(response.data);
+      const ownReview = response.data.reviews.find((review) => review.is_current_user);
+      setReviewRating(ownReview?.rating || reviewRating);
+      setReviewComment(ownReview?.comment || reviewComment.trim());
+      setReviewSuccess(t('pages.courses.reviewSaved'));
+    } catch (requestError) {
+      console.error(requestError);
+      setReviewError(t('pages.courses.failedToSaveReview'));
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -134,6 +200,13 @@ function CourseDetailPage() {
 
         {course.description && <p style={{ marginTop: '16px', fontSize: '15px' }}>{course.description}</p>}
 
+        <div className="course-rating course-rating--detail" aria-label={ratingText}>
+          <span className="course-rating__stars" aria-hidden="true">
+            {getRatingStars(course.average_rating)}
+          </span>
+          <span className="course-rating__text">{ratingText}</span>
+        </div>
+
         <div className="course-detail-actions">
           {enrolled ? (
             <Link to="/learning" className="btn-primary">
@@ -175,6 +248,84 @@ function CourseDetailPage() {
           </div>
         </section>
       )}
+
+      <section className="course-reviews">
+        <div className="course-reviews__header">
+          <h2 className="section-title">{t('pages.courses.reviewsTitle')}</h2>
+          <span className="course-reviews__count">{ratingText}</span>
+        </div>
+
+        <form className="course-review-form" onSubmit={handleReviewSubmit}>
+          <label className="course-review-form__label">{t('pages.courses.yourRating')}</label>
+          <div className="course-review-stars" role="radiogroup" aria-label={t('pages.courses.yourRating')}>
+            {Array.from({ length: MAX_RATING }, (_, index) => {
+              const value = index + 1;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  className={`course-review-stars__button ${value <= reviewRating ? 'is-active' : ''}`}
+                  onClick={() => setReviewRating(value)}
+                  role="radio"
+                  aria-checked={value === reviewRating}
+                  aria-label={`${value} ${t('pages.courses.stars')}`}
+                >
+                  ★
+                </button>
+              );
+            })}
+          </div>
+
+          <label className="course-review-form__label" htmlFor="course-review-comment">
+            {t('pages.courses.yourComment')}
+          </label>
+          <textarea
+            id="course-review-comment"
+            className="course-review-form__textarea"
+            value={reviewComment}
+            onChange={(event) => setReviewComment(event.target.value)}
+            placeholder={t('pages.courses.commentPlaceholder')}
+            rows={4}
+            maxLength={1000}
+          />
+
+          <div className="course-review-form__footer">
+            <button type="submit" className="btn-primary" disabled={reviewSubmitting}>
+              {reviewSubmitting ? t('pages.courses.savingReview') : t('pages.courses.submitReview')}
+            </button>
+            {reviewError && <span className="course-review-form__message course-review-form__message--error">{reviewError}</span>}
+            {reviewSuccess && <span className="course-review-form__message course-review-form__message--success">{reviewSuccess}</span>}
+          </div>
+        </form>
+
+        <div className="course-review-thread" aria-live="polite">
+          {course.reviews.length === 0 ? (
+            <p className="course-review-thread__empty">{t('pages.courses.noReviewComments')}</p>
+          ) : (
+            course.reviews.map((review) => (
+              <article key={review.id} className="course-review-message">
+                <div className="course-review-message__meta">
+                  <strong>{review.user_name}</strong>
+                  <span>{formatReviewDate(review.updated_at)}</span>
+                </div>
+                <div className="course-rating course-rating--message" aria-label={`${review.rating} / 5`}>
+                  <span className="course-rating__stars" aria-hidden="true">
+                    {getRatingStars(review.rating)}
+                  </span>
+                  <span className="course-rating__text">{review.rating} / 5</span>
+                </div>
+                {review.comment ? (
+                  <p className="course-review-message__comment">{review.comment}</p>
+                ) : (
+                  <p className="course-review-message__comment course-review-message__comment--empty">
+                    {t('pages.courses.ratingOnly')}
+                  </p>
+                )}
+              </article>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   );
 }

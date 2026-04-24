@@ -40,8 +40,21 @@ export interface CourseListItem {
   author_name: string | null;
   is_enrolled: boolean;
   image_url: string | null;
+  average_rating: number | null;
+  reviews_count: number;
+}
+
+export interface CourseReview {
+  id: number;
+  rating: number;
+  comment: string;
+  user_name: string;
+  is_current_user: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CourseDetail extends CourseListItem {
   modules: CourseModule[];
+  reviews: CourseReview[];
 }

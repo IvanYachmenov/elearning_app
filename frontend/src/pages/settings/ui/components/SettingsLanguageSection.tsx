@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
+﻿import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 
 function SettingsLanguageSection() {
   const { language, setLanguage, t } = useLanguage();
@@ -6,7 +6,7 @@ function SettingsLanguageSection() {
   return (
     <div className="settings-section">
       <h2 className="settings-section__title">{t('pages.settings.language')}</h2>
-      <div className="settings-options">
+      <div className="settings-options settings-options--compact">
         <button
           type="button"
           className={`settings-option ${language === 'en' ? 'settings-option--active' : ''}`}

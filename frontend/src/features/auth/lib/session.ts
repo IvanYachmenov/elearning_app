@@ -1,5 +1,5 @@
 import { api, setAuthToken } from '../../../shared/api';
-import { setCookie } from '../../../shared/lib/storage/cookies';
+import { deleteCookie, setCookie } from '../../../shared/lib/storage/cookies';
 import type { User } from '../../../shared/types';
 
 import type { AuthSessionTokens, GoogleAuthExchangeResponse } from '../types';
@@ -8,6 +8,12 @@ export function applyAuthSession(access: string, refresh: string, days = 365): v
   setCookie('access', access, days);
   setCookie('refresh', refresh, days);
   setAuthToken(access);
+}
+
+export function clearAuthSession(): void {
+  deleteCookie('access');
+  deleteCookie('refresh');
+  setAuthToken(null);
 }
 
 export async function fetchCurrentUser(): Promise<User> {

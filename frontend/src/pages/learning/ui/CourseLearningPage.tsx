@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+﻿import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -167,7 +167,9 @@ function CourseLearningPage() {
                       {moduleItem.topics.length} {t('pages.learning.topics')}
                     </div>
                   </div>
-                  <div className={'learning-module__chevron' + (isOpen ? ' open' : '')}>OPEN</div>
+                  <div className={'learning-module__chevron' + (isOpen ? ' open' : '')} aria-hidden="true">
+                    {isOpen ? '−' : '+'}
+                  </div>
                 </button>
 
                 <div
@@ -183,7 +185,7 @@ function CourseLearningPage() {
                           onClick={() => handleTopicClick(topic.id)}
                         >
                           <div className="learning-topic__title">
-                            {topic.title}
+                            <span>{topic.title}</span>
                             {topic.is_timed_test && (
                               <span className="learning-topic__timed-badge" title={t('pages.learning.timedTest')}>
                                 TIMED

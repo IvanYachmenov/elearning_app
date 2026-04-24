@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, Course, Module, Topic, TopicQuestion, TopicQuestionOption, TopicQuestionAnswer, TopicProgress
+from .models import User, Course, CourseReview, Module, Topic, TopicQuestion, TopicQuestionOption, TopicQuestionAnswer, TopicProgress
 
 
 @admin.register(User)
@@ -30,6 +30,13 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ("title", "author")
     search_fields = ("title", "description")
     list_filter = ("author",)
+
+
+@admin.register(CourseReview)
+class CourseReviewAdmin(admin.ModelAdmin):
+    list_display = ("course", "user", "rating", "updated_at")
+    list_filter = ("rating", "course")
+    search_fields = ("course__title", "user__username", "comment")
 
 
 @admin.register(Module)

@@ -2,12 +2,9 @@ import { API_URL } from '../../../../shared/api';
 
 import type { GitHubCallbackResult } from '../../types';
 
-export function initiateGitHubLogin(nextPath = '/home'): void {
-  const url = `${API_URL}/accounts/github/login/?next=${nextPath}&select_account=1`;
-  window.location.href = url;
-}
+const GITHUB_CALLBACK_PARAMS = ['access', 'refresh', 'error', 'provider', 'next'] as const;
 
-export function handleGitHubCallback(): GitHubCallbackResult {
+function readGitHubCallbackParams() {
   const params = new URLSearchParams(window.location.search);
   const access = params.get('access');
   const refresh = params.get('refresh');
@@ -20,7 +17,45 @@ export function handleGitHubCallback(): GitHubCallbackResult {
     refresh,
     error,
     provider,
-    nextPath: nextPath && nextPath.startsWith('/') ? nextPath : '/home',
-    isGitHubCallback: provider === 'github',
+    nextPath,
+    isGitHubCallback:
+      provider === 'github' || Boolean(access) || Boolean(refresh) || Boolean(error),
+  };
+}
+
+function clearGitHubCallbackParams(): void {
+  const url = new URL(window.location.href);
+  for (const param of GITHUB_CALLBACK_PARAMS) {
+    url.searchParams.delete(param);
+  }
+
+  const nextUrl = `${url.pathname}${url.search ? `?${url.searchParams.toString()}` : ''}${url.hash}`;
+  window.history.replaceState({}, document.title, nextUrl);
+}
+
+export function initiateGitHubLogin(nextPath = '/home'): void {
+  const url = `${API_URL}/accounts/github/login/?next=${encodeURIComponent(nextPath)}&select_account=1`;
+  window.location.href = url;
+}
+
+export function isGitHubCallbackInUrl(): boolean {
+  return readGitHubCallbackParams().isGitHubCallback;
+}
+
+export function handleGitHubCallback(): GitHubCallbackResult {
+  const callback = readGitHubCallbackParams();
+
+  if (callback.isGitHubCallback) {
+    clearGitHubCallbackParams();
+  }
+
+  return {
+    access: callback.access,
+    refresh: callback.refresh,
+    error: callback.error,
+    provider: callback.provider,
+    nextPath:
+      callback.nextPath && callback.nextPath.startsWith('/') ? callback.nextPath : '/home',
+    isGitHubCallback: callback.isGitHubCallback,
   };
 }

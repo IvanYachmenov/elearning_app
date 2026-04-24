@@ -2,6 +2,8 @@ from .user import UserSerializer, RegisterSerializer
 from .course import (
     TopicSerializer,
     ModuleSerializer,
+    CourseReviewSerializer,
+    CourseReviewCreateSerializer,
     CourseListSerializer,
     CourseDetailSerializer,
 )
@@ -28,6 +30,8 @@ __all__ = [
 
     "TopicSerializer",
     "ModuleSerializer",
+    "CourseReviewSerializer",
+    "CourseReviewCreateSerializer",
     "CourseListSerializer",
     "CourseDetailSerializer",
 

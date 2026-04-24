@@ -2,6 +2,7 @@ from .user import User
 
 from .course import (
     Course,
+    CourseReview,
     Module,
     Topic,
 )
@@ -16,6 +17,7 @@ from .learning import (
 __all__ = [
     "User",
     "Course",
+    "CourseReview",
     "Module",
     "Topic",
     "TopicProgress",

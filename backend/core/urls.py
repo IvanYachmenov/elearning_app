@@ -10,6 +10,7 @@ from .views import (
     SocialDisconnectView,
     CourseListView,
     CourseDetailView,
+    CourseReviewView,
     EnrollCourseView,
     MyCoursesListView,
     TeacherCourseViewSet,
@@ -46,6 +47,7 @@ urlpatterns = [
     #courses
     path("courses/", CourseListView.as_view(), name="course-list"),
     path("courses/<int:pk>/", CourseDetailView.as_view(), name="course-detail"),
+    path("courses/<int:pk>/reviews/", CourseReviewView.as_view(), name="course-review"),
     path("courses/<int:pk>/enroll/", EnrollCourseView.as_view(), name="course-enroll"),
     path("my-courses/", MyCoursesListView.as_view(), name="my-courses"),
 

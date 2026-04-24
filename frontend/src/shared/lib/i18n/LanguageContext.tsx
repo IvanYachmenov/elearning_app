@@ -52,7 +52,20 @@ const translations = {
                 goToLearning: 'Go to learning →',
                 enrolling: 'Enrolling...',
                 enrollInCourse: 'Enroll in this course',
-                failedToEnroll: 'Failed to enroll. Please try again.'
+                failedToEnroll: 'Failed to enroll. Please try again.',
+                noReviews: 'No reviews yet',
+                reviewsTitle: 'Course reviews',
+                yourRating: 'Your rating',
+                yourComment: 'Your comment',
+                commentPlaceholder: 'Share what helped, what was difficult, or who this course is best for.',
+                submitReview: 'Post review',
+                savingReview: 'Posting...',
+                reviewSaved: 'Review saved.',
+                failedToSaveReview: 'Failed to save review. Please try again.',
+                selectRating: 'Choose a rating from 1 to 5 stars.',
+                noReviewComments: 'No one has reviewed this course yet.',
+                ratingOnly: 'Rating without a comment.',
+                stars: 'stars'
             },
             learning: {
                 title: 'My Learning',
@@ -370,7 +383,20 @@ const translations = {
                 goToLearning: 'Prejsť na vzdelávanie',
                 enrolling: 'Prihlasovanie...',
                 enrollInCourse: 'Prihlásiť sa na tento kurz',
-                failedToEnroll: 'Prihlásenie zlyhalo. Skúste to znova.'
+                failedToEnroll: 'Prihlásenie zlyhalo. Skúste to znova.',
+                noReviews: 'Zatiaľ žiadne hodnotenia',
+                reviewsTitle: 'Hodnotenia kurzu',
+                yourRating: 'Vaše hodnotenie',
+                yourComment: 'Váš komentár',
+                commentPlaceholder: 'Napíšte, čo pomohlo, čo bolo ťažké, alebo komu sa kurz hodí.',
+                submitReview: 'Odoslať hodnotenie',
+                savingReview: 'Odosielanie...',
+                reviewSaved: 'Hodnotenie uložené.',
+                failedToSaveReview: 'Hodnotenie sa nepodarilo uložiť. Skúste to znova.',
+                selectRating: 'Vyberte hodnotenie od 1 do 5 hviezdičiek.',
+                noReviewComments: 'Tento kurz ešte nikto neohodnotil.',
+                ratingOnly: 'Hodnotenie bez komentára.',
+                stars: 'hviezdičiek'
             },
             learning: {
                 title: 'Moje vzdelávanie',

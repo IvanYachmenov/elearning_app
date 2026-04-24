@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+﻿import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeHistorySectionProps } from '../types';
 
@@ -49,7 +49,17 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
                               : '')
                         }
                       >
-                        <span className="topic-practice__option-indicator">{selected ? 'YES' : 'NO'}</span>
+                        <span
+                          className={
+                            'topic-practice__option-indicator' +
+                            (correct
+                              ? ' topic-practice__option-indicator--correct'
+                              : selected
+                                ? ' topic-practice__option-indicator--selected-history'
+                                : '')
+                          }
+                          aria-hidden="true"
+                        />
                         <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
                         {correct && (
                           <span className="topic-practice__option-correct-label">{t('pages.learning.correct')}</span>

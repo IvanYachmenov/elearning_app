@@ -10,6 +10,7 @@ from .auth import (
 from .courses import (
     CourseListView,
     CourseDetailView,
+    CourseReviewView,
     EnrollCourseView,
     MyCoursesListView,
 )
@@ -37,6 +38,7 @@ __all__ = [
     "SocialDisconnectView",
     "CourseListView",
     "CourseDetailView",
+    "CourseReviewView",
     "EnrollCourseView",
     "MyCoursesListView",
     "TeacherCourseViewSet",

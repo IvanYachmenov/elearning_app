@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+﻿import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeQuestionCardProps } from '../types';
 
@@ -73,7 +73,13 @@ function PracticeQuestionCard({
                 onClick={() => onOptionToggle(option.id)}
                 disabled={isAnswerLocked || submitLoading || practiceLoading}
               >
-                <span className="topic-practice__option-indicator">{selected ? 'YES' : 'NO'}</span>
+                <span
+                  className={
+                    'topic-practice__option-indicator' +
+                    (selected ? ' topic-practice__option-indicator--selected' : '')
+                  }
+                  aria-hidden="true"
+                />
                 <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
               </button>
             </li>
