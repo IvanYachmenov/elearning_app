@@ -563,6 +563,12 @@
   margin-bottom: 24px;
 }
 
+.teacher-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .teacher-form-label {
   display: block;
   font-size: 14px;
@@ -1329,5 +1335,10 @@
 
   .teacher-course-edit-form {
     padding: 20px;
+  }
+
+  .teacher-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }

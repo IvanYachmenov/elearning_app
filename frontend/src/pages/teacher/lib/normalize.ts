@@ -55,6 +55,16 @@ export function normalizeModule(moduleItem: unknown, fallbackOrder = 0): Teacher
   };
 }
 
+function normalizeTagList(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+}
+
 export function normalizeCourse(data: unknown): TeacherCourseFormData {
   const course = typeof data === 'object' && data !== null ? (data as Record<string, unknown>) : {};
   const imageUrl = course.image_url || course.image;
@@ -63,6 +73,8 @@ export function normalizeCourse(data: unknown): TeacherCourseFormData {
     title: String(course.title || ''),
     slug: String(course.slug || ''),
     description: String(course.description || ''),
+    programming_languages: normalizeTagList(course.programming_languages),
+    frameworks: normalizeTagList(course.frameworks),
     modules: Array.isArray(course.modules) ? course.modules.map((item, index) => normalizeModule(item, index)) : [],
     image: null,
     image_url: typeof imageUrl === 'string' ? imageUrl : null,

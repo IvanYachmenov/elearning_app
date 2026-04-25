@@ -186,6 +186,8 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
         imagePreviewUrl={imagePreviewUrl}
         onTitleChange={(value) => updateCourseField('title', value)}
         onDescriptionChange={(value) => updateCourseField('description', value)}
+        onProgrammingLanguagesChange={(value) => updateCourseField('programming_languages', value)}
+        onFrameworksChange={(value) => updateCourseField('frameworks', value)}
         onImageChange={(file) => updateCourseField('image', file)}
       />
 

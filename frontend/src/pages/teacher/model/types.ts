@@ -49,6 +49,8 @@ export interface TeacherCourseFormData {
   title: string;
   slug: string;
   description: string;
+  programming_languages: string[];
+  frameworks: string[];
   modules: TeacherEditableModule[];
   image: File | null;
   image_url: string | null;

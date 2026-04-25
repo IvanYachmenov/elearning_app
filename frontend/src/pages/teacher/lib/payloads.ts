@@ -56,6 +56,8 @@ export function buildCourseFormData(courseData: TeacherCourseFormData): FormData
 
   formData.append('title', courseData.title);
   formData.append('description', courseData.description || '');
+  formData.append('programming_languages', JSON.stringify(courseData.programming_languages || []));
+  formData.append('frameworks', JSON.stringify(courseData.frameworks || []));
   formData.append('modules', JSON.stringify(validModules));
 
   if (courseData.image instanceof File) {

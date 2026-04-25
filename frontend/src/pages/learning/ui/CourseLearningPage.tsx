@@ -178,39 +178,43 @@ function CourseLearningPage() {
                 >
                   {moduleItem.topics.length > 0 ? (
                     <ul className="learning-topic-list">
-                      {moduleItem.topics.map((topic) => (
-                        <li
-                          key={topic.id}
-                          className={'learning-topic learning-topic--' + topic.status}
-                          onClick={() => handleTopicClick(topic.id)}
-                        >
-                          <div className="learning-topic__title">
-                            <span>{topic.title}</span>
-                            {topic.is_timed_test && (
-                              <span className="learning-topic__timed-badge" title={t('pages.learning.timedTest')}>
-                                TIMED
-                              </span>
-                            )}
-                          </div>
+                      {moduleItem.topics.map((topic) => {
+                        const visibleScore = topic.score ?? (topic.status === 'in_progress' ? 0 : null);
 
-                          <div className="learning-topic__status">
-                            <span className="learning-topic__status-pill">
-                              {topic.status === 'not_started'
-                                ? t('pages.learning.statusNotStarted')
-                                : topic.status === 'in_progress'
-                                  ? t('pages.learning.statusInProgress')
-                                  : topic.status === 'completed'
-                                    ? topic.score != null && topic.score >= 100
-                                      ? t('pages.learning.statusPassed')
-                                      : t('pages.learning.statusCompleted')
-                                    : topic.status === 'failed'
-                                      ? t('pages.learning.statusFailed')
-                                      : topic.status.replace('_', ' ')}
-                            </span>
-                            {topic.score != null && <span className="learning-topic__score">{topic.score}%</span>}
-                          </div>
-                        </li>
-                      ))}
+                        return (
+                          <li
+                            key={topic.id}
+                            className={'learning-topic learning-topic--' + topic.status}
+                            onClick={() => handleTopicClick(topic.id)}
+                          >
+                            <div className="learning-topic__title">
+                              <span>{topic.title}</span>
+                              {topic.is_timed_test && (
+                                <span className="learning-topic__timed-badge" title={t('pages.learning.timedTest')}>
+                                  TIMER
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="learning-topic__status">
+                              <span className="learning-topic__status-pill">
+                                {topic.status === 'not_started'
+                                  ? t('pages.learning.statusNotStarted')
+                                  : topic.status === 'in_progress'
+                                    ? t('pages.learning.statusInProgress')
+                                    : topic.status === 'completed'
+                                      ? topic.score != null && topic.score >= 100
+                                        ? t('pages.learning.statusPassed')
+                                        : t('pages.learning.statusCompleted')
+                                      : topic.status === 'failed'
+                                        ? t('pages.learning.statusFailed')
+                                        : topic.status.replace('_', ' ')}
+                              </span>
+                              {visibleScore != null && <span className="learning-topic__score">{visibleScore}%</span>}
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : (
                     <p className="learning-topic-empty">{t('pages.learning.noTopicsYet')}</p>

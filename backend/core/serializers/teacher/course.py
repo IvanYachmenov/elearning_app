@@ -3,6 +3,35 @@ from django.utils.text import slugify
 from ...models import Course, Module, Topic
 from ...models.learning import TopicQuestion, TopicQuestionOption
 from .module import TeacherModuleSerializer
+import json
+
+
+def normalize_tag_list(value):
+    if value in (None, ""):
+        return []
+
+    if isinstance(value, str):
+        try:
+            parsed_value = json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            parsed_value = value.split(",")
+    else:
+        parsed_value = value
+
+    if not isinstance(parsed_value, list):
+        return []
+
+    normalized_tags = []
+    seen_tags = set()
+
+    for item in parsed_value:
+        tag = str(item).strip()
+        tag_key = tag.lower()
+        if tag and tag_key not in seen_tags:
+            normalized_tags.append(tag[:80])
+            seen_tags.add(tag_key)
+
+    return normalized_tags
 
 
 class TeacherCourseSerializer(serializers.ModelSerializer):
@@ -10,6 +39,8 @@ class TeacherCourseSerializer(serializers.ModelSerializer):
     author_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.ImageField(required=False, allow_null=True)
     image_url = serializers.SerializerMethodField(read_only=True)
+    programming_languages = serializers.JSONField(required=False)
+    frameworks = serializers.JSONField(required=False)
 
     class Meta:
         model = Course
@@ -18,12 +49,20 @@ class TeacherCourseSerializer(serializers.ModelSerializer):
             "title",
             "slug",
             "description",
+            "programming_languages",
+            "frameworks",
             "author_name",
             "modules",
             "image",
             "image_url",
         )
         read_only_fields = ("id", "slug", "author_name", "image_url")
+
+    def validate_programming_languages(self, value):
+        return normalize_tag_list(value)
+
+    def validate_frameworks(self, value):
+        return normalize_tag_list(value)
 
     def get_image_url(self, obj):
         if obj.image:
@@ -95,6 +134,8 @@ class TeacherCourseSerializer(serializers.ModelSerializer):
         
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
+        instance.programming_languages = validated_data.get('programming_languages', instance.programming_languages)
+        instance.frameworks = validated_data.get('frameworks', instance.frameworks)
         instance.image = validated_data.get('image', instance.image)
         
         if 'title' in validated_data:

@@ -8,6 +8,8 @@ import type { CourseDetailPageData } from '../model/types';
 import '../styles/courses.css';
 
 const MAX_RATING = 5;
+const FILLED_STAR = '\u2605';
+const EMPTY_STAR = '\u2606';
 
 function formatReviewDate(value: string): string {
   return new Intl.DateTimeFormat(undefined, {
@@ -17,9 +19,29 @@ function formatReviewDate(value: string): string {
   }).format(new Date(value));
 }
 
-function getRatingStars(rating: number | null): string {
-  const roundedRating = Math.max(0, Math.min(MAX_RATING, Math.round(rating || 0)));
-  return `${'★'.repeat(roundedRating)}${'☆'.repeat(MAX_RATING - roundedRating)}`;
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function RatingStars({ rating }: { rating: number | null }) {
+  const normalizedRating = typeof rating === 'number' ? rating : 0;
+
+  return (
+    <span className="course-rating__stars" aria-hidden="true">
+      {Array.from({ length: MAX_RATING }, (_, index) => {
+        const fillPercent = clamp((normalizedRating - index) * 100, 0, 100);
+
+        return (
+          <span key={index} className="course-rating__star">
+            <span className="course-rating__star-base">{EMPTY_STAR}</span>
+            <span className="course-rating__star-fill" style={{ width: `${fillPercent}%` }}>
+              {FILLED_STAR}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 function CourseDetailPage() {
@@ -95,7 +117,7 @@ function CourseDetailPage() {
       return t('pages.courses.noReviews');
     }
 
-    return `${course.average_rating.toFixed(1)} / 5 (${course.reviews_count})`;
+    return course.average_rating.toFixed(1);
   }, [course, t]);
 
   const handleEnroll = async () => {
@@ -182,42 +204,44 @@ function CourseDetailPage() {
       </div>
 
       <div className="course-detail-header">
-        <div className="course-detail-header__image">
-          {course.image_url ? (
-            <img src={course.image_url} alt={course.title} />
-          ) : (
-            <div className="course-detail-header__image-placeholder">C</div>
-          )}
+        <div className="course-detail-hero">
+          <div className="course-detail-header__image">
+            {course.image_url ? (
+              <img src={course.image_url} alt={course.title} />
+            ) : (
+              <div className="course-detail-header__image-placeholder">C</div>
+            )}
+          </div>
+
+          <div className="course-detail-hero__content">
+            <h1 className="page__title">{course.title}</h1>
+
+            {authorName && (
+              <p className="page__subtitle">
+                by <strong>{authorName}</strong>
+              </p>
+            )}
+
+            <div className="course-rating course-rating--detail" aria-label={ratingText}>
+              <RatingStars rating={course.average_rating} />
+              <span className="course-rating__text">{ratingText}</span>
+            </div>
+
+            <div className="course-detail-actions">
+              {enrolled ? (
+                <Link to="/learning" className="btn-primary">
+                  {t('pages.courses.goToLearning')}
+                </Link>
+              ) : (
+                <button type="button" className="btn-primary" onClick={handleEnroll} disabled={enrolling}>
+                  {enrolling ? t('pages.courses.enrolling') : t('pages.courses.enrollInCourse')}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <h1 className="page__title">{course.title}</h1>
-
-        {authorName && (
-          <p className="page__subtitle">
-            by <strong>{authorName}</strong>
-          </p>
-        )}
-
-        {course.description && <p style={{ marginTop: '16px', fontSize: '15px' }}>{course.description}</p>}
-
-        <div className="course-rating course-rating--detail" aria-label={ratingText}>
-          <span className="course-rating__stars" aria-hidden="true">
-            {getRatingStars(course.average_rating)}
-          </span>
-          <span className="course-rating__text">{ratingText}</span>
-        </div>
-
-        <div className="course-detail-actions">
-          {enrolled ? (
-            <Link to="/learning" className="btn-primary">
-              {t('pages.courses.goToLearning')}
-            </Link>
-          ) : (
-            <button type="button" className="btn-primary" onClick={handleEnroll} disabled={enrolling}>
-              {enrolling ? t('pages.courses.enrolling') : t('pages.courses.enrollInCourse')}
-            </button>
-          )}
-        </div>
+        {course.description && <p className="course-detail-description">{course.description}</p>}
 
         {error && <p style={{ color: '#dc2626', marginTop: '12px' }}>{error}</p>}
       </div>
@@ -236,7 +260,7 @@ function CourseDetailPage() {
                         {topic.title}
                         {topic.is_timed_test && (
                           <span className="topic-item__timed-badge" title={t('pages.learning.timedTest')}>
-                            TIMED
+                            TIMER
                           </span>
                         )}
                       </li>
@@ -252,7 +276,6 @@ function CourseDetailPage() {
       <section className="course-reviews">
         <div className="course-reviews__header">
           <h2 className="section-title">{t('pages.courses.reviewsTitle')}</h2>
-          <span className="course-reviews__count">{ratingText}</span>
         </div>
 
         <form className="course-review-form" onSubmit={handleReviewSubmit}>
@@ -270,7 +293,7 @@ function CourseDetailPage() {
                   aria-checked={value === reviewRating}
                   aria-label={`${value} ${t('pages.courses.stars')}`}
                 >
-                  ★
+                  {FILLED_STAR}
                 </button>
               );
             })}
@@ -308,11 +331,9 @@ function CourseDetailPage() {
                   <strong>{review.user_name}</strong>
                   <span>{formatReviewDate(review.updated_at)}</span>
                 </div>
-                <div className="course-rating course-rating--message" aria-label={`${review.rating} / 5`}>
-                  <span className="course-rating__stars" aria-hidden="true">
-                    {getRatingStars(review.rating)}
-                  </span>
-                  <span className="course-rating__text">{review.rating} / 5</span>
+                <div className="course-rating course-rating--message" aria-label={review.rating.toFixed(1)}>
+                  <RatingStars rating={review.rating} />
+                  <span className="course-rating__text">{review.rating.toFixed(1)}</span>
                 </div>
                 {review.comment ? (
                   <p className="course-review-message__comment">{review.comment}</p>

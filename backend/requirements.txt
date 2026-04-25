@@ -8,3 +8,5 @@ Pillow
 django-allauth
 PyJWT
 python-dotenv
+requests
+cryptography

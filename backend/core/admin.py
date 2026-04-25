@@ -27,8 +27,8 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("title", "author")
-    search_fields = ("title", "description")
+    list_display = ("title", "author", "programming_languages", "frameworks")
+    search_fields = ("title", "description", "programming_languages", "frameworks")
     list_filter = ("author",)
 
 
