@@ -12,6 +12,7 @@ from .learning import (
     TopicQuestion,
     TopicQuestionOption,
     TopicQuestionAnswer,
+    TopicQuestionHint,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "TopicQuestion",
     "TopicQuestionOption",
     "TopicQuestionAnswer",
+    "TopicQuestionHint",
 ]

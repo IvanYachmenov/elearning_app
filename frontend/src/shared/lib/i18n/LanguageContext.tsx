@@ -134,7 +134,19 @@ const translations = {
                 answerAccepted: 'Answer accepted!',
                 loadingQuestion: 'Loading question...',
                 loadingCourse: 'Loading course...',
-                courseNotFound: 'Course not found.'
+                courseNotFound: 'Course not found.',
+                hint: 'Hint',
+                hideHints: 'Hide hints',
+                loadingHints: 'Loading hints...',
+                noHintsYet: 'No hints yet. Be the first to add one.',
+                nextHint: 'Next hint',
+                hintPlaceholder: 'Write a useful hint for this question...',
+                postHint: 'Post hint',
+                postingHint: 'Posting...',
+                noMoreHints: 'No more hints for this question.',
+                hintPostLocked: 'You can add a hint after answering this question correctly.',
+                failedToLoadHints: 'Failed to load hints.',
+                failedToSaveHint: 'Failed to save hint. Please try again.'
             },
             settings: {
                 title: 'Settings',
@@ -479,7 +491,19 @@ const translations = {
                 answerAccepted: 'Odpoveď prijatá!',
                 loadingQuestion: 'Načítavanie otázky...',
                 loadingCourse: 'Načítavanie kurzu...',
-                courseNotFound: 'Kurz sa nenašiel.'
+                courseNotFound: 'Kurz sa nenasiel.',
+                hint: 'Napoveda',
+                hideHints: 'Skryt napovedy',
+                loadingHints: 'Nacitavanie napoved...',
+                noHintsYet: 'Zatial tu nie su ziadne napovedy. Pridajte prvu.',
+                nextHint: 'Dalsia napoveda',
+                hintPlaceholder: 'Napiste uzitocnu napovedu k tejto otazke...',
+                postHint: 'Pridat napovedu',
+                postingHint: 'Pridavanie...',
+                noMoreHints: 'K tejto otazke uz nie su dalsie napovedy.',
+                hintPostLocked: 'Napovedu mozete pridat az po spravnej odpovedi na tuto otazku.',
+                failedToLoadHints: 'Nacitanie napoved zlyhalo.',
+                failedToSaveHint: 'Ulozenie napovedy zlyhalo. Skuste to znova.'
             },
             settings: {
                 title: 'Nastavenia',

@@ -20,6 +20,7 @@ from .views import (
     TopicTheoryView,
     TopicNextQuestionView,
     TopicQuestionAnswerView,
+    TopicQuestionHintView,
     TopicPracticeHistoryView,
     TopicPracticeResetView,
 )
@@ -59,6 +60,7 @@ urlpatterns = [
     path("learning/topics/<int:pk>/", TopicTheoryView.as_view(), name="learning-topic-detail"),
     path("learning/topics/<int:pk>/next-question/", TopicNextQuestionView.as_view(), name="learning-topic-next-question"),
     path("learning/questions/<int:pk>/answer/", TopicQuestionAnswerView.as_view(), name="learning-question-answer"),
+    path("learning/questions/<int:pk>/hints/", TopicQuestionHintView.as_view(), name="learning-question-hints"),
     path("learning/topics/<int:pk>/reset/", TopicPracticeResetView.as_view(), name="learning-topic-reset"),
 
     # learning - practice history

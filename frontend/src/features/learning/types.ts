@@ -1,4 +1,4 @@
-import type { PracticeHistoryQuestion, PracticeQuestion } from '../../shared/types';
+import type { PracticeHistoryQuestion, PracticeQuestion, PracticeQuestionHint } from '../../shared/types';
 
 export type PracticeFeedbackType = 'success' | 'fail' | 'error' | 'neutral';
 
@@ -32,6 +32,18 @@ export interface PracticeQuestionCardProps {
   showFinishButton: boolean;
   showTimedNextButton: boolean;
   timedAnswerSaved: boolean;
+  hints: PracticeQuestionHint[];
+  hintsOpen: boolean;
+  hintsLoading: boolean;
+  hintsError: string | null;
+  activeHintIndex: number;
+  hintDraft: string;
+  hintSubmitLoading: boolean;
+  canPostHint: boolean;
+  onToggleHints: () => void;
+  onNextHint: () => void;
+  onHintDraftChange: (value: string) => void;
+  onSubmitHint: () => void;
 }
 
 export interface PracticeHistorySectionProps {

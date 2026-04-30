@@ -9,8 +9,10 @@ from ...models import (
     TopicQuestion,
     TopicQuestionOption,
     TopicQuestionAnswer,
+    TopicQuestionHint,
 )
 from ...serializers import (
+    TopicQuestionHintSerializer,
     TopicPracticeQuestionSerializer,
     TopicQuestionAnswerSubmitSerializer,
 )
@@ -501,4 +503,73 @@ class TopicQuestionAnswerView(APIView):
                 "time_limit_seconds": None,
                 "remaining_seconds": None,
             }
+        )
+
+
+# GET/POST /api/learning/questions/<id>/hints/
+class TopicQuestionHintView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_question(self, request, pk):
+        try:
+            question = TopicQuestion.objects.select_related(
+                "topic__module__course"
+            ).get(pk=pk)
+        except TopicQuestion.DoesNotExist:
+            return None, Response(
+                {"detail": "Question not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        course = question.topic.module.course
+        if not course.students.filter(pk=request.user.pk).exists():
+            return None, Response(
+                {"detail": "You are not enrolled in this course."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return question, None
+
+    def get(self, request, pk):
+        question, error_response = self.get_question(request, pk)
+        if error_response is not None:
+            return error_response
+
+        hints = TopicQuestionHint.objects.filter(question=question).select_related("author")
+        serializer = TopicQuestionHintSerializer(
+            hints,
+            many=True,
+            context={"request": request},
+        )
+        return Response({"hints": serializer.data})
+
+    def post(self, request, pk):
+        question, error_response = self.get_question(request, pk)
+        if error_response is not None:
+            return error_response
+
+        can_add_hint = TopicQuestionAnswer.objects.filter(
+            user=request.user,
+            question=question,
+            is_correct=True,
+        ).exists()
+        if not can_add_hint:
+            return Response(
+                {"detail": "You can add a hint only after answering this question correctly."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = TopicQuestionHintSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        hint = serializer.save(question=question, author=request.user)
+
+        return Response(
+            TopicQuestionHintSerializer(
+                hint,
+                context={"request": request},
+            ).data,
+            status=status.HTTP_201_CREATED,
         )

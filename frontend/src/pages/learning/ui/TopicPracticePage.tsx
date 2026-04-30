@@ -12,7 +12,13 @@ import type { PracticeAnswerFeedback } from '../../../features/learning/types';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { useNavigationLock } from '../../../shared/lib/navigation-lock';
-import type { PracticeHistoryQuestion, PracticeQuestion, TopicTheory } from '../../../shared/types';
+import type {
+  PracticeHistoryQuestion,
+  PracticeQuestion,
+  PracticeQuestionHint,
+  PracticeQuestionHintsResponse,
+  TopicTheory,
+} from '../../../shared/types';
 import type { PracticeApiPayload, TopicRouteParams, TopicHistoryResponse } from '../model/types';
 import '../styles/learning.css';
 
@@ -57,8 +63,17 @@ function TopicPracticePage() {
   const [historyQuestions, setHistoryQuestions] = useState<PracticeHistoryQuestion[]>([]);
 
   const [timedAnswerSaved, setTimedAnswerSaved] = useState(false);
+  const [hintsOpen, setHintsOpen] = useState(false);
+  const [questionHints, setQuestionHints] = useState<PracticeQuestionHint[]>([]);
+  const [hintsLoading, setHintsLoading] = useState(false);
+  const [hintsError, setHintsError] = useState<string | null>(null);
+  const [hintsLoadedQuestionId, setHintsLoadedQuestionId] = useState<number | null>(null);
+  const [activeHintIndex, setActiveHintIndex] = useState(0);
+  const [hintDraft, setHintDraft] = useState('');
+  const [hintSubmitLoading, setHintSubmitLoading] = useState(false);
 
   const timerExpiredRef = useRef(false);
+  const practiceQuestionId = practiceQuestion?.id ?? null;
 
   useEffect(() => {
     let isActive = true;
@@ -234,6 +249,17 @@ function TopicPracticePage() {
   }, [loadingTopic, error, topic, totalQuestions, practiceQuestion, practiceCompleted, practiceLoading, fetchNextQuestion]);
 
   useEffect(() => {
+    setHintsOpen(false);
+    setQuestionHints([]);
+    setHintsLoading(false);
+    setHintsError(null);
+    setHintsLoadedQuestionId(null);
+    setActiveHintIndex(0);
+    setHintDraft('');
+    setHintSubmitLoading(false);
+  }, [practiceQuestionId]);
+
+  useEffect(() => {
     if (!isReviewMode || !topicId) {
       return;
     }
@@ -366,6 +392,82 @@ function TopicPracticePage() {
     setSelectedOptions((previous) =>
       previous.includes(optionId) ? previous.filter((id) => id !== optionId) : [...previous, optionId],
     );
+  };
+
+  const loadQuestionHints = useCallback(
+    async (questionId: number, force = false) => {
+      if (!force && hintsLoadedQuestionId === questionId) {
+        return;
+      }
+
+      setHintsLoading(true);
+      setHintsError(null);
+
+      try {
+        const response = await api.get<PracticeQuestionHintsResponse>(`/api/learning/questions/${questionId}/hints/`);
+        setQuestionHints(response.data.hints || []);
+        setActiveHintIndex(0);
+        setHintsLoadedQuestionId(questionId);
+      } catch (requestError) {
+        console.error(requestError);
+        setHintsError(t('pages.learning.failedToLoadHints'));
+      } finally {
+        setHintsLoading(false);
+      }
+    },
+    [hintsLoadedQuestionId, t],
+  );
+
+  const handleToggleHints = () => {
+    if (!practiceQuestion) {
+      return;
+    }
+
+    if (!hintsOpen) {
+      void loadQuestionHints(practiceQuestion.id);
+    }
+
+    setHintsOpen((previous) => !previous);
+  };
+
+  const handleNextHint = () => {
+    setActiveHintIndex((previous) => Math.min(previous + 1, Math.max(questionHints.length - 1, 0)));
+  };
+
+  const handleSubmitHint = async () => {
+    if (!practiceQuestion) {
+      return;
+    }
+
+    const canSubmitHint = Boolean(answerFeedback && answerFeedback.score === practiceQuestion.max_score);
+    if (!canSubmitHint) {
+      setHintsError(t('pages.learning.hintPostLocked'));
+      return;
+    }
+
+    const text = hintDraft.trim();
+    if (!text) {
+      return;
+    }
+
+    setHintSubmitLoading(true);
+    setHintsError(null);
+
+    try {
+      const response = await api.post<PracticeQuestionHint>(`/api/learning/questions/${practiceQuestion.id}/hints/`, {
+        text,
+      });
+      const nextIndex = questionHints.length;
+      setQuestionHints((previous) => [...previous, response.data]);
+      setHintsLoadedQuestionId(practiceQuestion.id);
+      setActiveHintIndex(nextIndex);
+      setHintDraft('');
+    } catch (requestError) {
+      console.error(requestError);
+      setHintsError(t('pages.learning.failedToSaveHint'));
+    } finally {
+      setHintSubmitLoading(false);
+    }
   };
 
   const handleContinueTimed = async () => {
@@ -574,6 +676,7 @@ function TopicPracticePage() {
     ((!isTimedMode && (feedbackType === 'success' || feedbackType === 'fail')) ||
       (isTimedMode && feedbackType === 'neutral'));
   const showTimedNextButton = isTimedMode && timedAnswerSaved && !showFinishButton;
+  const canPostHint = Boolean(practiceQuestion && answerFeedback && answerFeedback.score === practiceQuestion.max_score);
 
   if (loadingTopic && !topic) {
     return <div className="page page-enter" />;
@@ -696,6 +799,18 @@ function TopicPracticePage() {
                 showNextButton={showNextButton}
                 showFinishButton={showFinishButton}
                 showTimedNextButton={showTimedNextButton}
+                hints={questionHints}
+                hintsOpen={hintsOpen}
+                hintsLoading={hintsLoading}
+                hintsError={hintsError}
+                activeHintIndex={activeHintIndex}
+                hintDraft={hintDraft}
+                hintSubmitLoading={hintSubmitLoading}
+                canPostHint={canPostHint}
+                onToggleHints={handleToggleHints}
+                onNextHint={handleNextHint}
+                onHintDraftChange={setHintDraft}
+                onSubmitHint={handleSubmitHint}
               />
             )}
           </>

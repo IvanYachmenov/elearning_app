@@ -120,3 +120,27 @@ class TopicQuestionAnswer(models.Model):
 
     def __str__(self):
         return f"{self.user} – Q{self.question_id} ({self.score}%)"
+
+class TopicQuestionHint(models.Model):
+    question = models.ForeignKey(
+        TopicQuestion,
+        on_delete=models.CASCADE,
+        related_name="hints",
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="question_hints",
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+        indexes = [
+            models.Index(fields=["question", "created_at"], name="core_hint_q_created_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.author} hint for Q{self.question_id}"

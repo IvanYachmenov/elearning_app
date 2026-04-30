@@ -1,7 +1,14 @@
 from rest_framework import serializers
 
 from .course import ModuleSerializer, TopicSerializer, CourseDetailSerializer
-from ..models import Topic, TopicProgress, TopicQuestionAnswer, TopicQuestionOption, TopicQuestion
+from ..models import (
+    Topic,
+    TopicProgress,
+    TopicQuestionAnswer,
+    TopicQuestionHint,
+    TopicQuestionOption,
+    TopicQuestion,
+)
 
 
 class LearningTopicSerializer(TopicSerializer):
@@ -156,6 +163,29 @@ class TopicQuestionAnswerSubmitSerializer(serializers.Serializer):
         child=serializers.IntegerField(),
         allow_empty=True,
     )
+
+
+class TopicQuestionHintSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source="author.username", read_only=True)
+    is_mine = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TopicQuestionHint
+        fields = ("id", "text", "author_name", "created_at", "is_mine")
+        read_only_fields = ("id", "author_name", "created_at", "is_mine")
+
+    def get_is_mine(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        return bool(user and user.is_authenticated and obj.author_id == user.id)
+
+    def validate_text(self, value):
+        text = value.strip()
+        if not text:
+            raise serializers.ValidationError("Hint text cannot be empty.")
+        if len(text) > 280:
+            raise serializers.ValidationError("Hint text must be 280 characters or fewer.")
+        return text
 
 
 class TopicPracticeHistoryQuestionSerializer(TopicPracticeQuestionSerializer):

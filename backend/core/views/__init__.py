@@ -24,6 +24,7 @@ from .learning import (
     TopicTheoryView,
     TopicNextQuestionView,
     TopicQuestionAnswerView,
+    TopicQuestionHintView,
     TopicPracticeHistoryView,
     TopicPracticeResetView,
 )
@@ -48,6 +49,7 @@ __all__ = [
     "TopicTheoryView",
     "TopicNextQuestionView",
     "TopicQuestionAnswerView",
+    "TopicQuestionHintView",
     "TopicPracticeHistoryView",
     "TopicPracticeResetView",
 ]

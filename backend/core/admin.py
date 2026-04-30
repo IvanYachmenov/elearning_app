@@ -1,7 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, Course, CourseReview, Module, Topic, TopicQuestion, TopicQuestionOption, TopicQuestionAnswer, TopicProgress
+from .models import (
+    User,
+    Course,
+    CourseReview,
+    Module,
+    Topic,
+    TopicQuestion,
+    TopicQuestionOption,
+    TopicQuestionAnswer,
+    TopicQuestionHint,
+    TopicProgress,
+)
 
 
 @admin.register(User)
@@ -72,6 +83,12 @@ class TopicQuestionOptionAdmin(admin.ModelAdmin):
 class TopicQuestionAnswerAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "question", "is_correct", "score", "answered_at")
     list_filter = ("is_correct", "question__topic")
+
+@admin.register(TopicQuestionHint)
+class TopicQuestionHintAdmin(admin.ModelAdmin):
+    list_display = ("id", "author", "question", "created_at")
+    list_filter = ("question__topic", "created_at")
+    search_fields = ("text", "author__username", "question__text")
 
 @admin.register(TopicProgress)
 class TopicProgressAdmin(admin.ModelAdmin):

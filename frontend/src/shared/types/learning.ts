@@ -38,6 +38,18 @@ export interface PracticeLastAnswer {
 
 export type PracticeQuestion = TopicQuestion;
 
+export interface PracticeQuestionHint {
+  id: number;
+  text: string;
+  author_name: string;
+  created_at: string;
+  is_mine: boolean;
+}
+
+export interface PracticeQuestionHintsResponse {
+  hints: PracticeQuestionHint[];
+}
+
 export interface PracticeHistoryQuestion extends TopicQuestion {
   user_option_ids: number[];
   is_correct: boolean | null;

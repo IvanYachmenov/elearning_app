@@ -18,8 +18,24 @@ function PracticeQuestionCard({
   showFinishButton,
   showTimedNextButton,
   timedAnswerSaved,
+  hints,
+  hintsOpen,
+  hintsLoading,
+  hintsError,
+  activeHintIndex,
+  hintDraft,
+  hintSubmitLoading,
+  canPostHint,
+  onToggleHints,
+  onNextHint,
+  onHintDraftChange,
+  onSubmitHint,
 }: PracticeQuestionCardProps) {
   const { t } = useLanguage();
+  const hintCharacterLimit = 280;
+  const activeHint = hints[activeHintIndex] ?? null;
+  const hasMoreHints = hints.length > 1 && activeHintIndex < hints.length - 1;
+  const isLastHint = hints.length > 1 && activeHintIndex === hints.length - 1;
 
   const renderFeedback = () => {
     if (!answerFeedback) {
@@ -139,7 +155,84 @@ function PracticeQuestionCard({
               {t('pages.auth.finishTest')}
             </button>
           )}
+
+          <button
+            type="button"
+            className="topic-practice__hint-toggle"
+            onClick={onToggleHints}
+            disabled={practiceLoading}
+            aria-expanded={hintsOpen}
+          >
+            <span className="topic-practice__hint-icon" aria-hidden="true" />
+            <span>{hintsOpen ? t('pages.learning.hideHints') : t('pages.learning.hint')}</span>
+          </button>
         </div>
+
+        {hintsOpen && (
+          <div className="topic-practice__hint-panel">
+            {hintsLoading && (
+              <p className="topic-practice__hint-empty">{t('pages.learning.loadingHints')}</p>
+            )}
+
+            {!hintsLoading && hintsError && (
+              <p className="topic-practice__hint-error">{hintsError}</p>
+            )}
+
+            {!hintsLoading && !hintsError && activeHint && (
+              <article className="topic-practice__hint-card">
+                <p className="topic-practice__hint-text">{activeHint.text}</p>
+                <div className="topic-practice__hint-meta">
+                  {activeHint.author_name} - {new Date(activeHint.created_at).toLocaleDateString()}
+                </div>
+                {hasMoreHints && (
+                  <button
+                    type="button"
+                    className="topic-practice__secondary-btn topic-practice__hint-next"
+                    onClick={onNextHint}
+                  >
+                    {t('pages.learning.nextHint')}
+                  </button>
+                )}
+                {isLastHint && (
+                  <p className="topic-practice__hint-end">{t('pages.learning.noMoreHints')}</p>
+                )}
+              </article>
+            )}
+
+            {!hintsLoading && !hintsError && !activeHint && (
+              <p className="topic-practice__hint-empty">{t('pages.learning.noHintsYet')}</p>
+            )}
+
+            {canPostHint ? (
+              <form
+                className="topic-practice__hint-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onSubmitHint();
+                }}
+              >
+                <textarea
+                  className="topic-practice__hint-input"
+                  value={hintDraft}
+                  onChange={(event) => onHintDraftChange(event.target.value)}
+                  placeholder={t('pages.learning.hintPlaceholder')}
+                  rows={2}
+                  maxLength={hintCharacterLimit}
+                  disabled={hintSubmitLoading}
+                />
+                <button
+                  type="submit"
+                  className="topic-practice__secondary-btn topic-practice__hint-submit"
+                  disabled={hintSubmitLoading || hintDraft.trim().length === 0}
+                >
+                  {hintSubmitLoading ? t('pages.learning.postingHint') : t('pages.learning.postHint')}
+                </button>
+              </form>
+            ) : (
+              <p className="topic-practice__hint-locked">{t('pages.learning.hintPostLocked')}</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
