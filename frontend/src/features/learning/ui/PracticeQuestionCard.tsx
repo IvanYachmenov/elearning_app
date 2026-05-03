@@ -1,4 +1,5 @@
 ﻿import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+import { LoadingIndicator } from '../../../shared/ui';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeQuestionCardProps } from '../types';
 
@@ -170,9 +171,7 @@ function PracticeQuestionCard({
 
         {hintsOpen && (
           <div className="topic-practice__hint-panel">
-            {hintsLoading && (
-              <p className="topic-practice__hint-empty">{t('pages.learning.loadingHints')}</p>
-            )}
+            {hintsLoading && <LoadingIndicator compact label={t('common.loading')} />}
 
             {!hintsLoading && hintsError && (
               <p className="topic-practice__hint-error">{hintsError}</p>

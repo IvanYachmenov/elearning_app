@@ -52,7 +52,6 @@ function CourseCard({ course }: CourseCardProps) {
   const authorName = course.author_name || course.author?.username || course.author?.email || null;
   const hasRating = typeof course.average_rating === 'number' && course.reviews_count > 0;
   const ratingText = hasRating ? course.average_rating?.toFixed(1) : t('pages.courses.noReviews');
-  const tags = [...(course.programming_languages || []), ...(course.frameworks || [])];
 
   return (
     <article className="course-card">
@@ -72,16 +71,6 @@ function CourseCard({ course }: CourseCardProps) {
           <RatingStars rating={course.average_rating} />
           <span className="course-rating__text">{ratingText}</span>
         </div>
-
-        {tags.length > 0 && (
-          <div className="course-card__tags" aria-label={t('pages.courses.courseTags')}>
-            {tags.map((tag) => (
-              <span key={tag} className="course-tag">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
 
         {shortDescription && <p className="course-card__description">{shortDescription}</p>}
 

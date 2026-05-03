@@ -12,8 +12,6 @@ export const INITIAL_COURSE_DATA: TeacherCourseFormData = {
   title: '',
   slug: '',
   description: '',
-  programming_languages: [],
-  frameworks: [],
   modules: [],
   image: null,
   image_url: null,

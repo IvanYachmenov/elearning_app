@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+import { LoadingIndicator } from '../../../shared/ui';
 import { getTeacherErrorMessage } from '../lib/errors';
 import { INITIAL_TOPIC_DATA } from '../lib/factories';
 import { normalizeTopicForm } from '../lib/normalize';
@@ -54,7 +55,7 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
 
   useEffect(() => {
     if (user.role !== 'teacher') {
-      navigate('/home', { replace: true });
+      navigate('/courses', { replace: true });
       return;
     }
 
@@ -127,7 +128,7 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
     return (
       <div className="page page-enter">
         <h1 className="page__title">{isEditMode ? t('pages.teacher.editTopic') : t('pages.teacher.createTopic')}</h1>
-        <p>{t('pages.teacher.loadingGeneric')}</p>
+        <LoadingIndicator label={t('common.loading')} />
       </div>
     );
   }

@@ -38,17 +38,16 @@
   background: #ffffff;
   cursor: pointer;
   font-weight: 800;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .settings-nav__item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.2);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.1);
   background: rgba(11, 11, 13, 0.02);
 }
 .settings-nav__item--active:hover {
   background: linear-gradient(135deg, #f97316 0%, #e7822f 100%);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.18);
 }
 
 .settings-nav__item--active {
@@ -123,7 +122,7 @@
   padding: 14px 12px;
   border: 2px solid rgba(11, 11, 13, 0.18);
   background: rgba(11, 11, 13, 0.02);
-  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
   margin-bottom: 12px;
 }
 
@@ -132,8 +131,7 @@
 }
 
 .settings-account__connection:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(11, 11, 13, 0.12);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.08);
   background: rgba(11, 11, 13, 0.03);
 }
 
@@ -255,7 +253,7 @@
   border: 2px solid var(--nav-black);
   background: #ffffff;
   cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -263,8 +261,7 @@
 }
 
 .settings-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.2);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.1);
   background: rgba(11, 11, 13, 0.02);
 }
 
@@ -277,8 +274,7 @@
 
 .settings-option--active:hover {
   background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.22);
 }
 
 .settings-option--active:hover .settings-option__label,
@@ -295,8 +291,7 @@
 
 [data-theme="dark"] .settings-option--active:hover {
   background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.22) !important;
   color: #0f172a !important;
 }
 
@@ -344,7 +339,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;

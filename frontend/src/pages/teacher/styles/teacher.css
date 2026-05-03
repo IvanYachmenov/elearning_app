@@ -328,7 +328,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
 }
 
 .teacher-delete-modal__btn:disabled {
@@ -500,7 +500,7 @@
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  transition: box-shadow 0.12s ease;
   box-shadow: var(--shadow-sm);
 }
 
@@ -777,12 +777,11 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
 }
 
 .teacher-module-edit-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  transform: translateY(-1px);
 }
 
 .teacher-module-edit-btn:disabled {
@@ -917,12 +916,11 @@
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
 }
 
 .teacher-topic-edit-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  transform: translateY(-1px);
 }
 
 .teacher-topic-edit-btn:disabled {
@@ -1065,7 +1063,7 @@
   font-size: 11px;
   font-weight: 900;
   cursor: pointer;
-  transition: all 0.14s ease;
+  transition: background-color 0.12s ease;
 }
 
 .teacher-add-option-btn:hover {

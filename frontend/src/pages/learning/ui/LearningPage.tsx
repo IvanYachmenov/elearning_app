@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { ApiListResponse, LearningCourse } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { LearningCoursesResponse } from '../model/types';
 import '../styles/learning.css';
 import '../../courses/styles/courses.css';
@@ -53,6 +54,8 @@ function LearningPage() {
     <div className="page page-enter">
       <h1 className="page__title">{t('pages.learning.title')}</h1>
       <p className="page__subtitle">{t('pages.learning.subtitle')}</p>
+
+      {loading && <LoadingIndicator label={t('common.loading')} />}
 
       {error && <p style={{ color: '#dc2626' }}>{error}</p>}
 

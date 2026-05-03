@@ -106,16 +106,11 @@
   box-shadow: var(--shadow-md);
 
   animation: authCardIn 0.45s ease-out both;
-  transition: transform var(--transition-speed);
 }
 
 @keyframes authCardIn {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-.auth-form-wrapper:hover {
-  transform: translateY(-2px);
 }
 
 .auth-title {
@@ -167,7 +162,7 @@
   font-size: 14px;
   color: var(--text-body);
 
-  transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+  transition: box-shadow 0.12s ease, background-color 0.12s ease;
 }
 
 .auth-input:hover {
@@ -177,7 +172,6 @@
 .auth-input:focus {
   outline: none;
   box-shadow: 0 0 0 4px rgba(69, 68, 148, 0.16);
-  transform: translateY(-1px);
 }
 
 /* Button */
@@ -194,13 +188,12 @@
   background: var(--nav-black);
   border: 1.5px solid var(--nav-black);
 
-  transition: transform var(--transition-speed), background-color var(--transition-speed), box-shadow var(--transition-speed);
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .auth-button:hover:not(:disabled) {
   background: #111114;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(11,11,13,0.18);
+  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.12);
 }
 
 .auth-button:disabled {
@@ -304,13 +297,12 @@
   background: #fff;
   color: var(--text-primary);
   cursor: pointer;
-  transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+  transition: box-shadow 0.12s ease, background-color 0.12s ease;
   position: relative;
 }
 
 .auth-oauth-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.1);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.08);
   background: #fafafa;
 }
 

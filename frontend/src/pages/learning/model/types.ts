@@ -2,6 +2,7 @@ import type {
   ApiListResponse,
   LearningCourse,
   PracticeHistoryResponse,
+  PracticeStats,
   PracticeLastAnswer,
   PracticeQuestion,
   TopicTheory,
@@ -27,8 +28,10 @@ export interface PracticeApiPayload {
   progress_percent?: number;
   topic_progress_percent?: number;
   score_percent?: number | null;
+  practice_stats?: PracticeStats;
   remaining_seconds?: number | null;
   time_limit_seconds?: number | null;
+  duration_seconds?: number | null;
   is_timed?: boolean;
   is_timed_test?: boolean;
   last_answer?: PracticeLastAnswer | null;

@@ -11,6 +11,7 @@ from ...models import (
     TopicQuestionAnswer,
     TopicQuestionHint,
 )
+from ...learning_stats import get_topic_practice_stats, get_topic_progress_duration_seconds
 from ...serializers import (
     TopicQuestionHintSerializer,
     TopicPracticeQuestionSerializer,
@@ -129,8 +130,10 @@ class TopicNextQuestionView(APIView):
                         total_questions,
                     ),
                     "score_percent": score_percent,
+                    "practice_stats": get_topic_practice_stats(topic),
                     "remaining_seconds": remaining_seconds,
                     "time_limit_seconds": limit_seconds,
+                    "duration_seconds": get_topic_progress_duration_seconds(progress),
                     "question": None,
                     "last_answer": None,
                 })
@@ -156,8 +159,10 @@ class TopicNextQuestionView(APIView):
                     total_questions,
                 ),
                 "score_percent": score_percent,
+                "practice_stats": get_topic_practice_stats(topic),
                 "time_limit_seconds": limit_seconds,
                 "remaining_seconds": remaining_seconds,
+                "duration_seconds": None,
                 "question": serializer.data,
                 "last_answer": None,
             })
@@ -208,8 +213,10 @@ class TopicNextQuestionView(APIView):
                 "correct_answers": answered_count,
                 "progress_percent": 100,
                 "score_percent": 100,
+                "practice_stats": get_topic_practice_stats(topic),
                 "time_limit_seconds": None,
                 "remaining_seconds": None,
+                "duration_seconds": None,
                 "question": None,
                 "last_answer": None,
             })
@@ -238,8 +245,10 @@ class TopicNextQuestionView(APIView):
             "correct_answers": answered_count,
             "progress_percent": progress_percent,
             "score_percent": progress_percent,
+            "practice_stats": get_topic_practice_stats(topic),
             "time_limit_seconds": None,
             "remaining_seconds": None,
+            "duration_seconds": None,
             "question": serializer.data,
             "last_answer": last_answer_payload,
         })
@@ -362,7 +371,9 @@ class TopicQuestionAnswerView(APIView):
                             "remaining_seconds": 0,
                             "correct_answers": correct_before,
                             "score_percent": score_percent,
+                            "practice_stats": get_topic_practice_stats(topic),
                             "time_limit_seconds": limit_seconds,
+                            "duration_seconds": get_topic_progress_duration_seconds(progress),
                             "is_timed": True,
                         },
                         status=status.HTTP_200_OK,
@@ -466,7 +477,9 @@ class TopicQuestionAnswerView(APIView):
                     "remaining_seconds": remaining_seconds,
                     "correct_answers": correct_answers_qs.count(),
                     "score_percent": score_percent,
+                    "practice_stats": get_topic_practice_stats(topic),
                     "time_limit_seconds": limit_seconds,
+                    "duration_seconds": get_topic_progress_duration_seconds(progress) if completed else None,
                     "is_timed": True,
                 }
             )
@@ -500,8 +513,10 @@ class TopicQuestionAnswerView(APIView):
                 "passed": status_value == TopicProgress.Status.COMPLETED,
                 "correct_answers": answered_count,
                 "score_percent": progress_percent,
+                "practice_stats": get_topic_practice_stats(topic),
                 "time_limit_seconds": None,
                 "remaining_seconds": None,
+                "duration_seconds": None,
             }
         )
 

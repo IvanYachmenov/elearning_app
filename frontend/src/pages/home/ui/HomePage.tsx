@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { ApiListResponse, CourseListItem } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { HomeNewsPost, HomePageProps } from '../model/types';
 import CourseCardSimple from './CourseCardSimple';
 import '../styles/home.css';
@@ -78,7 +79,7 @@ function HomePage({ user }: HomePageProps) {
       <section className="home-section">
         <h2 className="home-section__title">{t('pages.home.featuredCourses')}</h2>
         {loading ? (
-          <p className="home-section__text">{t('pages.home.loadingCourses')}</p>
+          <LoadingIndicator compact label={t('common.loading')} />
         ) : courses.length === 0 ? (
           <p className="home-section__text">{t('pages.home.noCoursesAvailable')}</p>
         ) : (

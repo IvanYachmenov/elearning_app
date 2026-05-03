@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { LearningCourse } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { ExpandedModulesState, LearningRouteParams } from '../model/types';
 import '../styles/learning.css';
 
@@ -89,7 +90,7 @@ function CourseLearningPage() {
   if (loading) {
     return (
       <div className="page page-enter">
-        <p>{t('pages.learning.loadingCourse')}</p>
+        <LoadingIndicator label={t('common.loading')} />
       </div>
     );
   }

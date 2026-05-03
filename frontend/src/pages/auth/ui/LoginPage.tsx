@@ -47,7 +47,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
         onAuth(access, user);
       }
 
-      navigate('/home');
+      navigate('/courses');
     } catch (authError) {
       console.error(authError);
       setError(t('pages.auth.loginFailed'));
@@ -68,7 +68,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
         onAuth(access, user);
       }
 
-      navigate('/home');
+      navigate('/courses');
     } catch (authError) {
       console.error('Google auth error:', authError);
       const providerError = isAxiosError<ApiErrorResponse>(authError)
@@ -118,7 +118,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
   };
 
   const handleGitHubLogin = () => {
-    initiateGitHubLogin('/home');
+    initiateGitHubLogin('/courses');
   };
 
   useEffect(() => {

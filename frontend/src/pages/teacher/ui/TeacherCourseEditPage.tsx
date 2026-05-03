@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+import { LoadingIndicator } from '../../../shared/ui';
 import {
   addEmptyModule,
   addEmptyTopicToModule,
@@ -51,7 +52,7 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
 
   useEffect(() => {
     if (user.role !== 'teacher') {
-      navigate('/home', { replace: true });
+      navigate('/courses', { replace: true });
       return;
     }
 
@@ -156,7 +157,7 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
     return (
       <div className="page page-enter">
         <h1 className="page__title">{isEditMode ? t('pages.teacher.editCourse') : t('pages.teacher.createCourseTitle')}</h1>
-        <p>{t('pages.teacher.loadingGeneric')}</p>
+        <LoadingIndicator label={t('common.loading')} />
       </div>
     );
   }
@@ -186,8 +187,6 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
         imagePreviewUrl={imagePreviewUrl}
         onTitleChange={(value) => updateCourseField('title', value)}
         onDescriptionChange={(value) => updateCourseField('description', value)}
-        onProgrammingLanguagesChange={(value) => updateCourseField('programming_languages', value)}
-        onFrameworksChange={(value) => updateCourseField('frameworks', value)}
         onImageChange={(file) => updateCourseField('image', file)}
       />
 

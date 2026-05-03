@@ -8,10 +8,8 @@ import {
   LoginPage,
   RegisterPage,
   StartPage,
-  HomePage,
   ProfilePage,
   SettingsPage,
-  ShopPage,
   CreditsPage,
   CourseDetailPage,
   CoursesPage,
@@ -29,6 +27,7 @@ import { MainLayout } from '../widgets/layout';
 
 import { api, setAuthToken } from '../shared/api';
 import { getCookie } from '../shared/lib/storage/cookies';
+import { LoadingIndicator } from '../shared/ui';
 import { CookieConsent } from '../features/cookie-consent';
 
 import { NavigationLockProvider } from '../shared/lib/navigation-lock';
@@ -74,7 +73,11 @@ function App() {
   };
 
   if (isCheckingAuth) {
-    return <div className="app-loading-screen">Loading...</div>;
+    return (
+      <div className="app-loading-screen">
+        <LoadingIndicator label="Loading..." />
+      </div>
+    );
   }
 
   return (
@@ -84,15 +87,15 @@ function App() {
           <NavigationLockProvider>
             <CookieConsent />
             <Routes>
-              <Route path="/" element={user ? <Navigate to="/home" replace /> : <StartPage />} />
+              <Route path="/" element={user ? <Navigate to="/courses" replace /> : <StartPage />} />
 
               <Route
                 path="/register"
-                element={user && !hasGitHubCallback ? <Navigate to="/home" replace /> : <RegisterPage onAuth={handleAuthSuccess} />}
+                element={user && !hasGitHubCallback ? <Navigate to="/courses" replace /> : <RegisterPage onAuth={handleAuthSuccess} />}
               />
               <Route
                 path="/login"
-                element={user && !hasGitHubCallback ? <Navigate to="/home" replace /> : <LoginPage onAuth={handleAuthSuccess} />}
+                element={user && !hasGitHubCallback ? <Navigate to="/courses" replace /> : <LoginPage onAuth={handleAuthSuccess} />}
               />
 
               <Route
@@ -100,13 +103,13 @@ function App() {
                   user ? <MainLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
                 }
               >
-                <Route path="/home" element={<HomePage user={user!} />} />
+                <Route path="/home" element={<Navigate to="/courses" replace />} />
                 <Route path="/profile" element={<ProfilePage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
                 <Route path="/learning" element={<LearningPage />} />
                 <Route path="/learning/courses/:id" element={<CourseLearningPage />} />
-                <Route path="/shop" element={<ShopPage />} />
+                <Route path="/shop" element={<Navigate to="/courses" replace />} />
                 <Route path="/settings" element={<SettingsPage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/learning/courses/:courseId/topics/:topicId" element={<TopicTheoryPage />} />

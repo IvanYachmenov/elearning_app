@@ -1,4 +1,5 @@
 ﻿import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+import { LoadingIndicator } from '../../../shared/ui';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeHistorySectionProps } from '../types';
 
@@ -7,7 +8,7 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
 
   return (
     <section className="topic-practice__history">
-      {loading && <p className="topic-practice__empty">{t('pages.learning.loadingTestHistory')}</p>}
+      {loading && <LoadingIndicator compact label={t('common.loading')} />}
 
       {error && <p style={{ color: '#dc2626', marginTop: '8px' }}>{error}</p>}
 

@@ -18,16 +18,27 @@ export interface LearningCourse extends Omit<CourseDetail, 'modules'> {
   progress_percent: number;
 }
 
+export interface PracticeStats {
+  completed_users: number;
+  passed_users: number;
+  average_success_percent: number | null;
+  pass_rate_percent: number | null;
+}
+
 export interface TopicTheory extends CourseTopic {
   course_id: number;
   course_title: string;
   module_id: number;
   module_title: string;
   status: TopicProgressStatus;
+  score: number | null;
+  timed_out?: boolean;
   total_questions: number;
   answered_questions: number;
   progress_percent: number;
   correct_answers?: number;
+  practice_stats?: PracticeStats;
+  duration_seconds?: number | null;
 }
 
 export interface PracticeLastAnswer {
@@ -70,8 +81,10 @@ export interface PracticePayload {
   progress_percent: number;
   topic_progress_percent?: number;
   score_percent: number;
+  practice_stats?: PracticeStats;
   remaining_seconds: number | null;
   time_limit_seconds: number | null;
+  duration_seconds: number | null;
   is_timed_test: boolean;
   last_answer: PracticeLastAnswer | null;
 }

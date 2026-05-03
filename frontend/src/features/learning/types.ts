@@ -1,4 +1,4 @@
-import type { PracticeHistoryQuestion, PracticeQuestion, PracticeQuestionHint } from '../../shared/types';
+import type { PracticeHistoryQuestion, PracticeQuestion, PracticeQuestionHint, PracticeStats } from '../../shared/types';
 
 export type PracticeFeedbackType = 'success' | 'fail' | 'error' | 'neutral';
 
@@ -53,14 +53,14 @@ export interface PracticeHistorySectionProps {
 }
 
 export interface PracticeCompletionPanelProps {
-  topicTitle: string;
   isTimed: boolean;
   timedOut: boolean;
   passed: boolean;
   scorePercent: number | null;
   correctAnswers: number;
   totalQuestions: number;
-  answeredQuestions: number;
+  durationSeconds?: number | null;
+  practiceStats?: PracticeStats | null;
   onRetry?: () => void;
   onViewHistory?: () => void;
   isReviewMode: boolean;

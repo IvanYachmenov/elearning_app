@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { TopicTheory } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { TopicRouteParams } from '../model/types';
 import '../styles/learning.css';
 
@@ -87,7 +88,7 @@ function TopicTheoryPage() {
   if (loading) {
     return (
       <div className="page page-enter">
-        <p>{t('pages.learning.loadingTopic')}</p>
+        <LoadingIndicator label={t('common.loading')} />
       </div>
     );
   }

@@ -51,7 +51,7 @@
   font-size: 32px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  transition: box-shadow 0.12s ease;
 }
 
 .profile-avatar-large--with-image {
@@ -59,12 +59,11 @@
 }
 
 .profile-avatar-large.editable:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 0 4px var(--nav-black), 0 8px 24px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 0 0 3px var(--nav-black), 0 4px 12px rgba(124, 58, 237, 0.18);
 }
 
 .profile-avatar-large--with-image.editable:hover {
-  box-shadow: 0 0 0 4px var(--nav-black), 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 3px var(--nav-black), 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .profile-avatar-img {
@@ -117,13 +116,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
   flex-shrink: 0;
 }
 
 .profile-edit-appearance-btn:hover {
   background: rgba(140, 140, 143, 0.8);
-  transform: scale(1.05);
 }
 
 .profile-appearance-actions {
@@ -140,7 +138,7 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
   white-space: nowrap;
 }
 
@@ -152,7 +150,6 @@
 
 .profile-save-appearance-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #0ea371 0%, #2ecf8a 100%);
-  transform: translateY(-1px);
 }
 
 .profile-cancel-appearance-btn:hover:not(:disabled) {
@@ -199,7 +196,7 @@
   letter-spacing: 0.05em;
   border: 2px solid var(--nav-black);
   cursor: pointer;
-  transition: transform 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .profile-edit-btn {
@@ -209,8 +206,7 @@
 
 .profile-edit-btn:hover {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.2);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.12);
 }
 
 .profile-save-btn {
@@ -221,8 +217,7 @@
 
 .profile-save-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #0ea371, #2ecf8a);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 
 .profile-save-btn:disabled {
@@ -237,7 +232,6 @@
 
 .profile-cancel-btn:hover:not(:disabled) {
   background: rgba(11, 11, 13, 0.05);
-  transform: translateY(-2px);
 }
 
 .profile-cancel-btn:disabled {
@@ -298,13 +292,12 @@
   font-size: 14px;
   color: var(--text-body);
   font-family: inherit;
-  transition: background-color 0.14s ease, transform 0.14s ease, box-shadow 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .profile-input:focus {
   outline: none;
   background: #fafafa;
-  transform: translateY(-1px);
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
 }
 
@@ -363,17 +356,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
   flex-shrink: 0;
 }
 
 .profile-gradient-nav:hover {
   background: rgba(11, 11, 13, 0.05);
-  transform: scale(1.1);
-}
-
-.profile-gradient-nav:active {
-  transform: scale(0.95);
 }
 
 .profile-gradient-label {
@@ -407,13 +395,12 @@
   height: 48px;
   border: 2px solid var(--nav-black);
   cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  transition: box-shadow 0.12s ease;
   position: relative;
 }
 
 .profile-gradient-option:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.3);
+  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.16);
 }
 
 .profile-gradient-option.selected {

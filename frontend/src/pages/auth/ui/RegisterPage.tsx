@@ -66,7 +66,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
         onAuth(access, user);
       }
 
-      navigate('/home');
+      navigate('/courses');
     } catch (authError) {
       console.error(authError);
       setError(t('pages.auth.registrationFailed'));
@@ -87,7 +87,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
         onAuth(access, user);
       }
 
-      navigate('/home');
+      navigate('/courses');
     } catch (authError) {
       console.error('Google auth error:', authError);
       const providerError = isAxiosError<ApiErrorResponse>(authError)
@@ -137,7 +137,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
   };
 
   const handleGitHubRegister = () => {
-    initiateGitHubLogin('/home');
+    initiateGitHubLogin('/courses');
   };
 
   useEffect(() => {

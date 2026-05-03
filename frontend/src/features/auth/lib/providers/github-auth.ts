@@ -33,7 +33,7 @@ function clearGitHubCallbackParams(): void {
   window.history.replaceState({}, document.title, nextUrl);
 }
 
-export function initiateGitHubLogin(nextPath = '/home'): void {
+export function initiateGitHubLogin(nextPath = '/courses'): void {
   const url = `${API_URL}/accounts/github/login/?next=${encodeURIComponent(nextPath)}&select_account=1`;
   window.location.href = url;
 }
@@ -55,7 +55,7 @@ export function handleGitHubCallback(): GitHubCallbackResult {
     error: callback.error,
     provider: callback.provider,
     nextPath:
-      callback.nextPath && callback.nextPath.startsWith('/') ? callback.nextPath : '/home',
+      callback.nextPath && callback.nextPath.startsWith('/') ? callback.nextPath : '/courses',
     isGitHubCallback: callback.isGitHubCallback,
   };
 }

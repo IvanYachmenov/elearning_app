@@ -33,7 +33,7 @@
 @keyframes landingFadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(4px);
     }
     to {
         opacity: 1;
@@ -77,7 +77,7 @@
     text-align: center;
     text-decoration: none;
     border: 2px solid;
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+    transition: box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
     border-radius: 0;
     color: white ;
 }
@@ -91,8 +91,7 @@
 .landing-button--primary:hover {
     color: #fff;
     background: #111114;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(11, 11, 13, 0.25);
+    box-shadow: 0 4px 12px rgba(11, 11, 13, 0.14);
     text-decoration: none;
 }
 
@@ -104,8 +103,7 @@
 
 .landing-button--secondary:hover {
     background: #fafafa;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.18);
     text-decoration: none;
 }
 
@@ -118,7 +116,6 @@
 .landing-button--tertiary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
     text-decoration: none;
 }
 
@@ -205,7 +202,7 @@
 [data-theme="dark"] .landing-button--primary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--border-color);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 [data-theme="dark"] .landing-button--secondary {
@@ -217,7 +214,7 @@
 [data-theme="dark"] .landing-button--secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--border-color);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 [data-theme="dark"] .landing-button--tertiary {

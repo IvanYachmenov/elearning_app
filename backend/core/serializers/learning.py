@@ -9,6 +9,7 @@ from ..models import (
     TopicQuestionOption,
     TopicQuestion,
 )
+from ..learning_stats import get_topic_practice_stats, get_topic_progress_duration_seconds
 
 
 class LearningTopicSerializer(TopicSerializer):
@@ -82,9 +83,14 @@ class TopicTheorySerializer(TopicSerializer):
     module_title = serializers.CharField(source="module.title", read_only=True)
 
     status = serializers.SerializerMethodField()
+    score = serializers.SerializerMethodField()
+    timed_out = serializers.SerializerMethodField()
     total_questions = serializers.SerializerMethodField()
     answered_questions = serializers.SerializerMethodField()
+    correct_answers = serializers.SerializerMethodField()
     progress_percent = serializers.SerializerMethodField()
+    practice_stats = serializers.SerializerMethodField()
+    duration_seconds = serializers.SerializerMethodField()
 
     class Meta:
         model = Topic
@@ -98,11 +104,16 @@ class TopicTheorySerializer(TopicSerializer):
             "module_id",
             "module_title",
             "status",
+            "score",
+            "timed_out",
             "is_timed_test",
             "time_limit_seconds",
             "total_questions",
             "answered_questions",
+            "correct_answers",
             "progress_percent",
+            "practice_stats",
+            "duration_seconds",
         )
 
     def get_status(self, obj):
@@ -110,6 +121,14 @@ class TopicTheorySerializer(TopicSerializer):
         if progress:
             return progress.status
         return TopicProgress.Status.NOT_STARTED
+
+    def get_score(self, obj):
+        progress = self.context.get("topic_progress")
+        return progress.score if progress else None
+
+    def get_timed_out(self, obj):
+        progress = self.context.get("topic_progress")
+        return bool(progress and progress.timed_out)
 
     def get_total_questions(self, obj):
         return TopicQuestion.objects.filter(topic=obj).count()
@@ -119,14 +138,30 @@ class TopicTheorySerializer(TopicSerializer):
         user = getattr(request, "user", None)
         if not user or user.is_anonymous:
             return 0
-        return TopicQuestionAnswer.objects.filter(user=user, question__topic=obj, is_correct=True,).count()
+        return TopicQuestionAnswer.objects.filter(user=user, question__topic=obj).count()
+
+    def get_correct_answers(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not user or user.is_anonymous:
+            return 0
+        return TopicQuestionAnswer.objects.filter(user=user, question__topic=obj, is_correct=True).count()
 
     def get_progress_percent(self, obj):
         total = self.get_total_questions(obj)
         if not total:
             return 0
-        answered = self.get_answered_questions(obj)
-        return round(answered * 100 / total)
+        correct = self.get_correct_answers(obj)
+        return round(correct * 100 / total)
+
+    def get_practice_stats(self, obj):
+        return get_topic_practice_stats(obj)
+
+    def get_duration_seconds(self, obj):
+        progress = self.context.get("topic_progress")
+        if not progress:
+            return None
+        return get_topic_progress_duration_seconds(progress)
 
 
 class TopicQuestionOptionSerializer(serializers.ModelSerializer):

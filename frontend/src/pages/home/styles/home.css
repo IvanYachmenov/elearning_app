@@ -50,12 +50,11 @@
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease;
 }
 
 .home-section__link:hover {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  transform: translateY(-1px);
 }
 
 .home-courses-scroll {
@@ -121,15 +120,14 @@
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .home-courses-scroll__button:hover {
   background: linear-gradient(135deg, #0ea371, #2ecf8a);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.16);
 }
 
 .home-section--shop {
@@ -150,7 +148,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  transition: box-shadow 0.12s ease;
 }
 
 .home-shop-item:nth-child(2) {
@@ -162,8 +160,7 @@
 }
 
 .home-shop-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(11, 11, 13, 0.25);
+  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.12);
 }
 
 .home-shop-item__icon {
@@ -212,15 +209,14 @@
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .home-shop-showcase__button:hover {
   background: linear-gradient(135deg, #db2777, #ec4899);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.16);
 }
 
 .home-news-list {
@@ -234,7 +230,7 @@
   background: #fff;
   border: 1px solid var(--border-light);
   border-radius: 0;
-  transition: border-color var(--transition-speed), transform 0.14s ease;
+  transition: border-color 0.12s ease;
 }
 
 [data-theme="dark"] .home-news-item {
@@ -244,7 +240,6 @@
 
 .home-news-item:hover {
   border-color: var(--nav-black);
-  transform: translateX(4px);
 }
 
 .home-news-item__date {

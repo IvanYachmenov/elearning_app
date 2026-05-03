@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { CourseDetail } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { CourseDetailPageData } from '../model/types';
 import '../styles/courses.css';
 
@@ -179,7 +180,7 @@ function CourseDetailPage() {
   if (loading) {
     return (
       <div className="page page-enter">
-        <p>{t('pages.courses.loadingCourse')}</p>
+        <LoadingIndicator label={t('common.loading')} />
       </div>
     );
   }

@@ -37,8 +37,6 @@ export interface CourseListItem {
   title: string;
   slug: string;
   description: string;
-  programming_languages: string[];
-  frameworks: string[];
   author_name: string | null;
   is_enrolled: boolean;
   image_url: string | null;

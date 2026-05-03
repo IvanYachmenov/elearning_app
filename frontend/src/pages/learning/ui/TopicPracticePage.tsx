@@ -17,14 +17,26 @@ import type {
   PracticeQuestion,
   PracticeQuestionHint,
   PracticeQuestionHintsResponse,
+  PracticeStats,
   TopicTheory,
 } from '../../../shared/types';
+import { LoadingIndicator } from '../../../shared/ui';
 import type { PracticeApiPayload, TopicRouteParams, TopicHistoryResponse } from '../model/types';
 import '../styles/learning.css';
 
 interface PracticePayloadOptions {
   preserveQuestion?: boolean;
 }
+
+const isPassingScore = (score: number | null | undefined) => typeof score === 'number' && score >= 100;
+
+const resolvePassedState = (passed: boolean | undefined, score: number | null | undefined, timedOut: boolean) => {
+  if (timedOut) {
+    return false;
+  }
+
+  return Boolean(passed) || isPassingScore(score);
+};
 
 function TopicPracticePage() {
   const { courseId, topicId } = useParams<TopicRouteParams>();
@@ -43,6 +55,8 @@ function TopicPracticePage() {
   const [timedOut, setTimedOut] = useState(false);
   const [passed, setPassed] = useState(false);
   const [scorePercent, setScorePercent] = useState<number | null>(null);
+  const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
+  const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null);
 
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -102,6 +116,13 @@ function TopicPracticePage() {
         setAnsweredCount(data.answered_questions ?? 0);
         setCorrectAnswers(data.correct_answers ?? data.answered_questions ?? 0);
         setTotalQuestions(data.total_questions ?? 0);
+        setPracticeStats(data.practice_stats ?? null);
+
+        const topicScore = typeof data.score === 'number' ? data.score : data.progress_percent ?? null;
+        setScorePercent(topicScore);
+        setDurationSeconds(typeof data.duration_seconds === 'number' ? data.duration_seconds : null);
+        setTimedOut(Boolean(data.timed_out));
+        setPassed(resolvePassedState(data.status === 'completed', topicScore, Boolean(data.timed_out)));
 
         const timed = Boolean(data.is_timed_test);
         setIsTimedMode(timed);
@@ -110,7 +131,10 @@ function TopicPracticePage() {
           setTimeLimitSeconds(data.time_limit_seconds);
         }
 
-        if ((data.total_questions ?? 0) > 0 && (data.progress_percent ?? 0) >= 100) {
+        if (
+          (data.total_questions ?? 0) > 0 &&
+          (data.status === 'completed' || data.status === 'failed' || (data.progress_percent ?? 0) >= 100)
+        ) {
           setPracticeCompleted(true);
         }
       } catch (requestError: unknown) {
@@ -155,6 +179,12 @@ function TopicPracticePage() {
       if (typeof data.score_percent === 'number') {
         setScorePercent(data.score_percent);
       }
+      if (data.practice_stats) {
+        setPracticeStats(data.practice_stats);
+      }
+      if ('duration_seconds' in data) {
+        setDurationSeconds(typeof data.duration_seconds === 'number' ? data.duration_seconds : null);
+      }
 
       const timed = Boolean(data.is_timed ?? data.is_timed_test);
       setIsTimedMode(timed);
@@ -172,9 +202,10 @@ function TopicPracticePage() {
       }
 
       const completedFlag = Boolean(data.completed || data.test_completed || data.timed_out);
+      const nextTimedOut = Boolean(data.timed_out);
       setPracticeCompleted(completedFlag);
-      setTimedOut(Boolean(data.timed_out));
-      setPassed(Boolean(data.passed));
+      setTimedOut(nextTimedOut);
+      setPassed(resolvePassedState(data.passed, data.score_percent, nextTimedOut));
 
       if (completedFlag) {
         unlockNavigation();
@@ -507,7 +538,7 @@ function TopicPracticePage() {
         } else {
           setPracticeCompleted(true);
           setTimedOut(Boolean(data.timed_out));
-          setPassed(Boolean(data.passed));
+          setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
           setPracticeQuestion(null);
           setTimedAnswerSaved(false);
         }
@@ -585,10 +616,13 @@ function TopicPracticePage() {
       if (typeof data.score_percent === 'number') {
         setScorePercent(data.score_percent);
       }
+      if (data.practice_stats) {
+        setPracticeStats(data.practice_stats);
+      }
 
       if (completed && data.test_completed && !isLastQuestionAnswer) {
         setPracticeCompleted(true);
-        setPassed(Boolean(data.passed));
+        setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
         setPracticeQuestion(null);
         setSelectedOptions([]);
         setAnswerFeedback(null);
@@ -621,7 +655,7 @@ function TopicPracticePage() {
     if (isLast) {
       setPracticeCompleted(true);
       setTimedOut(false);
-      setPassed(scorePercent !== null && scorePercent >= 100);
+      setPassed(resolvePassedState(undefined, scorePercent, false));
       setPracticeQuestion(null);
       setSelectedOptions([]);
       setAnswerFeedback(null);
@@ -648,6 +682,8 @@ function TopicPracticePage() {
       setAnswerFeedback(null);
       setSelectedOptions([]);
       setScorePercent(null);
+      setDurationSeconds(null);
+      setPracticeStats(null);
       setIsReviewMode(false);
       await fetchNextQuestion();
     } catch (requestError) {
@@ -679,7 +715,11 @@ function TopicPracticePage() {
   const canPostHint = Boolean(practiceQuestion && answerFeedback && answerFeedback.score === practiceQuestion.max_score);
 
   if (loadingTopic && !topic) {
-    return <div className="page page-enter" />;
+    return (
+      <div className="page page-enter">
+        <LoadingIndicator label={t('common.loading')} />
+      </div>
+    );
   }
 
   if (error || !topic) {
@@ -727,7 +767,7 @@ function TopicPracticePage() {
           {topic.course_title} | {topic.module_title}
         </div>
 
-        <h1 className="page__title">{topic.title} - Practice</h1>
+        <h1 className="page__title topic-page-header__title">{topic.title}</h1>
       </header>
 
       <section className="topic-practice">
@@ -755,19 +795,19 @@ function TopicPracticePage() {
         {canPractice && (
           <>
             {practiceLoading && !practiceQuestion && (
-              <p className="topic-practice__empty">{t('pages.learning.loadingQuestion')}</p>
+              <LoadingIndicator compact label={t('common.loading')} />
             )}
 
             {practiceCompleted && !practiceQuestion && !practiceLoading && !isReviewMode && (
               <PracticeCompletionPanel
-                topicTitle={topic.title}
                 isTimed={isTimedMode}
                 timedOut={timedOut}
                 passed={passed}
                 scorePercent={scorePercent}
                 correctAnswers={correctAnswers}
                 totalQuestions={totalQuestions}
-                answeredQuestions={answeredCount}
+                durationSeconds={durationSeconds}
+                practiceStats={practiceStats}
                 onRetry={handleRetry}
                 onViewHistory={() => setIsReviewMode(true)}
                 isReviewMode={isReviewMode}

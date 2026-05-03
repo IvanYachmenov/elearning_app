@@ -7,7 +7,7 @@ import AppFooter from './AppFooter';
 import { useNavigationLock } from '../../../shared/lib/navigation-lock';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 
-const ANIM_MS = 180;
+const ANIM_MS = 80;
 
 interface MainLayoutProps {
   user: User;
@@ -120,15 +120,6 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
           <div className="app-header__right">
             <nav className="app-nav" aria-label="Main navigation">
               <NavLink
-                to="/home"
-                className={getNavLinkClass('app-nav-link--home')}
-                onClick={handlePreventNavigation}
-                aria-disabled={isLocked}
-              >
-                {t('nav.home')}
-              </NavLink>
-
-              <NavLink
                 to="/courses"
                 className={getNavLinkClass('app-nav-link--courses')}
                 onClick={handlePreventNavigation}
@@ -202,14 +193,6 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
 
             <nav className="app-menu__nav" aria-label="Fullscreen navigation">
               <NavLink
-                to="/home"
-                className={({ isActive }) => `app-menu__link${isActive ? ' active' : ''}`}
-                onClick={handleMenuNavClick}
-                aria-disabled={isLocked}
-              >
-                {t('nav.home')}
-              </NavLink>
-              <NavLink
                 to="/courses"
                 className={({ isActive }) => `app-menu__link${isActive ? ' active' : ''}`}
                 onClick={handleMenuNavClick}
@@ -224,14 +207,6 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 aria-disabled={isLocked}
               >
                 {t('nav.learning')}
-              </NavLink>
-              <NavLink
-                to="/shop"
-                className={({ isActive }) => `app-menu__link${isActive ? ' active' : ''}`}
-                onClick={handleMenuNavClick}
-                aria-disabled={isLocked}
-              >
-                {t('nav.shop')}
               </NavLink>
 
               <div className="app-menu__divider" />

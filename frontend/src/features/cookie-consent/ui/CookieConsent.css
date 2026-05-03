@@ -4,7 +4,7 @@
     background: rgba(11, 11, 13, 0.55);
     backdrop-filter: blur(6px);
     z-index: 999;
-    animation: cookieBackdropIn 0.3s ease-out both;
+    animation: cookieBackdropIn 0.08s ease-out both;
 }
 
 @keyframes cookieBackdropIn {
@@ -22,13 +22,13 @@
     padding: 20px;
     z-index: 1000;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    animation: cookieConsentIn 0.3s ease-out both;
+    animation: cookieConsentIn 0.08s ease-out both;
 }
 
 @keyframes cookieConsentIn {
     from { 
-        transform: translateY(100%);
-        opacity: 0;
+        transform: translateY(8px);
+        opacity: 0.95;
     }
     to { 
         transform: translateY(0);
@@ -88,7 +88,7 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.1s ease;
     white-space: nowrap;
     position: relative;
     outline: none;
@@ -101,14 +101,12 @@
     border: 2px solid #0b0b0d;
     border-radius: 6px;
     opacity: 0;
-    transform: scale(0.85);
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.1s ease;
     pointer-events: none;
 }
 
 .cookie-consent__button:hover::before {
     opacity: 1;
-    transform: scale(1);
 }
 
 .cookie-consent__button:hover {
@@ -117,7 +115,6 @@
 
 .cookie-consent__button:active {
     background: #ea580c;
-    transform: scale(0.98);
 }
 
 @media (max-width: 768px) {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
+import { LoadingIndicator } from '../../../shared/ui';
 import { getTeacherErrorMessage } from '../lib/errors';
 import { normalizeTeacherCourseList } from '../lib/normalize';
 import type { TeacherCourseListItem, TeacherPageProps } from '../model/types';
@@ -37,7 +38,7 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
 
   useEffect(() => {
     if (user.role !== 'teacher') {
-      navigate('/home', { replace: true });
+      navigate('/courses', { replace: true });
       return;
     }
 
@@ -109,7 +110,12 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   }
 
   if (loading) {
-    return <div className="page page-enter"><h1 className="page__title">{t('pages.teacher.title')}</h1><p>{t('pages.teacher.loading')}</p></div>;
+    return (
+      <div className="page page-enter">
+        <h1 className="page__title">{t('pages.teacher.title')}</h1>
+        <LoadingIndicator label={t('common.loading')} />
+      </div>
+    );
   }
 
   if (error) {
