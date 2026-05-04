@@ -18,6 +18,7 @@ import {
   timePartsToSeconds,
   updateOptionField,
   updateQuestionField,
+  updateQuestionType,
 } from '../lib/topic-form';
 import type { TeacherPageProps, TeacherRouteParams, TeacherTopicFormData } from '../model/types';
 import TeacherEditorPage from './components/TeacherEditorPage';
@@ -178,10 +179,13 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
           updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'text', value))
         }
         onQuestionTypeChange={(questionIndex, value) =>
-          updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'question_type', value))
+          updateQuestions((questions) => updateQuestionType(questions, questionIndex, value))
         }
         onQuestionScoreChange={(questionIndex, value) =>
           updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'max_score', value))
+        }
+        onQuestionExpectedOutputChange={(questionIndex, value) =>
+          updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'expected_output', value))
         }
         onAddOption={(questionIndex) =>
           updateQuestions((questions) => addEmptyOptionToQuestion(questions, questionIndex))

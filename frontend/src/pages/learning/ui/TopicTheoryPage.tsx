@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
@@ -8,6 +9,114 @@ import type { TopicTheory } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
 import type { TopicRouteParams } from '../model/types';
 import '../styles/learning.css';
+
+type TheoryBlock =
+  | {
+      type: 'text';
+      content: string;
+    }
+  | {
+      type: 'code';
+      content: string;
+      language?: string;
+    };
+
+const codeFencePattern = /```([a-zA-Z0-9_+-]*)?[ \t]*\n?([\s\S]*?)```/g;
+const codeTokenPattern =
+  /(\/\/.*|#.*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b(?:const|let|var|function|return|if|else|for|while|class|import|from|export|default|async|await|try|catch|finally|throw|new|true|false|null|undefined|def|print|in|not|and|or|elif|None|True|False|self|public|private|protected|static|void|int|string|boolean|number)\b|\b\d+(?:\.\d+)?\b)/g;
+
+function getCodeTokenClass(token: string) {
+  if (token.startsWith('//') || token.startsWith('#') || token.startsWith('/*')) {
+    return 'topic-theory__code-token--comment';
+  }
+
+  if (
+    token.startsWith('"') ||
+    token.startsWith("'") ||
+    token.startsWith('`')
+  ) {
+    return 'topic-theory__code-token--string';
+  }
+
+  if (/^\d/.test(token)) {
+    return 'topic-theory__code-token--number';
+  }
+
+  return 'topic-theory__code-token--keyword';
+}
+
+function renderHighlightedCodeLine(line: string, lineIndex: number): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  codeTokenPattern.lastIndex = 0;
+
+  while ((match = codeTokenPattern.exec(line)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(line.slice(lastIndex, match.index));
+    }
+
+    nodes.push(
+      <span className={getCodeTokenClass(match[0])} key={`token-${lineIndex}-${match.index}`}>
+        {match[0]}
+      </span>,
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < line.length) {
+    nodes.push(line.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
+function renderHighlightedCode(code: string) {
+  const lines = code.split('\n');
+
+  return lines.map((line, index) => (
+    <span className="topic-theory__code-line" key={`line-${index}`}>
+      {renderHighlightedCodeLine(line, index)}
+      {index < lines.length - 1 ? '\n' : null}
+    </span>
+  ));
+}
+
+function parseTheoryContent(content: string): TheoryBlock[] {
+  const blocks: TheoryBlock[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  codeFencePattern.lastIndex = 0;
+
+  while ((match = codeFencePattern.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      blocks.push({
+        type: 'text',
+        content: content.slice(lastIndex, match.index),
+      });
+    }
+
+    blocks.push({
+      type: 'code',
+      language: match[1] || undefined,
+      content: match[2].replace(/\n$/, ''),
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    blocks.push({
+      type: 'text',
+      content: content.slice(lastIndex),
+    });
+  }
+
+  return blocks.filter((block) => block.content.length > 0);
+}
 
 function TopicTheoryPage() {
   const { courseId, topicId } = useParams<TopicRouteParams>();
@@ -112,6 +221,7 @@ function TopicTheoryPage() {
   const progressPercent = topic.progress_percent ?? 0;
   const timedLabel =
     topic.time_limit_seconds != null ? ` (${Math.floor(topic.time_limit_seconds / 60)} min)` : '';
+  const theoryBlocks = parseTheoryContent(topic.content);
 
   return (
     <div className="page page-enter">
@@ -140,7 +250,33 @@ function TopicTheoryPage() {
 
       <section className="topic-theory">
         <h2 className="topic-section-title">{t('pages.learning.theory')}</h2>
-        <div className="topic-theory__content">{topic.content}</div>
+        <div className="topic-theory__content">
+          {theoryBlocks.map((block, index) => {
+            if (block.type === 'code') {
+              return (
+                <figure className="topic-theory__code-block" key={`${block.type}-${index}`}>
+                  <figcaption>
+                    <span className="topic-theory__code-window-dots" aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span>{block.language || 'code'}</span>
+                  </figcaption>
+                  <pre>
+                    <code>{renderHighlightedCode(block.content)}</code>
+                  </pre>
+                </figure>
+              );
+            }
+
+            return (
+              <div className="topic-theory__text-block" key={`${block.type}-${index}`}>
+                {block.content}
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <div className="topic-theory__actions">

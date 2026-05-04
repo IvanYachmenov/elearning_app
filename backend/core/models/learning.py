@@ -68,6 +68,7 @@ class TopicQuestion(models.Model):
         default=QuestionType.SINGLE,
     )
     max_score = models.PositiveSmallIntegerField(default=100)
+    expected_output = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["order"]
@@ -107,6 +108,11 @@ class TopicQuestionAnswer(models.Model):
         blank=True,
         related_name="answers",
     )
+
+    submitted_code = models.TextField(blank=True, default="")
+    stdout = models.TextField(blank=True, default="")
+    stderr = models.TextField(blank=True, default="")
+    exit_code = models.IntegerField(null=True, blank=True)
 
     is_correct = models.BooleanField(default=False)
     score = models.PositiveSmallIntegerField(

@@ -16,12 +16,42 @@ from ...serializers import (
     TopicQuestionHintSerializer,
     TopicPracticeQuestionSerializer,
     TopicQuestionAnswerSubmitSerializer,
+    TopicQuestionCodeRunSerializer,
 )
+from ...services.code_runner import CodeRunnerError, run_python_code
 from .utils import (
     get_topic_time_limit_seconds,
     calculate_score_percent,
     ensure_topic_progress,
 )
+
+
+def is_code_run_successful(run_result: dict) -> bool:
+    return (
+        run_result.get("status") == "completed"
+        and run_result.get("exit_code") == 0
+        and not run_result.get("timed_out")
+    )
+
+
+def normalize_code_output(value: str) -> str:
+    normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.rstrip() for line in normalized.split("\n")]
+    return "\n".join(lines).rstrip("\n")
+
+
+def code_output_matches(actual: str, expected: str) -> bool:
+    return normalize_code_output(actual) == normalize_code_output(expected)
+
+
+def build_code_run_response(run_result: dict) -> dict:
+    return {
+        "status": run_result.get("status", "error"),
+        "stdout": run_result.get("stdout", ""),
+        "stderr": run_result.get("stderr", ""),
+        "exit_code": run_result.get("exit_code"),
+        "timed_out": bool(run_result.get("timed_out")),
+    }
 
 
 # GET /api/learning/topics/<id>/next-question/
@@ -230,6 +260,10 @@ class TopicNextQuestionView(APIView):
                 "selected_option_ids": list(
                     last_answer.selected_options.values_list("id", flat=True)
                 ),
+                "submitted_code": last_answer.submitted_code,
+                "stdout": last_answer.stdout,
+                "stderr": last_answer.stderr,
+                "exit_code": last_answer.exit_code,
                 "score": last_answer.score,
             }
 
@@ -283,120 +317,157 @@ class TopicQuestionAnswerView(APIView):
 
         data_serializer = TopicQuestionAnswerSubmitSerializer(data=request.data)
         data_serializer.is_valid(raise_exception=True)
-        option_ids = data_serializer.validated_data["selected_options"]
 
-        options_qs = TopicQuestionOption.objects.filter(
-            question=question, id__in=option_ids,
-        ) if option_ids else TopicQuestionOption.objects.none()
+        if question.question_type == TopicQuestion.QuestionType.CODE:
+            code = data_serializer.validated_data.get("code", "")
+            try:
+                run_result = run_python_code(code)
+            except CodeRunnerError as error:
+                return Response(
+                    {"detail": str(error)},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
 
-        if option_ids and options_qs.count() != len(option_ids):
-            return Response(
-                {"detail": "Invalid options for this question."},
-                status=status.HTTP_400_BAD_REQUEST,
+            is_correct = (
+                is_code_run_successful(run_result)
+                and code_output_matches(
+                    run_result.get("stdout", ""),
+                    question.expected_output,
+                )
             )
+            score = question.max_score if is_correct else 0
 
-        if not is_timed:
-            if (
-                    question.question_type == TopicQuestion.QuestionType.SINGLE
-                    and len(option_ids) != 1
-            ):
+            answer, _ = TopicQuestionAnswer.objects.get_or_create(
+                user=request.user,
+                question=question,
+            )
+            answer.is_correct = is_correct
+            answer.score = score
+            answer.submitted_code = code
+            answer.stdout = run_result.get("stdout", "")
+            answer.stderr = run_result.get("stderr", "")
+            answer.exit_code = run_result.get("exit_code")
+            answer.answered_at = timezone.now()
+            answer.save()
+            answer.selected_options.clear()
+        else:
+            option_ids = data_serializer.validated_data["selected_options"]
+
+            options_qs = TopicQuestionOption.objects.filter(
+                question=question, id__in=option_ids,
+            ) if option_ids else TopicQuestionOption.objects.none()
+
+            if option_ids and options_qs.count() != len(option_ids):
                 return Response(
-                    {"detail": "Exactly one option must be selected."},
+                    {"detail": "Invalid options for this question."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            if (
-                question.question_type == TopicQuestion.QuestionType.MULTI
-                and len(option_ids) < 1
-            ):
-                return Response(
-                    {"detail": "Select at least one option."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            else:
+            if not is_timed:
                 if (
                         question.question_type == TopicQuestion.QuestionType.SINGLE
-                        and len(option_ids) > 1
+                        and len(option_ids) != 1
                 ):
                     return Response(
-                        {"detail": "Select no more than one option."},
+                        {"detail": "Exactly one option must be selected."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-            if is_timed:
-                now = timezone.now()
-                limit_seconds = progress.time_limit_seconds or time_limit_seconds or 0
-                elapsed_seconds = (
-                    int((now - progress.started_at).total_seconds())
-                    if progress.started_at else 0
-                )
-                remaining_seconds = max(limit_seconds - elapsed_seconds, 0)
-
-                answers_before = TopicQuestionAnswer.objects.filter(
-                    user=request.user,
-                    question__topic=topic,
-                )
-                correct_before = answers_before.filter(is_correct=True).count()
-
-                if remaining_seconds <= 0:
-                    score_percent = calculate_score_percent(
-                        correct_before,
-                        TopicQuestion.objects.filter(topic=topic).count(),
-                    )
-                    progress.status = TopicProgress.Status.FAILED
-                    progress.timed_out = True
-                    progress.score = score_percent
-                    progress.completed_at = progress.completed_at or now
-                    progress.save(
-                        update_fields=[
-                            "status",
-                            "timed_out",
-                            "score",
-                            "completed_at",
-                        ]
-                    )
+                if (
+                    question.question_type == TopicQuestion.QuestionType.MULTI
+                    and len(option_ids) < 1
+                ):
                     return Response(
-                        {
-                            "is_correct": False,
-                            "score": 0,
-                            "answered_questions": answers_before.count(),
-                            "total_questions": TopicQuestion.objects.filter(topic=topic).count(),
-                            "topic_progress_percent": calculate_score_percent(
-                                answers_before.count(),
-                                TopicQuestion.objects.filter(topic=topic).count(),
-                            ),
-                            "test_completed": True,
-                            "timed_out": True,
-                            "passed": False,
-                            "remaining_seconds": 0,
-                            "correct_answers": correct_before,
-                            "score_percent": score_percent,
-                            "practice_stats": get_topic_practice_stats(topic),
-                            "time_limit_seconds": limit_seconds,
-                            "duration_seconds": get_topic_progress_duration_seconds(progress),
-                            "is_timed": True,
-                        },
-                        status=status.HTTP_200_OK,
+                        {"detail": "Select at least one option."},
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
+                else:
+                    if (
+                            question.question_type == TopicQuestion.QuestionType.SINGLE
+                            and len(option_ids) > 1
+                    ):
+                        return Response(
+                            {"detail": "Select no more than one option."},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
 
-        correct_ids = set(
-            question.options.filter(is_correct=True).values_list("id", flat=True)
-        )
-        selected_set = set(option_ids)
+                if is_timed:
+                    now = timezone.now()
+                    limit_seconds = progress.time_limit_seconds or time_limit_seconds or 0
+                    elapsed_seconds = (
+                        int((now - progress.started_at).total_seconds())
+                        if progress.started_at else 0
+                    )
+                    remaining_seconds = max(limit_seconds - elapsed_seconds, 0)
 
-        is_correct = bool(correct_ids) and (selected_set == correct_ids)
-        score = question.max_score if is_correct else 0
+                    answers_before = TopicQuestionAnswer.objects.filter(
+                        user=request.user,
+                        question__topic=topic,
+                    )
+                    correct_before = answers_before.filter(is_correct=True).count()
 
-        # Save answer
-        answer, _ = TopicQuestionAnswer.objects.get_or_create(
-            user=request.user,
-            question=question,
-        )
-        answer.is_correct = is_correct
-        answer.score = score
-        answer.answered_at = timezone.now()
-        answer.save()
-        answer.selected_options.set(option_ids)
+                    if remaining_seconds <= 0:
+                        score_percent = calculate_score_percent(
+                            correct_before,
+                            TopicQuestion.objects.filter(topic=topic).count(),
+                        )
+                        progress.status = TopicProgress.Status.FAILED
+                        progress.timed_out = True
+                        progress.score = score_percent
+                        progress.completed_at = progress.completed_at or now
+                        progress.save(
+                            update_fields=[
+                                "status",
+                                "timed_out",
+                                "score",
+                                "completed_at",
+                            ]
+                        )
+                        return Response(
+                            {
+                                "is_correct": False,
+                                "score": 0,
+                                "answered_questions": answers_before.count(),
+                                "total_questions": TopicQuestion.objects.filter(topic=topic).count(),
+                                "topic_progress_percent": calculate_score_percent(
+                                    answers_before.count(),
+                                    TopicQuestion.objects.filter(topic=topic).count(),
+                                ),
+                                "test_completed": True,
+                                "timed_out": True,
+                                "passed": False,
+                                "remaining_seconds": 0,
+                                "correct_answers": correct_before,
+                                "score_percent": score_percent,
+                                "practice_stats": get_topic_practice_stats(topic),
+                                "time_limit_seconds": limit_seconds,
+                                "duration_seconds": get_topic_progress_duration_seconds(progress),
+                                "is_timed": True,
+                            },
+                            status=status.HTTP_200_OK,
+                        )
+
+            correct_ids = set(
+                question.options.filter(is_correct=True).values_list("id", flat=True)
+            )
+            selected_set = set(option_ids)
+
+            is_correct = bool(correct_ids) and (selected_set == correct_ids)
+            score = question.max_score if is_correct else 0
+
+            answer, _ = TopicQuestionAnswer.objects.get_or_create(
+                user=request.user,
+                question=question,
+            )
+            answer.is_correct = is_correct
+            answer.score = score
+            answer.submitted_code = ""
+            answer.stdout = ""
+            answer.stderr = ""
+            answer.exit_code = None
+            answer.answered_at = timezone.now()
+            answer.save()
+            answer.selected_options.set(option_ids)
 
         all_q_count = TopicQuestion.objects.filter(topic=topic).count()
         correct_answers_qs = TopicQuestionAnswer.objects.filter(
@@ -519,6 +590,48 @@ class TopicQuestionAnswerView(APIView):
                 "duration_seconds": None,
             }
         )
+
+
+# POST /api/learning/questions/<id>/run-code/
+class TopicQuestionRunCodeView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, pk):
+        try:
+            question = TopicQuestion.objects.select_related(
+                "topic__module__course"
+            ).get(pk=pk)
+        except TopicQuestion.DoesNotExist:
+            return Response(
+                {"detail": "Question not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if question.question_type != TopicQuestion.QuestionType.CODE:
+            return Response(
+                {"detail": "This question is not a code question."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        course = question.topic.module.course
+        if not course.students.filter(pk=request.user.pk).exists():
+            return Response(
+                {"detail": "You are not enrolled in this course."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = TopicQuestionCodeRunSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            run_result = run_python_code(serializer.validated_data["code"])
+        except CodeRunnerError as error:
+            return Response(
+                {"detail": str(error)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        return Response(build_code_run_response(run_result))
 
 
 # GET/POST /api/learning/questions/<id>/hints/

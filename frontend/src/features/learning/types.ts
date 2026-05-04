@@ -1,4 +1,10 @@
-import type { PracticeHistoryQuestion, PracticeQuestion, PracticeQuestionHint, PracticeStats } from '../../shared/types';
+import type {
+  CodeRunResult,
+  PracticeHistoryQuestion,
+  PracticeQuestion,
+  PracticeQuestionHint,
+  PracticeStats,
+} from '../../shared/types';
 
 export type PracticeFeedbackType = 'success' | 'fail' | 'error' | 'neutral';
 
@@ -20,6 +26,11 @@ export interface PracticeQuestionCardProps {
   question: PracticeQuestion;
   selectedOptions: number[];
   onOptionToggle: (optionId: number) => void;
+  codeAnswer: string;
+  codeRunResult: CodeRunResult | null;
+  codeRunLoading: boolean;
+  onCodeChange: (value: string) => void;
+  onRunCode: () => void;
   answerFeedback: PracticeAnswerFeedback | null;
   onSubmit: () => void;
   onContinue: () => void;

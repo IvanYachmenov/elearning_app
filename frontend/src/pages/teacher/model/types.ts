@@ -25,6 +25,7 @@ export interface TeacherEditableQuestion {
   order: number;
   question_type: QuestionType;
   max_score: number;
+  expected_output: string;
   options: TeacherEditableOption[];
 }
 

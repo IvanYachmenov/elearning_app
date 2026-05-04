@@ -44,10 +44,22 @@ export interface TopicTheory extends CourseTopic {
 export interface PracticeLastAnswer {
   is_correct: boolean;
   selected_option_ids: number[];
+  submitted_code?: string;
+  stdout?: string;
+  stderr?: string;
+  exit_code?: number | null;
   score: number;
 }
 
 export type PracticeQuestion = TopicQuestion;
+
+export interface CodeRunResult {
+  status: 'completed' | 'runtime_error' | 'timeout' | 'error';
+  stdout: string;
+  stderr: string;
+  exit_code: number | null;
+  timed_out: boolean;
+}
 
 export interface PracticeQuestionHint {
   id: number;
@@ -63,6 +75,10 @@ export interface PracticeQuestionHintsResponse {
 
 export interface PracticeHistoryQuestion extends TopicQuestion {
   user_option_ids: number[];
+  submitted_code: string;
+  stdout: string;
+  stderr: string;
+  exit_code: number | null;
   is_correct: boolean | null;
 }
 

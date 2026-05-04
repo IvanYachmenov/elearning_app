@@ -29,18 +29,23 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-@oqrhd)-jho3y-8u2!s481$_!2v4ns$dn2llg+af&c1iz&03gj')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in {"1", "true", "yes", "on"}
 
 ALLOWED_HOSTS = [
-    "127.0.0.1", "localhost"
+    "127.0.0.1", "localhost", "0.0.0.0", "backend"
 ]
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+CODE_RUNNER_URL = os.getenv("CODE_RUNNER_URL", "http://code-runner:8080")
 
-CORS_ALLOWED_ORIGINS = [
+default_cors_allowed_origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    FRONTEND_URL,
 ]
+
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(default_cors_allowed_origins))
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -238,4 +243,3 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # We'll handle email verification separately
 ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'  # Custom adapter for user creation
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'  # Custom adapter for social accounts
-

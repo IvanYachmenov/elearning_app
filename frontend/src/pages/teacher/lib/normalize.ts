@@ -28,6 +28,7 @@ export function normalizeQuestion(question: unknown, fallbackOrder = 0): Teacher
     question_type:
       questionType === 'multiple_choice' || questionType === 'code' ? questionType : 'single_choice',
     max_score: typeof data.max_score === 'number' ? data.max_score : Number(data.max_score) || 100,
+    expected_output: String(data.expected_output ?? ''),
     options: Array.isArray(data.options) ? data.options.map(normalizeOption) : [],
   };
 }

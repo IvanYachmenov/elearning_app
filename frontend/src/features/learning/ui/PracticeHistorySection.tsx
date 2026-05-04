@@ -34,42 +34,65 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
                 <div className="topic-practice__question-text">{question.text}</div>
               </div>
 
-              <ul className="topic-practice__options">
-                {question.options.map((option) => {
-                  const selected = question.user_option_ids?.includes(option.id);
-                  const correct = option.is_correct;
-                  return (
-                    <li key={option.id}>
-                      <div
-                        className={
-                          'topic-practice__option-button topic-practice__option-button_history' +
-                          (correct
-                            ? ' topic-practice__option-button--success'
-                            : selected
-                              ? ' topic-practice__option-button--selected-history'
-                              : '')
-                        }
-                      >
-                        <span
+              {question.question_type === 'code' ? (
+                <div className="topic-practice__code-output topic-practice__code-output--history">
+                  <div className="topic-practice__code-output-row">
+                    <span className="topic-practice__code-output-label">{t('pages.learning.codeEditor')}</span>
+                    <pre className="topic-practice__code-output-box">{question.submitted_code || ''}</pre>
+                  </div>
+                  <div className="topic-practice__code-output-row">
+                    <span className="topic-practice__code-output-label">{t('pages.learning.output')}</span>
+                    <pre className="topic-practice__code-output-box">
+                      {question.stdout || t('pages.learning.noOutput')}
+                    </pre>
+                  </div>
+                  {question.stderr && (
+                    <div className="topic-practice__code-output-row">
+                      <span className="topic-practice__code-output-label">{t('pages.learning.stderr')}</span>
+                      <pre className="topic-practice__code-output-box topic-practice__code-output-box--error">
+                        {question.stderr}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <ul className="topic-practice__options">
+                  {question.options.map((option) => {
+                    const selected = question.user_option_ids?.includes(option.id);
+                    const correct = option.is_correct;
+                    return (
+                      <li key={option.id}>
+                        <div
                           className={
-                            'topic-practice__option-indicator' +
+                            'topic-practice__option-button topic-practice__option-button_history' +
                             (correct
-                              ? ' topic-practice__option-indicator--correct'
+                              ? ' topic-practice__option-button--success'
                               : selected
-                                ? ' topic-practice__option-indicator--selected-history'
+                                ? ' topic-practice__option-button--selected-history'
                                 : '')
                           }
-                          aria-hidden="true"
-                        />
-                        <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
-                        {correct && (
-                          <span className="topic-practice__option-correct-label">{t('pages.learning.correct')}</span>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                        >
+                          <span
+                            className={
+                              'topic-practice__option-indicator' +
+                              (correct
+                                ? ' topic-practice__option-indicator--correct'
+                                : selected
+                                  ? ' topic-practice__option-indicator--selected-history'
+                                  : '')
+                            }
+                            aria-hidden="true"
+                          />
+                          <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
+                          {correct && (
+                            <span className="topic-practice__option-correct-label">{t('pages.learning.correct')}</span>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
 
               {question.is_correct !== null && (
                 <div

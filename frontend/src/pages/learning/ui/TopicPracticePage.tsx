@@ -13,6 +13,7 @@ import { api } from '../../../shared/api';
 import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { useNavigationLock } from '../../../shared/lib/navigation-lock';
 import type {
+  CodeRunResult,
   PracticeHistoryQuestion,
   PracticeQuestion,
   PracticeQuestionHint,
@@ -59,6 +60,9 @@ function TopicPracticePage() {
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null);
 
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
+  const [codeAnswer, setCodeAnswer] = useState('');
+  const [codeRunResult, setCodeRunResult] = useState<CodeRunResult | null>(null);
+  const [codeRunLoading, setCodeRunLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [answerFeedback, setAnswerFeedback] = useState<PracticeAnswerFeedback | null>(null);
 
@@ -213,6 +217,8 @@ function TopicPracticePage() {
         timerExpiredRef.current = false;
         setPracticeQuestion(null);
         setSelectedOptions([]);
+        setCodeAnswer('');
+        setCodeRunResult(null);
         setAnswerFeedback(null);
         setTimedAnswerSaved(false);
         return;
@@ -222,6 +228,16 @@ function TopicPracticePage() {
 
       if (data.last_answer && !timed) {
         setSelectedOptions(data.last_answer.selected_option_ids || []);
+        if (data.question?.question_type === 'code') {
+          setCodeAnswer(data.last_answer.submitted_code || '');
+          setCodeRunResult({
+            status: data.last_answer.exit_code === 0 ? 'completed' : 'runtime_error',
+            stdout: data.last_answer.stdout || '',
+            stderr: data.last_answer.stderr || '',
+            exit_code: data.last_answer.exit_code ?? null,
+            timed_out: false,
+          });
+        }
         setAnswerFeedback({
           type: data.last_answer.is_correct ? 'success' : 'fail',
           message: data.last_answer.is_correct ? t('pages.learning.correctAnswer') : t('pages.learning.incorrectAnswer'),
@@ -288,6 +304,9 @@ function TopicPracticePage() {
     setActiveHintIndex(0);
     setHintDraft('');
     setHintSubmitLoading(false);
+    setCodeAnswer('');
+    setCodeRunResult(null);
+    setCodeRunLoading(false);
   }, [practiceQuestionId]);
 
   useEffect(() => {
@@ -509,8 +528,11 @@ function TopicPracticePage() {
     setSubmitLoading(true);
 
     try {
+      const answerPayload = practiceQuestion.question_type === 'code'
+        ? { code: codeAnswer }
+        : { selected_options: selectedOptions };
       const response = await api.post<PracticeApiPayload>(`/api/learning/questions/${practiceQuestion.id}/answer/`, {
-        selected_options: selectedOptions,
+        ...answerPayload,
       });
       const data = response.data;
 
@@ -540,6 +562,8 @@ function TopicPracticePage() {
           setTimedOut(Boolean(data.timed_out));
           setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
           setPracticeQuestion(null);
+          setCodeAnswer('');
+          setCodeRunResult(null);
           setTimedAnswerSaved(false);
         }
       } else {
@@ -574,11 +598,13 @@ function TopicPracticePage() {
 
     if (answerFeedback?.type === 'fail') {
       setAnswerFeedback(null);
-      setSelectedOptions([]);
+      if (practiceQuestion.question_type !== 'code') {
+        setSelectedOptions([]);
+      }
       return;
     }
 
-    if (selectedOptions.length === 0) {
+    if (practiceQuestion.question_type !== 'code' && selectedOptions.length === 0) {
       setAnswerFeedback({
         type: 'error',
         message: 'Please select at least one option.',
@@ -590,8 +616,11 @@ function TopicPracticePage() {
     setAnswerFeedback(null);
 
     try {
+      const answerPayload = practiceQuestion.question_type === 'code'
+        ? { code: codeAnswer }
+        : { selected_options: selectedOptions };
       const response = await api.post<PracticeApiPayload>(`/api/learning/questions/${practiceQuestion.id}/answer/`, {
-        selected_options: selectedOptions,
+        ...answerPayload,
       });
       const data = response.data;
 
@@ -625,6 +654,8 @@ function TopicPracticePage() {
         setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
         setPracticeQuestion(null);
         setSelectedOptions([]);
+        setCodeAnswer('');
+        setCodeRunResult(null);
         setAnswerFeedback(null);
       }
 
@@ -649,6 +680,33 @@ function TopicPracticePage() {
     }
   };
 
+  const handleRunCode = async () => {
+    if (!practiceQuestion || practiceQuestion.question_type !== 'code') {
+      return;
+    }
+
+    setCodeRunLoading(true);
+    setCodeRunResult(null);
+
+    try {
+      const response = await api.post<CodeRunResult>(`/api/learning/questions/${practiceQuestion.id}/run-code/`, {
+        code: codeAnswer,
+      });
+      setCodeRunResult(response.data);
+    } catch (requestError) {
+      console.error(requestError);
+      setCodeRunResult({
+        status: 'error',
+        stdout: '',
+        stderr: t('pages.learning.failedToRunCode'),
+        exit_code: null,
+        timed_out: false,
+      });
+    } finally {
+      setCodeRunLoading(false);
+    }
+  };
+
   const handleContinue = async () => {
     const isLast = Boolean(answerFeedback?.isLastQuestion) || (answeredCount >= totalQuestions && totalQuestions > 0);
 
@@ -658,6 +716,8 @@ function TopicPracticePage() {
       setPassed(resolvePassedState(undefined, scorePercent, false));
       setPracticeQuestion(null);
       setSelectedOptions([]);
+      setCodeAnswer('');
+      setCodeRunResult(null);
       setAnswerFeedback(null);
       setTimedAnswerSaved(false);
       return;
@@ -681,6 +741,8 @@ function TopicPracticePage() {
       setPassed(false);
       setAnswerFeedback(null);
       setSelectedOptions([]);
+      setCodeAnswer('');
+      setCodeRunResult(null);
       setScorePercent(null);
       setDurationSeconds(null);
       setPracticeStats(null);
@@ -827,6 +889,16 @@ function TopicPracticePage() {
                 question={practiceQuestion}
                 selectedOptions={selectedOptions}
                 onOptionToggle={handleOptionToggle}
+                codeAnswer={codeAnswer}
+                codeRunResult={codeRunResult}
+                codeRunLoading={codeRunLoading}
+                onCodeChange={(value) => {
+                  setCodeAnswer(value);
+                  if (answerFeedback?.type === 'fail' || answerFeedback?.type === 'error') {
+                    setAnswerFeedback(null);
+                  }
+                }}
+                onRunCode={handleRunCode}
                 answerFeedback={answerFeedback}
                 onSubmit={handleSubmitAnswer}
                 onContinue={handleContinue}
@@ -835,7 +907,7 @@ function TopicPracticePage() {
                 isTimedMode={isTimedMode}
                 isAnswerLocked={isAnswerLocked}
                 timedAnswerSaved={timedAnswerSaved}
-                disableSubmit={!isTimedMode && selectedOptions.length === 0}
+                disableSubmit={!isTimedMode && practiceQuestion.question_type !== 'code' && selectedOptions.length === 0}
                 showNextButton={showNextButton}
                 showFinishButton={showFinishButton}
                 showTimedNextButton={showTimedNextButton}
@@ -861,5 +933,3 @@ function TopicPracticePage() {
 }
 
 export default TopicPracticePage;
-
-

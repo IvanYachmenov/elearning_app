@@ -7,6 +7,11 @@ function PracticeQuestionCard({
   question,
   selectedOptions,
   onOptionToggle,
+  codeAnswer,
+  codeRunResult,
+  codeRunLoading,
+  onCodeChange,
+  onRunCode,
   answerFeedback,
   onSubmit,
   onContinue,
@@ -37,6 +42,7 @@ function PracticeQuestionCard({
   const activeHint = hints[activeHintIndex] ?? null;
   const hasMoreHints = hints.length > 1 && activeHintIndex < hints.length - 1;
   const isLastHint = hints.length > 1 && activeHintIndex === hints.length - 1;
+  const isCodeQuestion = question.question_type === 'code';
 
   const renderFeedback = () => {
     if (!answerFeedback) {
@@ -76,43 +82,100 @@ function PracticeQuestionCard({
         <div className="topic-practice__question-text">{question.text}</div>
       </div>
 
-      <ul className="topic-practice__options">
-        {question.options.map((option) => {
-          const selected = selectedOptions.includes(option.id);
-          return (
-            <li key={option.id}>
-              <button
-                type="button"
-                className={
-                  'topic-practice__option-button' +
-                  (selected ? ' topic-practice__option-button--selected' : '')
-                }
-                onClick={() => onOptionToggle(option.id)}
-                disabled={isAnswerLocked || submitLoading || practiceLoading}
-              >
-                <span
+      {isCodeQuestion ? (
+        <div className="topic-practice__code-area">
+          <label className="topic-practice__code-label" htmlFor={`code-question-${question.id}`}>
+            {t('pages.learning.codeEditor')}
+          </label>
+          <div className="topic-practice__code-editor-window">
+            <div className="topic-practice__code-editor-titlebar">
+              <span className="topic-theory__code-window-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span>python</span>
+            </div>
+            <textarea
+              id={`code-question-${question.id}`}
+              className="topic-practice__code-editor"
+              value={codeAnswer}
+              onChange={(event) => onCodeChange(event.target.value)}
+              spellCheck={false}
+              rows={10}
+              disabled={isAnswerLocked || submitLoading || practiceLoading}
+            />
+          </div>
+
+          {codeRunResult && (
+            <div className="topic-practice__code-output">
+              <div className="topic-practice__code-output-row">
+                <span className="topic-practice__code-output-label">{t('pages.learning.output')}</span>
+                <pre className="topic-practice__code-output-box">
+                  {codeRunResult.stdout || t('pages.learning.noOutput')}
+                </pre>
+              </div>
+              {(codeRunResult.stderr || codeRunResult.timed_out || codeRunResult.exit_code !== 0) && (
+                <div className="topic-practice__code-output-row">
+                  <span className="topic-practice__code-output-label">{t('pages.learning.stderr')}</span>
+                  <pre className="topic-practice__code-output-box topic-practice__code-output-box--error">
+                    {codeRunResult.timed_out ? 'Execution timed out.' : codeRunResult.stderr || `Exit code ${codeRunResult.exit_code}`}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <ul className="topic-practice__options">
+          {question.options.map((option) => {
+            const selected = selectedOptions.includes(option.id);
+            return (
+              <li key={option.id}>
+                <button
+                  type="button"
                   className={
-                    'topic-practice__option-indicator' +
-                    (selected ? ' topic-practice__option-indicator--selected' : '')
+                    'topic-practice__option-button' +
+                    (selected ? ' topic-practice__option-button--selected' : '')
                   }
-                  aria-hidden="true"
-                />
-                <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  onClick={() => onOptionToggle(option.id)}
+                  disabled={isAnswerLocked || submitLoading || practiceLoading}
+                >
+                  <span
+                    className={
+                      'topic-practice__option-indicator' +
+                      (selected ? ' topic-practice__option-indicator--selected' : '')
+                    }
+                    aria-hidden="true"
+                  />
+                  <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       <div className="topic-practice__actions">
         {renderFeedback()}
         <div className="topic-practice__buttons-row">
+          {isCodeQuestion && (
+            <button
+              type="button"
+              className="topic-practice__secondary-btn"
+              onClick={onRunCode}
+              disabled={codeRunLoading || submitLoading || practiceLoading || isAnswerLocked}
+            >
+              {codeRunLoading ? t('pages.learning.runningCode') : t('pages.learning.runCode')}
+            </button>
+          )}
+
           {!isTimedMode && (!answerFeedback || answerFeedback.type !== 'success') && (
             <button
               type="button"
               className="topic-practice__secondary-btn"
               onClick={onSubmit}
-              disabled={submitLoading || !question || disableSubmit}
+              disabled={submitLoading || codeRunLoading || !question || disableSubmit}
             >
               {submitLoading
                 ? t('pages.auth.submitting')
@@ -127,7 +190,7 @@ function PracticeQuestionCard({
               type="button"
               className="topic-practice__secondary-btn"
               onClick={onSubmit}
-              disabled={submitLoading || practiceLoading}
+              disabled={submitLoading || codeRunLoading || practiceLoading}
             >
               {submitLoading ? t('pages.auth.saving') : t('pages.auth.submitAnswer')}
             </button>

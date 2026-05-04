@@ -1,6 +1,7 @@
-import type { QuestionType } from '../../../../shared/types';
+import { useLayoutEffect, useRef } from 'react';
+
 import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
-import type { TeacherEditableQuestion, TeacherTimeParts, TeacherTopicFormData } from '../../model/types';
+import type { TeacherTimeParts, TeacherTopicFormData } from '../../model/types';
 
 interface TeacherTopicDetailsSectionProps {
   topicData: TeacherTopicFormData;
@@ -20,6 +21,33 @@ function TeacherTopicDetailsSection({
   onTimeChange,
 }: TeacherTopicDetailsSectionProps) {
   const { t } = useLanguage();
+  const theoryTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const syncTheoryTextareaHeight = (preservePageScroll = true) => {
+    const textarea = theoryTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    const pageScrollX = window.scrollX;
+    const pageScrollY = window.scrollY;
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+
+    if (preservePageScroll && document.activeElement === textarea) {
+      window.scrollTo(pageScrollX, pageScrollY);
+
+      window.requestAnimationFrame(() => {
+        window.scrollTo(pageScrollX, pageScrollY);
+      });
+    }
+  };
+
+  useLayoutEffect(() => {
+    syncTheoryTextareaHeight();
+  }, [topicData.content]);
 
   return (
     <>
@@ -40,7 +68,8 @@ function TeacherTopicDetailsSection({
       <div className="teacher-form-group">
         <label className="teacher-form-label">{t('pages.teacher.theoryText')}</label>
         <textarea
-          className="teacher-form-textarea"
+          ref={theoryTextareaRef}
+          className="teacher-form-textarea teacher-form-textarea--autogrow teacher-form-textarea--theory"
           value={topicData.content}
           onChange={(event) => onContentChange(event.target.value)}
           placeholder={t('pages.teacher.enterTheoryContent')}

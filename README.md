@@ -76,6 +76,26 @@ The system features a responsive design that works on desktop and mobile devices
 
 ## Installation and Setup
 
+### Docker Quick Start
+
+The full local development stack can be started with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+This starts PostgreSQL, Django/DRF, and Vite/React. By default the services are exposed at:
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:8000
+- PostgreSQL: localhost:5433
+
+If a local service already uses one of those ports, override only the host port:
+
+```bash
+BACKEND_PORT=8001 FRONTEND_PORT=5174 docker compose up --build
+```
+
 ### Prerequisites
 
 - Python 3.11 or higher
@@ -556,4 +576,3 @@ This project is developed for educational purposes as part of a bachelor's thesi
 ## Credits
 
 See the Credits page in the application or `frontend/src/pages/credits/ui/CreditsPage.jsx` for a complete list of technologies, libraries, and resources used in this project.
-

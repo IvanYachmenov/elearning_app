@@ -5,6 +5,7 @@ import type {
   TeacherEditableQuestion,
   TeacherTimeParts,
 } from '../model/types';
+import type { QuestionType } from '../../../shared/types';
 
 export function secondsToTimeParts(totalSeconds: number | null): TeacherTimeParts {
   if (!totalSeconds || totalSeconds < 30) {
@@ -44,6 +45,24 @@ export function updateQuestionField<K extends keyof TeacherEditableQuestion>(
   return questions.map((question, index) => (
     index === questionIndex ? { ...question, [field]: value } : question
   ));
+}
+
+export function updateQuestionType(
+  questions: TeacherEditableQuestion[],
+  questionIndex: number,
+  questionType: QuestionType,
+): TeacherEditableQuestion[] {
+  return questions.map((question, index) => {
+    if (index !== questionIndex) {
+      return question;
+    }
+
+    return {
+      ...question,
+      question_type: questionType,
+      options: questionType === 'code' ? [] : question.options,
+    };
+  });
 }
 
 export function removeQuestion(

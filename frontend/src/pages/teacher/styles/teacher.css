@@ -601,8 +601,24 @@
   min-height: 100px;
 }
 
+.teacher-form-textarea--autogrow {
+  overflow: hidden;
+  resize: none;
+}
+
+.teacher-form-textarea--theory {
+  min-height: 260px;
+  line-height: 1.65;
+}
+
 .teacher-form-textarea--large {
   min-height: 200px;
+}
+
+.teacher-form-textarea--code-output {
+  min-height: 110px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  white-space: pre;
 }
 
 /* Custom file input */

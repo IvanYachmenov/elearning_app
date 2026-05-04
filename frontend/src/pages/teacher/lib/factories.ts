@@ -47,6 +47,7 @@ export function createEmptyQuestion(order: number): TeacherEditableQuestion {
     order,
     question_type: 'single_choice',
     max_score: 100,
+    expected_output: '',
     options: [],
   };
 }

@@ -197,6 +197,23 @@ class TopicQuestionAnswerSubmitSerializer(serializers.Serializer):
     selected_options = serializers.ListField(
         child=serializers.IntegerField(),
         allow_empty=True,
+        required=False,
+        default=list,
+    )
+    code = serializers.CharField(
+        allow_blank=True,
+        required=False,
+        default="",
+        max_length=20000,
+        trim_whitespace=False,
+    )
+
+
+class TopicQuestionCodeRunSerializer(serializers.Serializer):
+    code = serializers.CharField(
+        allow_blank=True,
+        max_length=20000,
+        trim_whitespace=False,
     )
 
 
@@ -228,10 +245,21 @@ class TopicPracticeHistoryQuestionSerializer(TopicPracticeQuestionSerializer):
     Question + options + id of option(s), selected by this user
     """
     user_option_ids = serializers.SerializerMethodField()
+    submitted_code = serializers.SerializerMethodField()
+    stdout = serializers.SerializerMethodField()
+    stderr = serializers.SerializerMethodField()
+    exit_code = serializers.SerializerMethodField()
     is_correct = serializers.SerializerMethodField()
 
     class Meta(TopicPracticeQuestionSerializer.Meta):
-        fields = TopicPracticeQuestionSerializer.Meta.fields + ("user_option_ids", "is_correct", )
+        fields = TopicPracticeQuestionSerializer.Meta.fields + (
+            "user_option_ids",
+            "submitted_code",
+            "stdout",
+            "stderr",
+            "exit_code",
+            "is_correct",
+        )
 
     def get_user_option_ids(self, obj):
         """
@@ -244,6 +272,26 @@ class TopicPracticeHistoryQuestionSerializer(TopicPracticeQuestionSerializer):
         return list(
             answer.selected_options.values_list("id", flat=True)
         )
+
+    def get_submitted_code(self, obj):
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        return answer.submitted_code if answer else ""
+
+    def get_stdout(self, obj):
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        return answer.stdout if answer else ""
+
+    def get_stderr(self, obj):
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        return answer.stderr if answer else ""
+
+    def get_exit_code(self, obj):
+        answers_map = self.context.get("user_answers_map") or {}
+        answer = answers_map.get(obj.id)
+        return answer.exit_code if answer else None
 
     def get_is_correct(self, obj):
         """

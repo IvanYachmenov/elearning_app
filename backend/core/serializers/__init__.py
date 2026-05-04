@@ -21,6 +21,7 @@ from .learning import (
     TopicTheorySerializer,
     TopicPracticeQuestionSerializer,
     TopicQuestionAnswerSubmitSerializer,
+    TopicQuestionCodeRunSerializer,
     TopicQuestionHintSerializer,
     TopicPracticeHistoryQuestionSerializer
 )
@@ -46,6 +47,7 @@ __all__ = [
     "TopicTheorySerializer",
     "TopicPracticeQuestionSerializer",
     "TopicQuestionAnswerSubmitSerializer",
+    "TopicQuestionCodeRunSerializer",
     "TopicQuestionHintSerializer",
     "TopicPracticeHistoryQuestionSerializer",
 ]

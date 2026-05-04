@@ -23,7 +23,8 @@ function serializeQuestion(question: TeacherEditableQuestion, index: number) {
     order: typeof question.order === 'number' ? question.order : index,
     question_type: question.question_type || 'single_choice',
     max_score: Number(question.max_score) || 100,
-    options: (question.options || []).map(serializeOption),
+    expected_output: question.question_type === 'code' ? String(question.expected_output ?? '') : '',
+    options: question.question_type === 'code' ? [] : (question.options || []).map(serializeOption),
   };
 }
 
