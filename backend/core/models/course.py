@@ -3,10 +3,6 @@ from django.db import models
 from .user import User
 
 
-def course_image_upload_path(instance, filename):
-    return f'courses/{instance.slug}/image/{filename}'
-
-
 class Course(models.Model):
     author = models.ForeignKey(
         User,
@@ -18,13 +14,6 @@ class Course(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
-    image = models.ImageField(
-        upload_to=course_image_upload_path,
-        null=True,
-        blank=True,
-        max_length=500,
-        help_text="Course cover image"
-    )
 
     def __str__(self):
         return self.title

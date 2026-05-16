@@ -1,0 +1,83 @@
+.app-select {
+  position: relative;
+  display: inline-block;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.app-select--block {
+  display: block;
+  width: 100%;
+}
+
+.app-select__control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--nav-black);
+  border-radius: 0;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.app-select__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app-select__control:focus-visible {
+  outline: none;
+  border-color: var(--nav-orange);
+}
+
+.app-select__arrow {
+  width: 0;
+  height: 0;
+  flex-shrink: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--nav-orange);
+}
+
+.app-select__list {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 2px solid var(--nav-black);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.app-select__option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-select__option:hover {
+  background: rgba(249, 115, 22, 0.14);
+}
+
+.app-select__option--active {
+  background: var(--nav-orange);
+  color: #0f172a;
+}

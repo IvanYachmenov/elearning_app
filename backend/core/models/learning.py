@@ -53,6 +53,7 @@ class TopicQuestion(models.Model):
         SINGLE = "single_choice", "Single choice"
         MULTI = "multiple_choice", "Multiple choice"
         CODE = "code", "Python code"
+        JS_CODE = "javascript_code", "JavaScript code"
 
     topic = models.ForeignKey(
         "Topic",
@@ -67,7 +68,6 @@ class TopicQuestion(models.Model):
         choices=QuestionType.choices,
         default=QuestionType.SINGLE,
     )
-    max_score = models.PositiveSmallIntegerField(default=100)
     expected_output = models.TextField(blank=True, default="")
 
     class Meta:

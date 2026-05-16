@@ -23,6 +23,11 @@ services:
     container_name: elearning_backend
     restart: unless-stopped
     environment:
+      # Dev-friendly defaults; override ALL of these for the AWS deploy.
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-key}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-127.0.0.1,localhost,0.0.0.0,backend}
+      TEACHER_ACCESS_CODE: ${TEACHER_ACCESS_CODE:-}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DB:-elearning}

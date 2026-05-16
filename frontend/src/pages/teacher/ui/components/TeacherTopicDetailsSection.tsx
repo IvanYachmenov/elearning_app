@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
 
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { TeacherTimeParts, TeacherTopicFormData } from '../../model/types';
 
 interface TeacherTopicDetailsSectionProps {
@@ -20,7 +19,6 @@ function TeacherTopicDetailsSection({
   onToggleTimedTest,
   onTimeChange,
 }: TeacherTopicDetailsSectionProps) {
-  const { t } = useLanguage();
   const theoryTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const syncTheoryTextareaHeight = (preservePageScroll = true) => {
@@ -53,26 +51,26 @@ function TeacherTopicDetailsSection({
     <>
       <div className="teacher-form-group">
         <label className="teacher-form-label">
-          {t('pages.teacher.topicTitle')} <span style={{ color: 'red' }}>*</span>
+          {"Topic Title"} <span style={{ color: 'red' }}>*</span>
         </label>
         <input
           type="text"
           className="teacher-form-input"
           value={topicData.title}
           onChange={(event) => onTitleChange(event.target.value)}
-          placeholder={t('pages.teacher.enterTopicTitle')}
+          placeholder={"Enter topic title"}
           required
         />
       </div>
 
       <div className="teacher-form-group">
-        <label className="teacher-form-label">{t('pages.teacher.theoryText')}</label>
+        <label className="teacher-form-label">{"Theory Text"}</label>
         <textarea
           ref={theoryTextareaRef}
           className="teacher-form-textarea teacher-form-textarea--autogrow teacher-form-textarea--theory"
           value={topicData.content}
           onChange={(event) => onContentChange(event.target.value)}
-          placeholder={t('pages.teacher.enterTheoryContent')}
+          placeholder={"Enter theory content for this topic"}
           rows={8}
         />
       </div>
@@ -84,13 +82,13 @@ function TeacherTopicDetailsSection({
             checked={topicData.is_timed_test}
             onChange={(event) => onToggleTimedTest(event.target.checked)}
           />
-          {t('pages.teacher.timedTest')}
+          {"Timed test"}
         </label>
       </div>
 
       {topicData.is_timed_test ? (
         <div className="teacher-form-group">
-          <label className="teacher-form-label">{t('pages.teacher.timeLimit')}</label>
+          <label className="teacher-form-label">{"Time Limit (seconds)"}</label>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <label style={{ fontSize: '12px', color: '#666' }}>Minutes</label>

@@ -25,14 +25,12 @@ class UserAdmin(BaseUserAdmin):
         ("Extra fields", {
             "fields": (
                 "role",
-                "points",
-                "two_factor_enabled",
                 "enrolled_courses",
             )
         }),
     )
 
-    list_display = ("username", "email", "role", "points", "is_staff", "is_superuser")
+    list_display = ("username", "email", "role", "is_staff", "is_superuser")
     list_filter = ("role", "is_staff", "is_superuser")
 
 
@@ -70,7 +68,7 @@ class TopicQuestionOptionInline(admin.TabularInline):
 
 @admin.register(TopicQuestion)
 class TopicQuestionAdmin(admin.ModelAdmin):
-    list_display = ("id", "topic", "order", "question_type", "max_score")
+    list_display = ("id", "topic", "order", "question_type")
     list_filter = ("topic", "question_type")
     inlines = [TopicQuestionOptionInline]
 

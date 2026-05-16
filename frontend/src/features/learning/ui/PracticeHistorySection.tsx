@@ -1,19 +1,17 @@
-﻿import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { LoadingIndicator } from '../../../shared/ui';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeHistorySectionProps } from '../types';
 
 function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHistorySectionProps) {
-  const { t } = useLanguage();
 
   return (
     <section className="topic-practice__history">
-      {loading && <LoadingIndicator compact label={t('common.loading')} />}
+      {loading && <LoadingIndicator compact label={"Loading..."} />}
 
       {error && <p style={{ color: '#dc2626', marginTop: '8px' }}>{error}</p>}
 
       {!loading && !error && historyQuestions.length === 0 && (
-        <p className="topic-practice__empty">{t('pages.learning.noAnsweredQuestions')}</p>
+        <p className="topic-practice__empty">{"No answered questions to display."}</p>
       )}
 
       {!loading && !error && historyQuestions.length > 0 && (
@@ -26,29 +24,31 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
               <div className="topic-practice__question-header">
                 <span className="topic-practice__type">
                   {question.question_type === 'single_choice'
-                    ? t('pages.learning.singleChoice')
+                    ? "Single choice"
                     : question.question_type === 'multiple_choice'
-                      ? t('pages.learning.multipleChoice')
-                      : t('pages.learning.code')}
+                      ? "Multiple choice"
+                      : question.question_type === 'javascript_code'
+                        ? "JavaScript code"
+                        : "Python code"}
                 </span>
                 <div className="topic-practice__question-text">{question.text}</div>
               </div>
 
-              {question.question_type === 'code' ? (
+              {(question.question_type === 'code' || question.question_type === 'javascript_code') ? (
                 <div className="topic-practice__code-output topic-practice__code-output--history">
                   <div className="topic-practice__code-output-row">
-                    <span className="topic-practice__code-output-label">{t('pages.learning.codeEditor')}</span>
+                    <span className="topic-practice__code-output-label">{"Python code"}</span>
                     <pre className="topic-practice__code-output-box">{question.submitted_code || ''}</pre>
                   </div>
                   <div className="topic-practice__code-output-row">
-                    <span className="topic-practice__code-output-label">{t('pages.learning.output')}</span>
+                    <span className="topic-practice__code-output-label">{"Output"}</span>
                     <pre className="topic-practice__code-output-box">
-                      {question.stdout || t('pages.learning.noOutput')}
+                      {question.stdout || "No output"}
                     </pre>
                   </div>
                   {question.stderr && (
                     <div className="topic-practice__code-output-row">
-                      <span className="topic-practice__code-output-label">{t('pages.learning.stderr')}</span>
+                      <span className="topic-practice__code-output-label">{"Errors"}</span>
                       <pre className="topic-practice__code-output-box topic-practice__code-output-box--error">
                         {question.stderr}
                       </pre>
@@ -85,7 +85,7 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
                           />
                           <span className="topic-practice__option-text">{cleanOptionText(option.text)}</span>
                           {correct && (
-                            <span className="topic-practice__option-correct-label">{t('pages.learning.correct')}</span>
+                            <span className="topic-practice__option-correct-label">{"Correct"}</span>
                           )}
                         </div>
                       </li>
@@ -95,15 +95,17 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
               )}
 
               {question.is_correct !== null && (
-                <div
+                <span
                   className={
-                    'topic-practice__feedback' +
-                    (question.is_correct ? ' topic-practice__feedback--success' : ' topic-practice__feedback--fail')
+                    'topic-practice__verdict' +
+                    (question.is_correct
+                      ? ' topic-practice__verdict--ok'
+                      : ' topic-practice__verdict--bad')
                   }
-                  style={{ marginTop: '8px' }}
+                  title={question.is_correct ? 'Answered correctly' : 'Answered incorrectly'}
                 >
-                  {question.is_correct ? t('pages.learning.correctAnswer') : t('pages.learning.incorrectAnswer')}
-                </div>
+                  {question.is_correct ? 'Correct' : 'Incorrect'}
+                </span>
               )}
             </div>
           ))}

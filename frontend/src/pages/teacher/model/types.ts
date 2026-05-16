@@ -24,7 +24,6 @@ export interface TeacherEditableQuestion {
   text: string;
   order: number;
   question_type: QuestionType;
-  max_score: number;
   expected_output: string;
   options: TeacherEditableOption[];
 }
@@ -51,8 +50,6 @@ export interface TeacherCourseFormData {
   slug: string;
   description: string;
   modules: TeacherEditableModule[];
-  image: File | null;
-  image_url: string | null;
 }
 
 export interface TeacherModuleFormData {
@@ -73,7 +70,6 @@ export interface TeacherTopicFormData {
 export interface TeacherCourseListItem {
   id: number;
   title: string;
-  image_url: string | null;
   modules: TeacherEditableModule[];
 }
 

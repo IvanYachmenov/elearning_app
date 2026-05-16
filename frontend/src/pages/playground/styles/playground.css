@@ -1,0 +1,145 @@
+.playground-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.playground {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.playground__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.playground__title {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  margin: 0;
+}
+
+.playground__controls {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+/* Make the language dropdown the same height as the Run button */
+.playground__controls .app-select {
+  display: flex;
+}
+
+.playground__controls .app-select__control {
+  height: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.playground__run-btn {
+  padding: 10px 28px;
+  border: 2px solid var(--nav-black);
+  border-radius: 0;
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  color: var(--nav-black);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.playground__run-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
+}
+
+.playground__run-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.playground__editor {
+  flex: 1;
+  width: 100%;
+  min-height: 240px;
+  resize: vertical;
+  padding: 14px 16px;
+  border: 2px solid var(--nav-black);
+  border-radius: 0;
+  background: #f6f7f9;
+  color: #334155;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13.5px;
+  line-height: 1.55;
+  tab-size: 4;
+}
+
+.playground__editor:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(249, 115, 22, 0.35);
+}
+
+.playground__error {
+  padding: 12px;
+  border: 2px solid #ef4444;
+  background: #fdecec;
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.playground__output {
+  border: 2px solid var(--nav-black);
+  background: #fff;
+}
+
+.playground__output-head {
+  padding: 6px 12px;
+  border-bottom: 2px solid var(--nav-black);
+  background: #eef0f3;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.playground__output-head--err {
+  border-top: 2px solid var(--nav-black);
+  background: #fdecec;
+  color: #b91c1c;
+}
+
+.playground__badge {
+  color: #b91c1c;
+}
+
+.playground__exit {
+  color: var(--text-muted);
+}
+
+.playground__stream {
+  margin: 0;
+  padding: 12px 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.playground__stream--err {
+  color: #b91c1c;
+}

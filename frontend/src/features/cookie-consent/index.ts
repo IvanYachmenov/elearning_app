@@ -1,1 +1,1 @@
-﻿export {default as CookieConsent} from './ui/CookieConsent';
+export {default as CookieConsent} from './ui/CookieConsent';

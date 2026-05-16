@@ -1,5 +1,6 @@
+import { AppSelect, AutoGrowTextarea } from '../../../../shared/ui';
+import { isCodeQuestion } from '../../../../shared/types';
 import type { QuestionType } from '../../../../shared/types';
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { TeacherEditableQuestion } from '../../model/types';
 
 interface TeacherTopicQuestionsSectionProps {
@@ -8,7 +9,6 @@ interface TeacherTopicQuestionsSectionProps {
   onDeleteQuestion: (questionIndex: number) => void;
   onQuestionTextChange: (questionIndex: number, value: string) => void;
   onQuestionTypeChange: (questionIndex: number, value: QuestionType) => void;
-  onQuestionScoreChange: (questionIndex: number, value: number) => void;
   onQuestionExpectedOutputChange: (questionIndex: number, value: string) => void;
   onAddOption: (questionIndex: number) => void;
   onOptionTextChange: (questionIndex: number, optionIndex: number, value: string) => void;
@@ -22,21 +22,19 @@ function TeacherTopicQuestionsSection({
   onDeleteQuestion,
   onQuestionTextChange,
   onQuestionTypeChange,
-  onQuestionScoreChange,
   onQuestionExpectedOutputChange,
   onAddOption,
   onOptionTextChange,
   onOptionCorrectChange,
   onDeleteOption,
 }: TeacherTopicQuestionsSectionProps) {
-  const { t } = useLanguage();
 
   return (
     <div className="teacher-questions-section">
       <div className="teacher-questions-header">
-        <h5 className="teacher-questions-title">{t('pages.teacher.questions')}</h5>
+        <h5 className="teacher-questions-title">{"Questions"}</h5>
         <button className="teacher-add-question-btn" type="button" onClick={onAddQuestion}>
-          + {t('pages.teacher.addQuestion')}
+          + {"Add Question"}
         </button>
       </div>
 
@@ -46,74 +44,65 @@ function TeacherTopicQuestionsSection({
             <div key={question.id || questionIndex} className="teacher-question-item">
               <div className="teacher-question-header">
                 <h6 className="teacher-question-title">
-                  {t('pages.teacher.question')} {questionIndex + 1}
+                  {"Question"} {questionIndex + 1}
                 </h6>
                 <button
                   className="teacher-question-delete-btn"
                   type="button"
                   onClick={() => onDeleteQuestion(questionIndex)}
                 >
-                  {t('pages.teacher.delete')}
+                  {"Delete"}
                 </button>
               </div>
 
               <div className="teacher-form-group">
-                <label className="teacher-form-label">{t('pages.teacher.questionText')}</label>
-                <textarea
+                <label className="teacher-form-label">{"Question Text"}</label>
+                <AutoGrowTextarea
                   className="teacher-form-textarea"
                   value={question.text}
                   onChange={(event) => onQuestionTextChange(questionIndex, event.target.value)}
-                  placeholder={t('pages.teacher.enterQuestionText')}
+                  placeholder={"Enter question text"}
                   rows={2}
                 />
               </div>
 
               <div className="teacher-form-group">
-                <label className="teacher-form-label">{t('pages.teacher.questionType')}</label>
-                <select
-                  className="teacher-form-input"
+                <label className="teacher-form-label">{"Question Type"}</label>
+                <AppSelect
+                  className="app-select--block"
+                  ariaLabel="Question type"
                   value={question.question_type}
-                  onChange={(event) => onQuestionTypeChange(questionIndex, event.target.value as QuestionType)}
-                >
-                  <option value="single_choice">{t('pages.teacher.singleChoice')}</option>
-                  <option value="multiple_choice">{t('pages.teacher.multipleChoice')}</option>
-                  <option value="code">{t('pages.teacher.pythonCode')}</option>
-                </select>
-              </div>
-
-              <div className="teacher-form-group">
-                <label className="teacher-form-label">{t('pages.teacher.maxScore')}</label>
-                <input
-                  type="number"
-                  className="teacher-form-input"
-                  value={question.max_score || 100}
-                  onChange={(event) => onQuestionScoreChange(questionIndex, Number(event.target.value) || 100)}
-                  min="1"
-                  max="100"
+                  options={[
+                    { value: 'single_choice', label: 'Single Choice' },
+                    { value: 'multiple_choice', label: 'Multiple Choice' },
+                    { value: 'code', label: 'Python Code' },
+                    { value: 'javascript_code', label: 'JavaScript Code' },
+                  ]}
+                  onChange={(next) => onQuestionTypeChange(questionIndex, next as QuestionType)}
                 />
               </div>
 
-              {question.question_type === 'code' ? (
+              {isCodeQuestion(question.question_type) ? (
                 <div className="teacher-form-group">
-                  <label className="teacher-form-label">{t('pages.teacher.expectedOutput')}</label>
-                  <textarea
+                  <label className="teacher-form-label">{"Expected Output"}</label>
+                  <AutoGrowTextarea
                     className="teacher-form-textarea teacher-form-textarea--code-output"
                     value={question.expected_output}
                     onChange={(event) => onQuestionExpectedOutputChange(questionIndex, event.target.value)}
-                    placeholder={t('pages.teacher.expectedOutputPlaceholder')}
+                    placeholder={"Exact stdout, including line breaks"}
                     rows={4}
                   />
                 </div>
               ) : (
                 <div className="teacher-options-section">
                   <div className="teacher-options-header">
-                    <label className="teacher-form-label">{t('pages.teacher.options')}</label>
+                    <label className="teacher-form-label">{"Options"}</label>
                     <button
                       className="teacher-add-option-btn"
                       type="button"
                       onClick={() => onAddOption(questionIndex)}
                     >
-                      + {t('pages.teacher.addOption')}
+                      + {"Add Option"}
                     </button>
                   </div>
 
@@ -127,7 +116,7 @@ function TeacherTopicQuestionsSection({
                               className="teacher-form-input"
                               value={option.text}
                               onChange={(event) => onOptionTextChange(questionIndex, optionIndex, event.target.value)}
-                              placeholder={t('pages.teacher.optionText')}
+                              placeholder={"Option text"}
                             />
                             <label className="teacher-form-checkbox-label">
                               <input
@@ -136,7 +125,7 @@ function TeacherTopicQuestionsSection({
                                 checked={option.is_correct}
                                 onChange={(event) => onOptionCorrectChange(questionIndex, optionIndex, event.target.checked)}
                               />
-                              {t('pages.teacher.correct')}
+                              {"Correct"}
                             </label>
                             <button
                               className="teacher-option-delete-btn"
@@ -150,7 +139,7 @@ function TeacherTopicQuestionsSection({
                       ))}
                     </div>
                   ) : (
-                    <p className="teacher-empty-text-small">{t('pages.teacher.noOptionsYet')}</p>
+                    <p className="teacher-empty-text-small">{"No options yet. Add at least 2 options."}</p>
                   )}
                 </div>
               )}
@@ -158,7 +147,7 @@ function TeacherTopicQuestionsSection({
           ))}
         </div>
       ) : (
-        <p className="teacher-empty-text-small">{t('pages.teacher.noQuestionsYet')}</p>
+        <p className="teacher-empty-text-small">{"No questions yet. Click \"Add Question\" to create one."}</p>
       )}
     </div>
   );

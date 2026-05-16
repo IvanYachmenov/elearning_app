@@ -13,8 +13,6 @@ export const INITIAL_COURSE_DATA: TeacherCourseFormData = {
   slug: '',
   description: '',
   modules: [],
-  image: null,
-  image_url: null,
 };
 
 export const INITIAL_MODULE_DATA: TeacherModuleFormData = {
@@ -46,7 +44,6 @@ export function createEmptyQuestion(order: number): TeacherEditableQuestion {
     text: '',
     order,
     question_type: 'single_choice',
-    max_score: 100,
     expected_output: '',
     options: [],
   };

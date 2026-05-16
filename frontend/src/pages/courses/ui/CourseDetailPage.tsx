@@ -2,7 +2,6 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { CourseDetail } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
 import type { CourseDetailPageData } from '../model/types';
@@ -48,7 +47,6 @@ function RatingStars({ rating }: { rating: number | null }) {
 function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [course, setCourse] = useState<CourseDetailPageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
@@ -66,7 +64,7 @@ function CourseDetailPage() {
     const loadCourse = async () => {
       if (!id) {
         if (isActive) {
-          setError(t('pages.courses.courseNotFound'));
+          setError("Course not found or failed to load.");
           setLoading(false);
         }
         return;
@@ -87,7 +85,7 @@ function CourseDetailPage() {
       } catch (requestError) {
         console.error(requestError);
         if (isActive) {
-          setError(t('pages.courses.courseNotFound'));
+          setError("Course not found or failed to load.");
           setCourse(null);
           setEnrolled(false);
         }
@@ -103,7 +101,7 @@ function CourseDetailPage() {
     return () => {
       isActive = false;
     };
-  }, [id, t]);
+  }, [id]);
 
   const authorName = useMemo(() => {
     if (!course) {
@@ -113,17 +111,21 @@ function CourseDetailPage() {
     return course.author_name || course.author?.username || course.author?.email || null;
   }, [course]);
 
+  const hasRating = Boolean(
+    course && course.average_rating && course.reviews_count && course.reviews_count > 0,
+  );
+
   const ratingText = useMemo(() => {
-    if (!course || !course.average_rating || course.reviews_count === 0) {
-      return t('pages.courses.noReviews');
+    if (!hasRating || !course?.average_rating) {
+      return '';
     }
 
     return course.average_rating.toFixed(1);
-  }, [course, t]);
+  }, [hasRating, course]);
 
   const handleEnroll = async () => {
     if (!id) {
-      setError(t('pages.courses.failedToEnroll'));
+      setError("Failed to enroll. Please try again.");
       return;
     }
 
@@ -136,7 +138,7 @@ function CourseDetailPage() {
       setEnrolled(true);
     } catch (requestError) {
       console.error(requestError);
-      setError(t('pages.courses.failedToEnroll'));
+      setError("Failed to enroll. Please try again.");
     } finally {
       setEnrolling(false);
     }
@@ -146,12 +148,12 @@ function CourseDetailPage() {
     event.preventDefault();
 
     if (!id) {
-      setReviewError(t('pages.courses.failedToSaveReview'));
+      setReviewError("Failed to save review. Please try again.");
       return;
     }
 
     if (reviewRating < 1 || reviewRating > MAX_RATING) {
-      setReviewError(t('pages.courses.selectRating'));
+      setReviewError("Choose a rating from 1 to 5 stars.");
       return;
     }
 
@@ -168,10 +170,10 @@ function CourseDetailPage() {
       const ownReview = response.data.reviews.find((review) => review.is_current_user);
       setReviewRating(ownReview?.rating || reviewRating);
       setReviewComment(ownReview?.comment || reviewComment.trim());
-      setReviewSuccess(t('pages.courses.reviewSaved'));
+      setReviewSuccess("Review saved.");
     } catch (requestError) {
       console.error(requestError);
-      setReviewError(t('pages.courses.failedToSaveReview'));
+      setReviewError("Failed to save review. Please try again.");
     } finally {
       setReviewSubmitting(false);
     }
@@ -180,7 +182,7 @@ function CourseDetailPage() {
   if (loading) {
     return (
       <div className="page page-enter">
-        <LoadingIndicator label={t('common.loading')} />
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
@@ -188,9 +190,9 @@ function CourseDetailPage() {
   if (error || !course) {
     return (
       <div className="page page-enter">
-        <p style={{ color: '#dc2626' }}>{error || t('pages.courses.courseNotFoundShort')}</p>
+        <p style={{ color: '#dc2626' }}>{error || "Course not found."}</p>
         <Link to="/courses" className="btn-primary" style={{ marginTop: '16px' }}>
-          {t('pages.courses.backToCourses')}
+          {"Back to courses"}
         </Link>
       </div>
     );
@@ -200,20 +202,12 @@ function CourseDetailPage() {
     <div className="page page-enter">
       <div className="course-detail-back">
         <button type="button" className="btn-primary" onClick={() => navigate('/courses')}>
-          {t('pages.courses.backToCoursesTitle')}
+          {"Back to Courses"}
         </button>
       </div>
 
       <div className="course-detail-header">
         <div className="course-detail-hero">
-          <div className="course-detail-header__image">
-            {course.image_url ? (
-              <img src={course.image_url} alt={course.title} />
-            ) : (
-              <div className="course-detail-header__image-placeholder">C</div>
-            )}
-          </div>
-
           <div className="course-detail-hero__content">
             <h1 className="page__title">{course.title}</h1>
 
@@ -223,19 +217,21 @@ function CourseDetailPage() {
               </p>
             )}
 
-            <div className="course-rating course-rating--detail" aria-label={ratingText}>
-              <RatingStars rating={course.average_rating} />
-              <span className="course-rating__text">{ratingText}</span>
-            </div>
+            {hasRating && (
+              <div className="course-rating course-rating--detail" aria-label={ratingText}>
+                <RatingStars rating={course.average_rating} />
+                <span className="course-rating__text">{ratingText}</span>
+              </div>
+            )}
 
             <div className="course-detail-actions">
               {enrolled ? (
                 <Link to="/learning" className="btn-primary">
-                  {t('pages.courses.goToLearning')}
+                  {"Go to learning →"}
                 </Link>
               ) : (
                 <button type="button" className="btn-primary" onClick={handleEnroll} disabled={enrolling}>
-                  {enrolling ? t('pages.courses.enrolling') : t('pages.courses.enrollInCourse')}
+                  {enrolling ? "Enrolling..." : "Enroll in this course"}
                 </button>
               )}
             </div>
@@ -249,7 +245,7 @@ function CourseDetailPage() {
 
       {course.modules && course.modules.length > 0 && (
         <section className="course-content">
-          <h2 className="section-title">{t('pages.learning.courseContent')}</h2>
+          <h2 className="section-title">{"Course Content"}</h2>
           <div className="module-list">
             {course.modules.map((moduleItem) => (
               <div key={moduleItem.id} className="module-item">
@@ -260,7 +256,7 @@ function CourseDetailPage() {
                       <li key={topic.id} className="topic-item">
                         {topic.title}
                         {topic.is_timed_test && (
-                          <span className="topic-item__timed-badge" title={t('pages.learning.timedTest')}>
+                          <span className="topic-item__timed-badge" title={"Timed test"}>
                             TIMER
                           </span>
                         )}
@@ -276,12 +272,12 @@ function CourseDetailPage() {
 
       <section className="course-reviews">
         <div className="course-reviews__header">
-          <h2 className="section-title">{t('pages.courses.reviewsTitle')}</h2>
+          <h2 className="section-title">{"Course reviews"}</h2>
         </div>
 
         <form className="course-review-form" onSubmit={handleReviewSubmit}>
-          <label className="course-review-form__label">{t('pages.courses.yourRating')}</label>
-          <div className="course-review-stars" role="radiogroup" aria-label={t('pages.courses.yourRating')}>
+          <label className="course-review-form__label">{"Your rating"}</label>
+          <div className="course-review-stars" role="radiogroup" aria-label={"Your rating"}>
             {Array.from({ length: MAX_RATING }, (_, index) => {
               const value = index + 1;
               return (
@@ -292,7 +288,7 @@ function CourseDetailPage() {
                   onClick={() => setReviewRating(value)}
                   role="radio"
                   aria-checked={value === reviewRating}
-                  aria-label={`${value} ${t('pages.courses.stars')}`}
+                  aria-label={`${value} ${"stars"}`}
                 >
                   {FILLED_STAR}
                 </button>
@@ -301,21 +297,21 @@ function CourseDetailPage() {
           </div>
 
           <label className="course-review-form__label" htmlFor="course-review-comment">
-            {t('pages.courses.yourComment')}
+            {"Your comment"}
           </label>
           <textarea
             id="course-review-comment"
             className="course-review-form__textarea"
             value={reviewComment}
             onChange={(event) => setReviewComment(event.target.value)}
-            placeholder={t('pages.courses.commentPlaceholder')}
+            placeholder={"Share what helped, what was difficult, or who this course is best for."}
             rows={4}
             maxLength={1000}
           />
 
           <div className="course-review-form__footer">
             <button type="submit" className="btn-primary" disabled={reviewSubmitting}>
-              {reviewSubmitting ? t('pages.courses.savingReview') : t('pages.courses.submitReview')}
+              {reviewSubmitting ? "Posting..." : "Post review"}
             </button>
             {reviewError && <span className="course-review-form__message course-review-form__message--error">{reviewError}</span>}
             {reviewSuccess && <span className="course-review-form__message course-review-form__message--success">{reviewSuccess}</span>}
@@ -324,7 +320,7 @@ function CourseDetailPage() {
 
         <div className="course-review-thread" aria-live="polite">
           {course.reviews.length === 0 ? (
-            <p className="course-review-thread__empty">{t('pages.courses.noReviewComments')}</p>
+            <p className="course-review-thread__empty">{"No one has reviewed this course yet."}</p>
           ) : (
             course.reviews.map((review) => (
               <article key={review.id} className="course-review-message">
@@ -340,7 +336,7 @@ function CourseDetailPage() {
                   <p className="course-review-message__comment">{review.comment}</p>
                 ) : (
                   <p className="course-review-message__comment course-review-message__comment--empty">
-                    {t('pages.courses.ratingOnly')}
+                    {"Rating without a comment."}
                   </p>
                 )}
               </article>

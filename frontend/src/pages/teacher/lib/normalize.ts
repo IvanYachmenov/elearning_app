@@ -26,8 +26,11 @@ export function normalizeQuestion(question: unknown, fallbackOrder = 0): Teacher
     text: String(data.text || ''),
     order: typeof data.order === 'number' ? data.order : fallbackOrder,
     question_type:
-      questionType === 'multiple_choice' || questionType === 'code' ? questionType : 'single_choice',
-    max_score: typeof data.max_score === 'number' ? data.max_score : Number(data.max_score) || 100,
+      questionType === 'multiple_choice' ||
+      questionType === 'code' ||
+      questionType === 'javascript_code'
+        ? questionType
+        : 'single_choice',
     expected_output: String(data.expected_output ?? ''),
     options: Array.isArray(data.options) ? data.options.map(normalizeOption) : [],
   };
@@ -58,15 +61,12 @@ export function normalizeModule(moduleItem: unknown, fallbackOrder = 0): Teacher
 
 export function normalizeCourse(data: unknown): TeacherCourseFormData {
   const course = typeof data === 'object' && data !== null ? (data as Record<string, unknown>) : {};
-  const imageUrl = course.image_url || course.image;
 
   return {
     title: String(course.title || ''),
     slug: String(course.slug || ''),
     description: String(course.description || ''),
     modules: Array.isArray(course.modules) ? course.modules.map((item, index) => normalizeModule(item, index)) : [],
-    image: null,
-    image_url: typeof imageUrl === 'string' ? imageUrl : null,
   };
 }
 
@@ -108,7 +108,6 @@ export function normalizeTeacherCourseList(data: unknown): TeacherCourseListItem
     return {
       id: typeof source.id === 'number' ? source.id : 0,
       title: course.title,
-      image_url: course.image_url,
       modules: course.modules,
     };
   });

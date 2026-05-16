@@ -1,9 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-def user_avatar_upload_path(instance, filename):
-    return f'users/{instance.username}/avatar/{filename}'
-
 class User(AbstractUser):
     class Roles(models.TextChoices):
         STUDENT = "student", "Student"
@@ -16,16 +13,12 @@ class User(AbstractUser):
         default=Roles.STUDENT,
     )
 
-    points = models.PositiveIntegerField(default=0)
-
     enrolled_courses = models.ManyToManyField(
         "Course",
         related_name="students",
         blank=True,
     )
 
-    two_factor_enabled = models.BooleanField(default=False)
-    
     # OAuth fields
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     github_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
@@ -39,20 +32,6 @@ class User(AbstractUser):
         default='email'
     )
     email_verified = models.BooleanField(default=False)
-    
-    avatar = models.ImageField(
-        upload_to=user_avatar_upload_path,
-        null=True,
-        blank=True,
-        max_length=500
-    )
-    
-    profile_background_gradient = models.CharField(
-        max_length=500,
-        null=True,
-        blank=True,
-        help_text="CSS gradient string for profile background"
-    )
 
     @property
     def is_teacher(self) -> bool:

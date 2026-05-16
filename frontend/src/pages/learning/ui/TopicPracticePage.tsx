@@ -10,8 +10,9 @@ import {
 } from '../../../features/learning';
 import type { PracticeAnswerFeedback } from '../../../features/learning/types';
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { useNavigationLock } from '../../../shared/lib/navigation-lock';
+import { runJavaScriptInWorker } from '../../../shared/lib/js-runner';
+import { isCodeQuestion } from '../../../shared/types';
 import type {
   CodeRunResult,
   PracticeHistoryQuestion,
@@ -43,7 +44,6 @@ function TopicPracticePage() {
   const { courseId, topicId } = useParams<TopicRouteParams>();
   const navigate = useNavigate();
   const { lockNavigation, unlockNavigation } = useNavigationLock();
-  const { t } = useLanguage();
 
   const [topic, setTopic] = useState<TopicTheory | null>(null);
   const [loadingTopic, setLoadingTopic] = useState(true);
@@ -99,7 +99,7 @@ function TopicPracticePage() {
     const loadTopic = async () => {
       if (!topicId) {
         if (isActive) {
-          setError(t('pages.learning.topicNotFound'));
+          setError("Topic not found or you are not enrolled.");
           setLoadingTopic(false);
         }
         return;
@@ -149,11 +149,11 @@ function TopicPracticePage() {
 
         const status = isAxiosError(requestError) ? requestError.response?.status : undefined;
         if (status === 404) {
-          setError(t('pages.learning.topicNotFound'));
+          setError("Topic not found or you are not enrolled.");
         } else if (status === 403) {
-          setError(t('pages.learning.notEnrolled'));
+          setError("You are not enrolled in this course.");
         } else {
-          setError(t('pages.learning.failedToLoadTopic'));
+          setError("Failed to load topic.");
         }
       } finally {
         if (isActive) {
@@ -167,7 +167,7 @@ function TopicPracticePage() {
     return () => {
       isActive = false;
     };
-  }, [topicId, t]);
+  }, [topicId]);
 
   const applyPracticePayload = useCallback(
     (data: PracticeApiPayload, options: PracticePayloadOptions = {}) => {
@@ -228,7 +228,7 @@ function TopicPracticePage() {
 
       if (data.last_answer && !timed) {
         setSelectedOptions(data.last_answer.selected_option_ids || []);
-        if (data.question?.question_type === 'code') {
+        if (data.question && isCodeQuestion(data.question.question_type)) {
           setCodeAnswer(data.last_answer.submitted_code || '');
           setCodeRunResult({
             status: data.last_answer.exit_code === 0 ? 'completed' : 'runtime_error',
@@ -240,7 +240,7 @@ function TopicPracticePage() {
         }
         setAnswerFeedback({
           type: data.last_answer.is_correct ? 'success' : 'fail',
-          message: data.last_answer.is_correct ? t('pages.learning.correctAnswer') : t('pages.learning.incorrectAnswer'),
+          message: data.last_answer.is_correct ? "Correct answer!" : "Incorrect answer.",
           score: data.last_answer.score,
         });
       } else {
@@ -249,7 +249,7 @@ function TopicPracticePage() {
         setTimedAnswerSaved(false);
       }
     },
-    [t, unlockNavigation],
+    [unlockNavigation],
   );
 
   const fetchNextQuestion = useCallback(async () => {
@@ -268,12 +268,12 @@ function TopicPracticePage() {
       setSelectedOptions([]);
       setAnswerFeedback({
         type: 'error',
-        message: t('pages.learning.failedToLoadNextQuestion'),
+        message: "Failed to load next question.",
       });
     } finally {
       setPracticeLoading(false);
     }
-  }, [applyPracticePayload, topicId, t]);
+  }, [applyPracticePayload, topicId]);
 
   useEffect(() => {
     if (
@@ -335,9 +335,9 @@ function TopicPracticePage() {
 
         const status = isAxiosError(requestError) ? requestError.response?.status : undefined;
         if (status === 400) {
-          setHistoryError(t('pages.learning.historyAvailableAfterFinish'));
+          setHistoryError("History is available only after you finish this topic.");
         } else {
-          setHistoryError(t('pages.learning.failedToLoadTestHistory'));
+          setHistoryError("Failed to load test history.");
         }
       } finally {
         if (isActive) {
@@ -351,7 +351,7 @@ function TopicPracticePage() {
     return () => {
       isActive = false;
     };
-  }, [isReviewMode, topicId, t]);
+  }, [isReviewMode, topicId]);
 
   const hasTimer = typeof remainingSeconds === 'number';
   const isTimedTestActive =
@@ -364,7 +364,7 @@ function TopicPracticePage() {
 
   useEffect(() => {
     if (isTimedTestActive) {
-      lockNavigation(t('pages.learning.timedTestInProgress'), [`/learning/courses/${courseId}/topics/${topicId}/practice`]);
+      lockNavigation("Timed test in progress. Navigation is locked until you finish.", [`/learning/courses/${courseId}/topics/${topicId}/practice`]);
     } else {
       unlockNavigation();
     }
@@ -372,7 +372,7 @@ function TopicPracticePage() {
     return () => {
       unlockNavigation();
     };
-  }, [isTimedTestActive, lockNavigation, unlockNavigation, courseId, topicId, t]);
+  }, [isTimedTestActive, lockNavigation, unlockNavigation, courseId, topicId]);
 
   useEffect(() => {
     return () => {
@@ -460,12 +460,12 @@ function TopicPracticePage() {
         setHintsLoadedQuestionId(questionId);
       } catch (requestError) {
         console.error(requestError);
-        setHintsError(t('pages.learning.failedToLoadHints'));
+        setHintsError("Failed to load hints.");
       } finally {
         setHintsLoading(false);
       }
     },
-    [hintsLoadedQuestionId, t],
+    [hintsLoadedQuestionId],
   );
 
   const handleToggleHints = () => {
@@ -489,9 +489,9 @@ function TopicPracticePage() {
       return;
     }
 
-    const canSubmitHint = Boolean(answerFeedback && answerFeedback.score === practiceQuestion.max_score);
+    const canSubmitHint = Boolean(answerFeedback && answerFeedback.score === 100);
     if (!canSubmitHint) {
-      setHintsError(t('pages.learning.hintPostLocked'));
+      setHintsError("You can add a hint after answering this question correctly.");
       return;
     }
 
@@ -514,10 +514,28 @@ function TopicPracticePage() {
       setHintDraft('');
     } catch (requestError) {
       console.error(requestError);
-      setHintsError(t('pages.learning.failedToSaveHint'));
+      setHintsError("Failed to save hint. Please try again.");
     } finally {
       setHintSubmitLoading(false);
     }
+  };
+
+  // Builds the answer body. JavaScript questions run in the browser and send
+  // their captured output for grading; Python sends code; others send options.
+  const buildAnswerPayload = async () => {
+    if (practiceQuestion && practiceQuestion.question_type === 'javascript_code') {
+      const jsResult = await runJavaScriptInWorker(codeAnswer);
+      setCodeRunResult(jsResult);
+      return {
+        code: codeAnswer,
+        client_stdout: jsResult.stdout,
+        client_stderr: jsResult.stderr,
+      };
+    }
+    if (practiceQuestion && isCodeQuestion(practiceQuestion.question_type)) {
+      return { code: codeAnswer };
+    }
+    return { selected_options: selectedOptions };
   };
 
   const handleContinueTimed = async () => {
@@ -528,9 +546,7 @@ function TopicPracticePage() {
     setSubmitLoading(true);
 
     try {
-      const answerPayload = practiceQuestion.question_type === 'code'
-        ? { code: codeAnswer }
-        : { selected_options: selectedOptions };
+      const answerPayload = await buildAnswerPayload();
       const response = await api.post<PracticeApiPayload>(`/api/learning/questions/${practiceQuestion.id}/answer/`, {
         ...answerPayload,
       });
@@ -569,7 +585,7 @@ function TopicPracticePage() {
       } else {
         setAnswerFeedback({
           type: 'neutral',
-          message: t('pages.learning.answerAccepted'),
+          message: "Answer accepted!",
           score: data.score,
           isLastQuestion: isLastQuestionAnswer,
         });
@@ -579,7 +595,7 @@ function TopicPracticePage() {
       console.error(requestError);
       setAnswerFeedback({
         type: 'error',
-        message: t('pages.learning.failedToSubmitAnswer'),
+        message: "Failed to submit answer. Please try again.",
       });
     } finally {
       setSubmitLoading(false);
@@ -598,13 +614,13 @@ function TopicPracticePage() {
 
     if (answerFeedback?.type === 'fail') {
       setAnswerFeedback(null);
-      if (practiceQuestion.question_type !== 'code') {
+      if (!isCodeQuestion(practiceQuestion.question_type)) {
         setSelectedOptions([]);
       }
       return;
     }
 
-    if (practiceQuestion.question_type !== 'code' && selectedOptions.length === 0) {
+    if (!isCodeQuestion(practiceQuestion.question_type) && selectedOptions.length === 0) {
       setAnswerFeedback({
         type: 'error',
         message: 'Please select at least one option.',
@@ -616,9 +632,7 @@ function TopicPracticePage() {
     setAnswerFeedback(null);
 
     try {
-      const answerPayload = practiceQuestion.question_type === 'code'
-        ? { code: codeAnswer }
-        : { selected_options: selectedOptions };
+      const answerPayload = await buildAnswerPayload();
       const response = await api.post<PracticeApiPayload>(`/api/learning/questions/${practiceQuestion.id}/answer/`, {
         ...answerPayload,
       });
@@ -630,7 +644,7 @@ function TopicPracticePage() {
 
       setAnswerFeedback({
         type: data.is_correct ? 'success' : 'fail',
-        message: data.is_correct ? t('pages.learning.correctAnswer') : t('pages.learning.incorrectAnswer'),
+        message: data.is_correct ? "Correct answer!" : "Incorrect answer.",
         score: data.score,
         isLastQuestion: isLastQuestionAnswer,
       });
@@ -673,7 +687,7 @@ function TopicPracticePage() {
       console.error(requestError);
       setAnswerFeedback({
         type: 'error',
-        message: t('pages.learning.failedToSubmitAnswer'),
+        message: "Failed to submit answer. Please try again.",
       });
     } finally {
       setSubmitLoading(false);
@@ -681,12 +695,19 @@ function TopicPracticePage() {
   };
 
   const handleRunCode = async () => {
-    if (!practiceQuestion || practiceQuestion.question_type !== 'code') {
+    if (!practiceQuestion || !isCodeQuestion(practiceQuestion.question_type)) {
       return;
     }
 
     setCodeRunLoading(true);
     setCodeRunResult(null);
+
+    if (practiceQuestion.question_type === 'javascript_code') {
+      const jsResult = await runJavaScriptInWorker(codeAnswer);
+      setCodeRunResult(jsResult);
+      setCodeRunLoading(false);
+      return;
+    }
 
     try {
       const response = await api.post<CodeRunResult>(`/api/learning/questions/${practiceQuestion.id}/run-code/`, {
@@ -698,7 +719,7 @@ function TopicPracticePage() {
       setCodeRunResult({
         status: 'error',
         stdout: '',
-        stderr: t('pages.learning.failedToRunCode'),
+        stderr: "Failed to run code.",
         exit_code: null,
         timed_out: false,
       });
@@ -752,7 +773,7 @@ function TopicPracticePage() {
       console.error(requestError);
       setAnswerFeedback({
         type: 'error',
-        message: t('pages.learning.failedToRestartTest'),
+        message: "Failed to restart the test. Please try again.",
       });
     } finally {
       setPracticeLoading(false);
@@ -774,12 +795,12 @@ function TopicPracticePage() {
     ((!isTimedMode && (feedbackType === 'success' || feedbackType === 'fail')) ||
       (isTimedMode && feedbackType === 'neutral'));
   const showTimedNextButton = isTimedMode && timedAnswerSaved && !showFinishButton;
-  const canPostHint = Boolean(practiceQuestion && answerFeedback && answerFeedback.score === practiceQuestion.max_score);
+  const canPostHint = Boolean(practiceQuestion && answerFeedback && answerFeedback.score === 100);
 
   if (loadingTopic && !topic) {
     return (
       <div className="page page-enter">
-        <LoadingIndicator label={t('common.loading')} />
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
@@ -787,14 +808,14 @@ function TopicPracticePage() {
   if (error || !topic) {
     return (
       <div className="page page-enter">
-        <p style={{ color: '#dc2626' }}>{error || t('pages.learning.topicNotFound')}</p>
+        <p style={{ color: '#dc2626' }}>{error || "Topic not found or you are not enrolled."}</p>
         <button
           type="button"
           className="learning-back-link"
           onClick={() => navigate('/learning')}
           style={{ marginTop: '16px' }}
         >
-          {t('pages.learning.backToMyLearning')}
+          {"Back to My Learning"}
         </button>
       </div>
     );
@@ -811,7 +832,7 @@ function TopicPracticePage() {
             disabled={isExitLocked}
             aria-disabled={isExitLocked}
           >
-            {t('pages.learning.backToTheory')}
+            {"Back to theory"}
           </button>
 
           {practiceCompleted && isReviewMode && (
@@ -820,7 +841,7 @@ function TopicPracticePage() {
               className="learning-back-link topic-page-header__back-results"
               onClick={() => setIsReviewMode(false)}
             >
-              {t('pages.learning.backToResults')}
+              {"Back to results"}
             </button>
           )}
         </div>
@@ -857,7 +878,7 @@ function TopicPracticePage() {
         {canPractice && (
           <>
             {practiceLoading && !practiceQuestion && (
-              <LoadingIndicator compact label={t('common.loading')} />
+              <LoadingIndicator compact label={"Loading..."} />
             )}
 
             {practiceCompleted && !practiceQuestion && !practiceLoading && !isReviewMode && (
@@ -907,7 +928,7 @@ function TopicPracticePage() {
                 isTimedMode={isTimedMode}
                 isAnswerLocked={isAnswerLocked}
                 timedAnswerSaved={timedAnswerSaved}
-                disableSubmit={!isTimedMode && practiceQuestion.question_type !== 'code' && selectedOptions.length === 0}
+                disableSubmit={!isTimedMode && !isCodeQuestion(practiceQuestion.question_type) && selectedOptions.length === 0}
                 showNextButton={showNextButton}
                 showFinishButton={showFinishButton}
                 showTimedNextButton={showTimedNextButton}

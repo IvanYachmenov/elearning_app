@@ -1,4 +1,7 @@
-export type QuestionType = 'single_choice' | 'multiple_choice' | 'code';
+export type QuestionType = 'single_choice' | 'multiple_choice' | 'code' | 'javascript_code';
+
+export const isCodeQuestion = (type: QuestionType): boolean =>
+  type === 'code' || type === 'javascript_code';
 
 export interface TopicQuestionOption {
   id: number;
@@ -11,7 +14,6 @@ export interface TopicQuestion {
   text: string;
   order: number;
   question_type: QuestionType;
-  max_score: number;
   options: TopicQuestionOption[];
 }
 
@@ -39,7 +41,6 @@ export interface CourseListItem {
   description: string;
   author_name: string | null;
   is_enrolled: boolean;
-  image_url: string | null;
   average_rating: number | null;
   reviews_count: number;
 }

@@ -1,3 +1,4 @@
+import { isCodeQuestion } from '../../../shared/types';
 import type {
   TeacherCourseFormData,
   TeacherEditableModule,
@@ -22,9 +23,8 @@ function serializeQuestion(question: TeacherEditableQuestion, index: number) {
     text: String(question.text || ''),
     order: typeof question.order === 'number' ? question.order : index,
     question_type: question.question_type || 'single_choice',
-    max_score: Number(question.max_score) || 100,
-    expected_output: question.question_type === 'code' ? String(question.expected_output ?? '') : '',
-    options: question.question_type === 'code' ? [] : (question.options || []).map(serializeOption),
+    expected_output: isCodeQuestion(question.question_type) ? String(question.expected_output ?? '') : '',
+    options: isCodeQuestion(question.question_type) ? [] : (question.options || []).map(serializeOption),
   };
 }
 
@@ -58,10 +58,6 @@ export function buildCourseFormData(courseData: TeacherCourseFormData): FormData
   formData.append('title', courseData.title);
   formData.append('description', courseData.description || '');
   formData.append('modules', JSON.stringify(validModules));
-
-  if (courseData.image instanceof File) {
-    formData.append('image', courseData.image);
-  }
 
   return formData;
 }

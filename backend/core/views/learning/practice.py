@@ -318,15 +318,30 @@ class TopicQuestionAnswerView(APIView):
         data_serializer = TopicQuestionAnswerSubmitSerializer(data=request.data)
         data_serializer.is_valid(raise_exception=True)
 
-        if question.question_type == TopicQuestion.QuestionType.CODE:
+        if question.question_type in (
+            TopicQuestion.QuestionType.CODE,
+            TopicQuestion.QuestionType.JS_CODE,
+        ):
             code = data_serializer.validated_data.get("code", "")
-            try:
-                run_result = run_python_code(code)
-            except CodeRunnerError as error:
-                return Response(
-                    {"detail": str(error)},
-                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
-                )
+
+            if question.question_type == TopicQuestion.QuestionType.JS_CODE:
+                # JavaScript runs in the browser; trust the client-reported
+                # output and grade it the same way as Python output.
+                run_result = {
+                    "status": "completed",
+                    "stdout": data_serializer.validated_data.get("client_stdout", ""),
+                    "stderr": data_serializer.validated_data.get("client_stderr", ""),
+                    "exit_code": 0,
+                    "timed_out": False,
+                }
+            else:
+                try:
+                    run_result = run_python_code(code)
+                except CodeRunnerError as error:
+                    return Response(
+                        {"detail": str(error)},
+                        status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    )
 
             is_correct = (
                 is_code_run_successful(run_result)
@@ -335,7 +350,7 @@ class TopicQuestionAnswerView(APIView):
                     question.expected_output,
                 )
             )
-            score = question.max_score if is_correct else 0
+            score = 100 if is_correct else 0
 
             answer, _ = TopicQuestionAnswer.objects.get_or_create(
                 user=request.user,
@@ -453,7 +468,7 @@ class TopicQuestionAnswerView(APIView):
             selected_set = set(option_ids)
 
             is_correct = bool(correct_ids) and (selected_set == correct_ids)
-            score = question.max_score if is_correct else 0
+            score = 100 if is_correct else 0
 
             answer, _ = TopicQuestionAnswer.objects.get_or_create(
                 user=request.user,
@@ -595,6 +610,7 @@ class TopicQuestionAnswerView(APIView):
 # POST /api/learning/questions/<id>/run-code/
 class TopicQuestionRunCodeView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
+    throttle_scope = "code"
 
     def post(self, request, pk):
         try:

@@ -8,8 +8,6 @@ from .module import TeacherModuleSerializer
 class TeacherCourseSerializer(serializers.ModelSerializer):
     modules = TeacherModuleSerializer(many=True, required=False)
     author_name = serializers.SerializerMethodField(read_only=True)
-    image = serializers.ImageField(required=False, allow_null=True)
-    image_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Course
@@ -20,19 +18,8 @@ class TeacherCourseSerializer(serializers.ModelSerializer):
             "description",
             "author_name",
             "modules",
-            "image",
-            "image_url",
         )
-        read_only_fields = ("id", "slug", "author_name", "image_url")
-
-    def get_image_url(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            from django.conf import settings
-            return f"{settings.MEDIA_URL}{obj.image.url}" if obj.image else None
-        return None
+        read_only_fields = ("id", "slug", "author_name")
 
     def get_author_name(self, obj):
         author = obj.author
@@ -95,8 +82,7 @@ class TeacherCourseSerializer(serializers.ModelSerializer):
         
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
-        instance.image = validated_data.get('image', instance.image)
-        
+
         if 'title' in validated_data:
             title = validated_data['title']
             base_slug = slugify(title)

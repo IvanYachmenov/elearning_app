@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { LoadingIndicator } from '../../../shared/ui';
 import {
   addEmptyModule,
@@ -26,7 +25,6 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
   const { id } = useParams<TeacherRouteParams>();
   const isEditMode = Boolean(id);
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
@@ -44,11 +42,11 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
       const response = await api.get(`/api/teacher/courses/${id}/`);
       setCourseData(normalizeCourse(response.data));
     } catch (requestError) {
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.failedToLoadCourse')));
+      setError(getTeacherErrorMessage(requestError, "Failed to load course."));
     } finally {
       setLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     if (user.role !== 'teacher') {
@@ -60,22 +58,6 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
       void fetchCourse();
     }
   }, [user.role, navigate, isEditMode, id, fetchCourse]);
-
-  const imagePreviewUrl = useMemo(() => {
-    if (courseData.image instanceof File) {
-      return URL.createObjectURL(courseData.image);
-    }
-
-    return courseData.image_url;
-  }, [courseData.image, courseData.image_url]);
-
-  useEffect(() => {
-    return () => {
-      if (imagePreviewUrl && courseData.image instanceof File) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-    };
-  }, [imagePreviewUrl, courseData.image]);
 
   const updateCourseField = <K extends keyof TeacherCourseFormData>(field: K, value: TeacherCourseFormData[K]) => {
     setCourseData((previous) => ({ ...previous, [field]: value }));
@@ -101,7 +83,7 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
       }
     } catch (requestError) {
       console.error('Save error:', requestError);
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.failedToSaveCourse')));
+      setError(getTeacherErrorMessage(requestError, "Failed to save course."));
     } finally {
       setSaving(false);
     }
@@ -127,16 +109,6 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
     }
   };
 
-  const handleEditModule = (moduleIndex: number) => {
-    const moduleItem = courseData.modules[moduleIndex];
-    if (moduleItem.id) {
-      navigate(`/teacher/courses/${id}/modules/${moduleItem.id}/edit`);
-      return;
-    }
-
-    setError(t('pages.teacher.saveCourseFirst'));
-  };
-
   const handleEditTopic = (moduleIndex: number, topicIndex: number) => {
     const moduleItem = courseData.modules[moduleIndex];
     const topic = moduleItem.topics[topicIndex];
@@ -146,7 +118,7 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
       return;
     }
 
-    setError(t('pages.teacher.saveModuleAndTopicFirst'));
+    setError("Please save the module and topic first.");
   };
 
   if (user.role !== 'teacher') {
@@ -156,27 +128,27 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
   if (loading) {
     return (
       <div className="page page-enter">
-        <h1 className="page__title">{isEditMode ? t('pages.teacher.editCourse') : t('pages.teacher.createCourseTitle')}</h1>
-        <LoadingIndicator label={t('common.loading')} />
+        <h1 className="page__title">{isEditMode ? "Edit Course" : "Create Course"}</h1>
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
 
   return (
     <TeacherEditorPage
-      title={isEditMode ? t('pages.teacher.editCourse') : t('pages.teacher.createCourseTitle')}
-      backLabel={t('pages.teacher.back')}
+      title={isEditMode ? "Edit Course" : "Create Course"}
+      backLabel={"Back"}
       onBack={() => navigate('/teacher/courses')}
       backDisabled={saving}
       error={error}
       actions={(
         <>
           <button className="teacher-save-btn" type="button" onClick={handleSave} disabled={saving}>
-            {saving ? t('pages.teacher.saving') : t('pages.teacher.save')}
+            {saving ? "Saving..." : "Save"}
           </button>
           {isEditMode ? (
             <button className="teacher-delete-btn" type="button" onClick={handleDelete} disabled={saving}>
-              {t('pages.teacher.delete')}
+              {"Delete"}
             </button>
           ) : null}
         </>
@@ -184,10 +156,8 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
     >
       <TeacherCourseBasicsSection
         courseData={courseData}
-        imagePreviewUrl={imagePreviewUrl}
         onTitleChange={(value) => updateCourseField('title', value)}
         onDescriptionChange={(value) => updateCourseField('description', value)}
-        onImageChange={(file) => updateCourseField('image', file)}
       />
 
       <TeacherCourseModulesSection
@@ -196,7 +166,6 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
         onModuleTitleChange={(moduleIndex, value) =>
           updateModules(updateModuleField(courseData.modules, moduleIndex, 'title', value))
         }
-        onEditModule={handleEditModule}
         onDeleteModule={(moduleIndex) => updateModules(removeModule(courseData.modules, moduleIndex))}
         onAddTopic={(moduleIndex) => updateModules(addEmptyTopicToModule(courseData.modules, moduleIndex))}
         onTopicTitleChange={(moduleIndex, topicIndex, value) =>

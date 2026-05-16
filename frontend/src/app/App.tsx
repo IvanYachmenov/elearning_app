@@ -13,13 +13,13 @@ import {
   CreditsPage,
   CourseDetailPage,
   CoursesPage,
+  PlaygroundPage,
   CourseLearningPage,
   LearningPage,
   TopicTheoryPage,
   TopicPracticePage,
   TeacherCoursesPage,
   TeacherCourseEditPage,
-  TeacherModuleEditPage,
   TeacherTopicEditPage,
 } from '../pages';
 
@@ -31,8 +31,6 @@ import { LoadingIndicator } from '../shared/ui';
 import { CookieConsent } from '../features/cookie-consent';
 
 import { NavigationLockProvider } from '../shared/lib/navigation-lock';
-import { ThemeProvider } from '../shared/lib/theme/ThemeContext';
-import { LanguageProvider } from '../shared/lib/i18n/LanguageContext';
 import { clearAuthSession, isGitHubCallbackInUrl } from '../features/auth';
 import type { AuthSuccessHandler, User } from '../shared/types';
 
@@ -82,10 +80,8 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ThemeProvider>
-        <LanguageProvider>
-          <NavigationLockProvider>
-            <CookieConsent />
+      <NavigationLockProvider>
+        <CookieConsent />
             <Routes>
               <Route path="/" element={user ? <Navigate to="/courses" replace /> : <StartPage />} />
 
@@ -103,13 +99,12 @@ function App() {
                   user ? <MainLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
                 }
               >
-                <Route path="/home" element={<Navigate to="/courses" replace />} />
                 <Route path="/profile" element={<ProfilePage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
+                <Route path="/playground" element={<PlaygroundPage />} />
                 <Route path="/learning" element={<LearningPage />} />
                 <Route path="/learning/courses/:id" element={<CourseLearningPage />} />
-                <Route path="/shop" element={<Navigate to="/courses" replace />} />
                 <Route path="/settings" element={<SettingsPage user={user!} onUserUpdate={setUser} />} />
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/learning/courses/:courseId/topics/:topicId" element={<TopicTheoryPage />} />
@@ -120,14 +115,6 @@ function App() {
                 <Route path="/teacher/courses" element={<TeacherCoursesPage user={user!} />} />
                 <Route path="/teacher/courses/new" element={<TeacherCourseEditPage user={user!} />} />
                 <Route path="/teacher/courses/:id/edit" element={<TeacherCourseEditPage user={user!} />} />
-                <Route
-                  path="/teacher/courses/:courseId/modules/new"
-                  element={<TeacherModuleEditPage user={user!} />}
-                />
-                <Route
-                  path="/teacher/courses/:courseId/modules/:moduleId/edit"
-                  element={<TeacherModuleEditPage user={user!} />}
-                />
                 <Route
                   path="/teacher/courses/:courseId/modules/:moduleId/topics/new"
                   element={<TeacherTopicEditPage user={user!} />}
@@ -140,9 +127,7 @@ function App() {
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </NavigationLockProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      </NavigationLockProvider>
     </BrowserRouter>
   );
 }

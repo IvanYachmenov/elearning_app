@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
 
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 
 function AppFooter() {
-  const { t } = useLanguage();
 
   return (
     <footer
@@ -14,7 +12,7 @@ function AppFooter() {
         textAlign: 'center',
       }}
     >
-      {t('pages.credits.footerIconsBy')}{' '}
+      {"Icons by"}{' '}
       <a
         href="https://www.flaticon.com/"
         target="_blank"
@@ -24,9 +22,9 @@ function AppFooter() {
         Flaticon
       </a>
       {' | '}
-      {t('pages.credits.footerSeeFullCredits')}{' '}
+      {"See full credits on the"}{' '}
       <Link to="/credits" style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}>
-        {t('pages.credits.footerCreditsPage')}
+        {"Credits page"}
       </Link>
       .
     </footer>

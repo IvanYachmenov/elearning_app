@@ -1,20 +1,15 @@
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { SettingsPageProps } from '../model/types';
 import SettingsAccountSection from './components/SettingsAccountSection';
-import SettingsLanguageSection from './components/SettingsLanguageSection';
-import SettingsThemeSection from './components/SettingsThemeSection';
+import SettingsBecomeTeacher from './components/SettingsBecomeTeacher';
 import '../styles/settings.css';
 
 function SettingsPage({ user, onUserUpdate }: SettingsPageProps) {
-  const { t } = useLanguage();
-
   return (
     <div className="page page-enter">
-      <h1 className="page__title">{t('pages.settings.title')}</h1>
+      <h1 className="page__title">Settings</h1>
 
       <SettingsAccountSection user={user} onUserUpdate={onUserUpdate} />
-      <SettingsLanguageSection />
-      <SettingsThemeSection />
+      <SettingsBecomeTeacher user={user} onUserUpdate={onUserUpdate} />
     </div>
   );
 }

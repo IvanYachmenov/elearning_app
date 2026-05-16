@@ -25,19 +25,39 @@ load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-@oqrhd)-jho3y-8u2!s481$_!2v4ns$dn2llg+af&c1iz&03gj')
+import sys
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: keep the secret key used in production secret!
+_INSECURE_SECRET = 'django-insecure-@oqrhd)-jho3y-8u2!s481$_!2v4ns$dn2llg+af&c1iz&03gj'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', _INSECURE_SECRET)
+
+# Local dev defaults to DEBUG=True so it "just works". For the AWS deploy
+# set DJANGO_DEBUG=False in the environment.
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in {"1", "true", "yes", "on"}
 
+# Loud warning (NOT a crash) if deployed with DEBUG off and the public dev key.
+if not DEBUG and SECRET_KEY == _INSECURE_SECRET:
+    print(
+        "WARNING: DJANGO_SECRET_KEY is the public dev key. Set a unique "
+        "DJANGO_SECRET_KEY before exposing this deployment publicly.",
+        file=sys.stderr,
+    )
+
 ALLOWED_HOSTS = [
-    "127.0.0.1", "localhost", "0.0.0.0", "backend"
+    host.strip()
+    for host in os.getenv(
+        "DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,0.0.0.0,backend"
+    ).split(",")
+    if host.strip()
 ]
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 CODE_RUNNER_URL = os.getenv("CODE_RUNNER_URL", "http://code-runner:8080")
+
+# Pre-shared code that lets a student upgrade their account to a teacher
+# (entered on the Settings page). Empty by default = teacher upgrade disabled.
+TEACHER_ACCESS_CODE = os.getenv("TEACHER_ACCESS_CODE", "")
 
 default_cors_allowed_origins = [
     "http://localhost:5173",
@@ -63,7 +83,6 @@ INSTALLED_APPS = [
     # Third party
     'rest_framework',
     'corsheaders',
-    'django_filters',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -100,14 +119,31 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ),
-    "DEFAULT_FILTER_BACKENDS": (
-        "django_filters.rest_framework.DjangoFilterBackend",
-        "rest_framework.filters.SearchFilter",
-        "rest_framework.filters.OrderingFilter",
-    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    # Rate limiting — protects auth endpoints from brute force and caps
+    # how often code can be executed (cost/abuse protection).
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "1000/day",
+        "code": "20/min",
+    },
 }
+
+# Production hardening (only active when DEBUG is off).
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 ROOT_URLCONF = 'elearn_backend.urls'
 
@@ -181,8 +217,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -195,6 +229,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),  # Refresh token lives for 30 days
     'ROTATE_REFRESH_TOKENS': True,  # Generate new refresh token on each refresh
     'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': True,  # Fill User.last_login on token obtain (JWT login)
 }
 
 # Django Allauth Settings

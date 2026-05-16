@@ -11,18 +11,18 @@
   padding: 12px 24px;
   border-radius: 0;
   border: 2px solid var(--nav-black);
-  background: #10b981;
-  color: #fff;
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  color: var(--nav-black);
   font-size: 14px;
   font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: box-shadow 0.14s ease;
-  box-shadow: var(--shadow-sm);
+  transition: background 0.12s ease;
 }
 
 .teacher-create-btn:hover:not(:disabled) {
-  background: #0ea371;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
 }
 
 .teacher-empty {
@@ -31,7 +31,6 @@
   background-color: #ffffff;
   border-radius: 0;
   border: 2px solid var(--nav-black);
-  box-shadow: var(--shadow-sm);
 }
 
 .teacher-empty p {
@@ -53,60 +52,18 @@
 
 .teacher-course-card {
   position: relative;
-  height: var(--teacher-card-height, 300px);
-  min-height: var(--teacher-card-height, 300px);
   background-color: #ffffff;
-  padding: 0;
+  padding: 18px 18px 16px;
   border-radius: 0;
   border: 2px solid var(--nav-black);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.14s ease;
   display: flex;
   flex-direction: column;
-  overflow: visible;
-}
-
-.teacher-course-card--clickable {
-  cursor: pointer;
-}
-
-.teacher-course-card--clickable:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(11, 11, 13, 0.12);
-}
-
-.teacher-course-card:hover {
-  box-shadow: 0 4px 12px rgba(11, 11, 13, 0.2);
-}
-
-.teacher-course-card__image-wrap {
-  width: 100%;
-  height: var(--teacher-image-height, 160px);
-  min-height: var(--teacher-image-height, 160px);
-  flex-shrink: 0;
-  background: #f9fafb;
-  border-bottom: 2px solid var(--nav-black);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.teacher-course-card__image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  display: block;
+  gap: 14px;
 }
 
 .teacher-course-card__body {
-  flex: 1;
-  min-height: 0;
-  padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -117,10 +74,7 @@
   margin: 0;
   letter-spacing: -0.02em;
   line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .teacher-course-card__meta {
@@ -130,139 +84,47 @@
   font-size: 13px;
   color: var(--text-muted);
   font-weight: 600;
-  flex-shrink: 0;
 }
 
-.teacher-dropdown-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(11, 11, 13, 0.55);
-  backdrop-filter: blur(6px);
-  z-index: 999;
-  animation: teacher-dropdown-backdrop-in 0.3s ease-out both;
-}
-
-@keyframes teacher-dropdown-backdrop-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.teacher-dropdown-floating {
-  position: fixed;
-  z-index: 1000;
+.teacher-course-card__actions {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  pointer-events: auto;
-  box-sizing: border-box;
+  gap: 10px;
 }
 
-.teacher-course-card--floating {
-  flex-shrink: 0;
-  pointer-events: none;
-  cursor: default;
-}
-
-.teacher-dropdown-modal {
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-.teacher-dropdown-modal--under-card {
-  flex-shrink: 0;
-  position: relative;
-  top: auto;
-  left: auto;
-  transform: none;
-  max-width: none;
-  border: 2px solid var(--nav-black);
-  box-shadow: 0 8px 24px rgba(11, 11, 13, 0.2);
-  animation: teacher-dropdown-under-card-in 0.3s ease-out both;
-}
-
-@keyframes teacher-dropdown-under-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.teacher-dropdown-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-light);
-  flex-shrink: 0;
-}
-
-.teacher-dropdown-modal__title {
-  font-size: 16px;
-  font-weight: 900;
-  color: #0f172a;
-  margin: 0;
-  line-height: 1.25;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.teacher-course-card__actions .teacher-card-btn {
   flex: 1;
-  min-width: 0;
 }
 
-.teacher-dropdown-modal__options {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 12px 16px 16px;
-  gap: 8px;
-  min-height: 0;
-}
-
-.teacher-dropdown-modal__opt {
-  flex: 1;
-  min-height: 44px;
-  width: 100%;
+/* Card action buttons share the app button language */
+.teacher-card-btn {
   padding: 10px 16px;
   border: 2px solid var(--nav-black);
-  background: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f172a;
-  text-align: center;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: background-color 0.14s ease, color 0.14s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: background 0.12s ease;
 }
 
-.teacher-dropdown-modal__opt:hover {
-  background: rgba(11, 11, 13, 0.06);
+.teacher-card-btn--edit {
+  color: var(--nav-black);
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
 }
 
-.teacher-dropdown-modal__opt--delete:hover {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #991b1b;
+.teacher-card-btn--edit:hover {
+  background: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
 }
 
-.teacher-dropdown-modal__opt--close {
-  background: #0f172a;
-  color: #fff;
-  border-color: #0f172a;
+.teacher-card-btn--delete {
+  color: #b91c1c;
+  background: #fdecec;
+  border-color: #ef4444;
 }
 
-.teacher-dropdown-modal__opt--close:hover {
-  background: #374151;
-  border-color: #374151;
-  color: #fff;
+.teacher-card-btn--delete:hover {
+  background: #fbdada;
 }
 
 .teacher-error-inline {
@@ -290,7 +152,6 @@
 .teacher-delete-modal {
   background: #fff;
   border: 2px solid var(--nav-black);
-  box-shadow: 0 8px 32px rgba(11, 11, 13, 0.2);
   padding: 24px;
   max-width: 360px;
   width: 100%;
@@ -346,106 +207,13 @@
 }
 
 .teacher-delete-modal__btn--confirm {
-  background: #dc2626;
-  color: #fff;
-  border-color: #b91c1c;
+  background: #fdecec;
+  color: #b91c1c;
+  border-color: #ef4444;
 }
 
 .teacher-delete-modal__btn--confirm:hover:not(:disabled) {
-  background: #b91c1c;
-}
-
-[data-theme="dark"] .teacher-empty {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-empty p {
-  color: var(--text-secondary);
-}
-
-[data-theme="dark"] .teacher-course-card {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-course-card__image-wrap {
-  background: var(--bg-secondary);
-  border-bottom-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-course-card__title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-course-card__meta {
-  color: var(--text-muted);
-}
-
-[data-theme="dark"] .teacher-dropdown-backdrop {
-  background: rgba(0, 0, 0, 0.65);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__header {
-  border-bottom-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__opt {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__opt:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__opt--delete:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border-color: #f87171;
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__opt--close {
-  background: var(--text-primary);
-  color: var(--bg-primary);
-  border-color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-dropdown-modal__opt--close:hover {
-  background: #4b5563;
-  border-color: #4b5563;
-  color: #fff;
-}
-
-[data-theme="dark"] .teacher-delete-modal {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .teacher-delete-modal__title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-delete-modal__btn--cancel {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-delete-modal__btn--cancel:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: #fbdada;
 }
 
 .teacher-course-edit-top {
@@ -471,14 +239,6 @@
   margin: 0;
 }
 
-[data-theme="dark"] .teacher-course-edit-title {
-  color: var(--text-primary);
-}
-
-.teacher-course-edit-header {
-  display: none;
-}
-
 .teacher-course-edit-footer {
   margin-top: 40px;
   padding-top: 32px;
@@ -495,18 +255,18 @@
   padding: 12px 24px;
   border-radius: 0;
   border: 2px solid var(--nav-black);
-  background: #10b981;
-  color: #fff;
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  color: var(--nav-black);
   font-size: 14px;
   font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: box-shadow 0.12s ease;
-  box-shadow: var(--shadow-sm);
+  transition: background 0.12s ease;
 }
 
 .teacher-save-btn:hover:not(:disabled) {
-  background: #0ea371;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
 }
 
 .teacher-save-btn:disabled {
@@ -555,8 +315,7 @@
   background: #ffffff;
   padding: 32px;
   border-radius: 0;
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-sm);
+  border: none;
 }
 
 .teacher-form-group {
@@ -587,17 +346,18 @@
   color: #0f172a;
   font-size: 14px;
   font-family: inherit;
-  transition: box-shadow 0.14s ease;
 }
 
 .teacher-form-input:focus,
 .teacher-form-textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(11, 11, 13, 0.1);
+  border-color: var(--nav-orange);
+  border-radius: 0;
 }
 
 .teacher-form-textarea {
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   min-height: 100px;
 }
 
@@ -645,29 +405,17 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.14s ease, box-shadow 0.14s ease;
+  transition: background-color 0.14s ease;
   width: 100%;
   text-align: center;
 }
 
 .teacher-file-input-label:hover {
   background: rgba(11, 11, 13, 0.05);
-  box-shadow: 0 0 0 4px rgba(11, 11, 13, 0.1);
 }
 
 .teacher-file-input:focus + .teacher-file-input-label {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(11, 11, 13, 0.1);
-}
-
-[data-theme="dark"] .teacher-file-input-label {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-file-input-label:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .teacher-course-modules {
@@ -706,13 +454,10 @@
   font-size: 13px;
   font-weight: 900;
   cursor: pointer;
-  transition: box-shadow 0.14s ease;
-  box-shadow: var(--shadow-sm);
 }
 
 .teacher-add-module-btn:hover:not(:disabled) {
   background: #ea770e;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
 .teacher-add-module-btn--secondary {
@@ -722,7 +467,6 @@
 
 .teacher-add-module-btn--secondary:hover:not(:disabled) {
   background: rgba(11, 11, 13, 0.05);
-  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.12);
 }
 
 .teacher-modules-list {
@@ -733,14 +477,8 @@
 
 .teacher-module-item {
   padding: 14px;
-  border: 1px solid var(--border-light);
+  border: none;
   background: #ffffff;
-  box-shadow: none;
-  transition: box-shadow 0.14s ease;
-}
-
-.teacher-module-item:hover {
-  box-shadow: 0 2px 8px rgba(11, 11, 13, 0.12);
 }
 
 .teacher-module-header {
@@ -782,27 +520,6 @@
   min-width: 0;
   font-size: 16px;
   font-weight: 900;
-}
-
-.teacher-module-edit-btn {
-  padding: 6px 12px;
-  border-radius: 0;
-  border: 2px solid var(--nav-black);
-  background: #fff;
-  color: var(--nav-black);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.teacher-module-edit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-}
-
-.teacher-module-edit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .teacher-module-delete-btn {
@@ -850,13 +567,10 @@
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
-  transition: box-shadow 0.14s ease;
-  box-shadow: var(--shadow-sm);
 }
 
 .teacher-add-topic-btn:hover {
   background: #ea770e;
-  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.2);
 }
 
 .teacher-topics-list {
@@ -867,14 +581,9 @@
 
 .teacher-topic-item {
   padding: 12px;
-  border: 1px solid var(--border-medium);
+  border: none;
   background: #ffffff;
-  transition: box-shadow 0.14s ease;
   margin-left: 20px; /* tree indentation */
-}
-
-.teacher-topic-item:hover {
-  box-shadow: 0 2px 6px rgba(11, 11, 13, 0.12);
 }
 
 .teacher-topic-header {
@@ -902,18 +611,6 @@
 
 .teacher-topic-toggle:hover {
   background: rgba(11, 11, 13, 0.05);
-}
-
-[data-theme="dark"] .teacher-module-toggle,
-[data-theme="dark"] .teacher-topic-toggle {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-module-toggle:hover,
-[data-theme="dark"] .teacher-topic-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .teacher-topic-title {
@@ -1005,13 +702,10 @@
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
-  transition: box-shadow 0.14s ease;
-  box-shadow: var(--shadow-sm);
 }
 
 .teacher-add-question-btn:hover {
   background: #ea770e;
-  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.2);
 }
 
 .teacher-questions-list {
@@ -1022,7 +716,7 @@
 
 .teacher-question-item {
   padding: 12px;
-  border: 1px solid var(--border-medium);
+  border: none;
   background: #ffffff;
   margin-left: 20px; /* deeper indentation (inside topic) */
 }
@@ -1060,7 +754,7 @@
 .teacher-options-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px dashed var(--border-medium);
+  border: none;
 }
 
 .teacher-options-header {
@@ -1094,7 +788,7 @@
 
 .teacher-option-item {
   padding: 8px;
-  border: 1px solid var(--border-light);
+  border: none;
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -1154,184 +848,7 @@
   color: #dc2626;
 }
 
-[data-theme="dark"] .teacher-course-edit-form {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-form-label {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-form-input,
-[data-theme="dark"] .teacher-form-textarea {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-form-input:focus,
-[data-theme="dark"] .teacher-form-textarea:focus {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .teacher-cancel-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-cancel-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .teacher-add-module-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-add-module-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .teacher-add-module-btn--secondary {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-add-module-btn--secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .teacher-modules-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-course-modules {
-  border-top-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-module-item {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-module-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-empty-text {
-  color: var(--text-secondary);
-}
-
-[data-theme="dark"] .teacher-error {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
-}
-
-[data-theme="dark"] .teacher-course-edit-footer {
-  border-top-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-topics-section {
-  border-top-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-topics-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-add-topic-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-add-topic-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .teacher-topic-item {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-topic-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-module-edit-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-module-edit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  color: #0f172a;
-}
-
-[data-theme="dark"] .teacher-topic-edit-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-topic-edit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  color: #0f172a;
-}
-
-[data-theme="dark"] .teacher-form-checkbox-label {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-course-edit-top {
-  border-bottom-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-course-edit-form {
-  background: var(--bg-primary);
-}
-
-[data-theme="dark"] .teacher-module-item {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-module-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-[data-theme="dark"] .teacher-topic-item {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-question-item {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .teacher-topics-title,
-[data-theme="dark"] .teacher-questions-title,
-[data-theme="dark"] .teacher-question-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .teacher-option-item {
-  background: rgba(30, 41, 59, 0.5);
-  border-color: var(--border-color);
-}
-
 @media (max-width: 768px) {
-  .teacher-courses-header,
-  .teacher-course-edit-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
   .teacher-course-edit-actions {
     width: 100%;

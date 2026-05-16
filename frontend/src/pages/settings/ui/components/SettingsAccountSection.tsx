@@ -1,4 +1,4 @@
-﻿import { isAxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,6 @@ import {
 } from '../../../../features/auth';
 import type { GoogleCredentialResponse } from '../../../../features/auth/types';
 import { api } from '../../../../shared/api';
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { ApiErrorResponse, User } from '../../../../shared/types';
 import type {
   SettingsAccountSectionProps,
@@ -26,7 +25,6 @@ const INITIAL_CONNECTIONS: SocialConnectionsResponse = {
 
 function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionProps) {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [connections, setConnections] = useState<SocialConnectionsResponse>(INITIAL_CONNECTIONS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,15 +41,15 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
   const roleLabel = useMemo(() => {
     switch (user.role) {
       case 'student':
-        return t('pages.settings.roleStudent');
+        return "Student";
       case 'teacher':
-        return t('pages.settings.roleTeacher');
+        return "Teacher";
       case 'admin':
-        return t('pages.settings.roleAdmin');
+        return "Admin";
       default:
         return String(user.role);
     }
-  }, [t, user.role]);
+  }, [user.role]);
 
   const loadConnections = useCallback(async () => {
     try {
@@ -81,7 +79,7 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
       await refreshCurrentUser();
     } catch (requestError: unknown) {
       console.error('Disconnect failed:', requestError);
-      setError(t('pages.settings.failedToDisconnect'));
+      setError("Failed to disconnect. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +104,7 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
       const providerError = isAxiosError<ApiErrorResponse>(requestError)
         ? requestError.response?.data?.detail
         : undefined;
-      setError(providerError || t('pages.auth.googleAuthFailed'));
+      setError(providerError || "Google authentication failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +117,7 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
     }
 
     if (response.error && response.error !== 'popup_closed_by_user' && response.error !== 'popup_blocked') {
-      setError(t('pages.auth.googleAuthFailed'));
+      setError("Google authentication failed. Please try again.");
     }
   };
 
@@ -128,7 +126,7 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
     if (!clientId) {
-      setError(t('pages.settings.googleOAuthNotConfigured'));
+      setError("Google OAuth is not configured.");
       return;
     }
 
@@ -142,12 +140,12 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
 
       const didStart = await triggerGoogleFedCmSignIn(googleHiddenButtonRef);
       if (!didStart) {
-        setError(t('pages.auth.googleSignInLoadFailed'));
+        setError("Google Sign-In failed to load. Please refresh the page.");
       }
     } catch (requestError: unknown) {
       console.error('Google connect error:', requestError);
       if (!(requestError instanceof DOMException && requestError.name === 'AbortError')) {
-        setError(t('pages.auth.googleSignInFailed'));
+        setError("Failed to initialize Google Sign-In. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -156,37 +154,37 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
 
   return (
     <div className="settings-section">
-      <h2 className="settings-section__title">{t('pages.settings.account')}</h2>
+      <h2 className="settings-section__title">{"Account"}</h2>
 
       {error && <div className="settings-account__error">{error}</div>}
 
       <div className="settings-account__grid">
         <div className="settings-account__card">
-          <div className="settings-account__card-title">{t('pages.settings.overview')}</div>
+          <div className="settings-account__card-title">{"Overview"}</div>
           <div className="settings-account__row">
-            <span className="settings-account__label">{t('pages.settings.status')}</span>
-            <span className="settings-account__value">{t('pages.settings.active')}</span>
+            <span className="settings-account__label">{"Status"}</span>
+            <span className="settings-account__value">{"Active"}</span>
           </div>
           <div className="settings-account__row">
-            <span className="settings-account__label">{t('pages.settings.created')}</span>
+            <span className="settings-account__label">{"Created"}</span>
             <span className="settings-account__value">{createdAtLabel}</span>
           </div>
           <div className="settings-account__row">
-            <span className="settings-account__label">{t('pages.settings.role')}</span>
+            <span className="settings-account__label">{"Role"}</span>
             <span className="settings-account__value">{roleLabel}</span>
           </div>
           <div className="settings-account__row">
-            <span className="settings-account__label">{t('pages.auth.username')}</span>
+            <span className="settings-account__label">{"Username"}</span>
             <span className="settings-account__value">{user.username || '-'}</span>
           </div>
           <div className="settings-account__row">
-            <span className="settings-account__label">{t('pages.auth.email')}</span>
+            <span className="settings-account__label">{"Email"}</span>
             <span className="settings-account__value">{user.email || '-'}</span>
           </div>
         </div>
 
         <div className="settings-account__card">
-          <div className="settings-account__card-title">{t('pages.settings.connections')}</div>
+          <div className="settings-account__card-title">{"Connections"}</div>
 
           <div className="settings-account__connection">
             <div className="settings-account__connection-left">
@@ -201,9 +199,9 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
                   <img
                     className="settings-account__status-icon"
                     src={connections.github ? '/assets/icons/connected.png' : '/assets/icons/disconnected.png'}
-                    alt={connections.github ? t('pages.settings.connected') : t('pages.settings.notConnected')}
+                    alt={connections.github ? "Connected" : "Not connected"}
                   />
-                  <span>{connections.github ? t('pages.settings.connected') : t('pages.settings.notConnected')}</span>
+                  <span>{connections.github ? "Connected" : "Not connected"}</span>
                 </div>
               </div>
             </div>
@@ -215,16 +213,16 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
                   onClick={() => handleDisconnect('github')}
                   disabled={isLoading}
                 >
-                  {t('pages.settings.disconnect')}
+                  {"Disconnect"}
                 </button>
               ) : (
                 <button
                   type="button"
-                  className="settings-account__btn"
+                  className="settings-account__btn settings-account__btn--connect"
                   onClick={handleConnectGitHub}
                   disabled={isLoading}
                 >
-                  {t('pages.settings.connect')}
+                  {"Connect"}
                 </button>
               )}
             </div>
@@ -243,9 +241,9 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
                   <img
                     className="settings-account__status-icon"
                     src={connections.google ? '/assets/icons/connected.png' : '/assets/icons/disconnected.png'}
-                    alt={connections.google ? t('pages.settings.connected') : t('pages.settings.notConnected')}
+                    alt={connections.google ? "Connected" : "Not connected"}
                   />
-                  <span>{connections.google ? t('pages.settings.connected') : t('pages.settings.notConnected')}</span>
+                  <span>{connections.google ? "Connected" : "Not connected"}</span>
                 </div>
               </div>
             </div>
@@ -257,16 +255,16 @@ function SettingsAccountSection({ user, onUserUpdate }: SettingsAccountSectionPr
                   onClick={() => handleDisconnect('google')}
                   disabled={isLoading}
                 >
-                  {t('pages.settings.disconnect')}
+                  {"Disconnect"}
                 </button>
               ) : (
                 <button
                   type="button"
-                  className="settings-account__btn"
+                  className="settings-account__btn settings-account__btn--connect"
                   onClick={handleConnectGoogle}
                   disabled={isLoading}
                 >
-                  {t('pages.settings.connect')}
+                  {"Connect"}
                 </button>
               )}
             </div>

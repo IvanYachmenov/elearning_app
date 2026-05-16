@@ -40,6 +40,37 @@ class MeView(generics.RetrieveUpdateAPIView):
         context['request'] = self.request
         return context
 
+
+# POST /api/auth/become-teacher/
+class BecomeTeacherView(APIView):
+    """Upgrade the current student to a teacher using a pre-shared code."""
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        configured_code = (settings.TEACHER_ACCESS_CODE or "").strip()
+        submitted_code = str(request.data.get("code", "")).strip()
+
+        if not configured_code:
+            return Response(
+                {"detail": "Teacher access is not configured."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        user = request.user
+        if user.role == User.Roles.TEACHER:
+            return Response(UserSerializer(user, context={"request": request}).data)
+
+        if not submitted_code or submitted_code != configured_code:
+            return Response(
+                {"detail": "Invalid teacher access code."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.role = User.Roles.TEACHER
+        user.save(update_fields=["role"])
+        return Response(UserSerializer(user, context={"request": request}).data)
+
+
 # POST /api/auth/google/
 class GoogleOAuthView(APIView):
     permission_classes = (permissions.AllowAny,)

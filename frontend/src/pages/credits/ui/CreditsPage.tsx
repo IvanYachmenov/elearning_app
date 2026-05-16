@@ -1,6 +1,5 @@
-﻿import type { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 
 const sectionStyle: CSSProperties = { marginBottom: '32px' };
 const sectionTitleStyle: CSSProperties = {
@@ -15,16 +14,15 @@ const listItemStyle: CSSProperties = { marginBottom: '8px' };
 const linkStyle: CSSProperties = { color: 'var(--text-primary)', textDecoration: 'underline' };
 
 function CreditsPage() {
-  const { t } = useLanguage();
 
   return (
     <div className="page page-enter">
-      <h1 className="page__title">{t('pages.credits.title')}</h1>
-      <p className="page__subtitle">{t('pages.credits.subtitle')}</p>
+      <h1 className="page__title">{"Credits & Attributions"}</h1>
+      <p className="page__subtitle">{"This project uses various open-source libraries, icons, and resources. Below are all the required attributions and credits."}</p>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>{t('pages.credits.icons')}</h2>
-        <p style={paragraphStyle}>{t('pages.credits.iconsDescription')}</p>
+        <h2 style={sectionTitleStyle}>{"Icons"}</h2>
+        <p style={paragraphStyle}>{"All icons used in this application are from Flaticon and are used in accordance with their free license terms."}</p>
         <ul style={listStyle}>
           <li style={listItemStyle}>
             <a href="https://www.flaticon.com/free-icons/study" title="study icons" target="_blank" rel="noreferrer" style={linkStyle}>
@@ -52,16 +50,6 @@ function CreditsPage() {
             </a>
           </li>
           <li style={listItemStyle}>
-            <a href="https://www.flaticon.com/free-icons/sun" title="sun icons" target="_blank" rel="noreferrer" style={linkStyle}>
-              Sun icons used for the light theme selector - Flaticon
-            </a>
-          </li>
-          <li style={listItemStyle}>
-            <a href="https://www.flaticon.com/free-icons/moon" title="moon icons" target="_blank" rel="noreferrer" style={linkStyle}>
-              Moon icons used for the dark theme selector - Flaticon
-            </a>
-          </li>
-          <li style={listItemStyle}>
             <a href="https://www.flaticon.com/free-icons/connect" title="connection status icons" target="_blank" rel="noreferrer" style={linkStyle}>
               Connected and disconnected status icons used in settings - Flaticon
             </a>
@@ -70,7 +58,7 @@ function CreditsPage() {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>{t('pages.credits.frontendLibraries')}</h2>
+        <h2 style={sectionTitleStyle}>{"Frontend Libraries"}</h2>
         <ul style={listStyle}>
           <li style={listItemStyle}>
             <strong>React</strong> - <a href="https://react.dev/" target="_blank" rel="noreferrer" style={linkStyle}>https://react.dev/</a> (MIT License)
@@ -84,14 +72,11 @@ function CreditsPage() {
           <li style={listItemStyle}>
             <strong>Axios</strong> - <a href="https://axios-http.com/" target="_blank" rel="noreferrer" style={linkStyle}>https://axios-http.com/</a> (MIT License)
           </li>
-          <li style={listItemStyle}>
-            <strong>Redux Toolkit</strong> - <a href="https://redux-toolkit.js.org/" target="_blank" rel="noreferrer" style={linkStyle}>https://redux-toolkit.js.org/</a> (MIT License)
-          </li>
         </ul>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>{t('pages.credits.backendLibraries')}</h2>
+        <h2 style={sectionTitleStyle}>{"Backend Libraries"}</h2>
         <ul style={listStyle}>
           <li style={listItemStyle}>
             <strong>Django</strong> - <a href="https://www.djangoproject.com/" target="_blank" rel="noreferrer" style={linkStyle}>https://www.djangoproject.com/</a> (BSD License)
@@ -103,7 +88,16 @@ function CreditsPage() {
             <strong>djangorestframework-simplejwt</strong> - <a href="https://github.com/jazzband/djangorestframework-simplejwt" target="_blank" rel="noreferrer" style={linkStyle}>JWT Authentication for Django REST Framework</a> (MIT License)
           </li>
           <li style={listItemStyle}>
-            <strong>Pillow</strong> - <a href="https://pillow.readthedocs.io/" target="_blank" rel="noreferrer" style={linkStyle}>https://pillow.readthedocs.io/</a> (HPND License)
+            <strong>django-allauth</strong> - <a href="https://docs.allauth.org/" target="_blank" rel="noreferrer" style={linkStyle}>https://docs.allauth.org/</a> (MIT License)
+          </li>
+          <li style={listItemStyle}>
+            <strong>django-cors-headers</strong> - <a href="https://github.com/adamchainz/django-cors-headers" target="_blank" rel="noreferrer" style={linkStyle}>https://github.com/adamchainz/django-cors-headers</a> (MIT License)
+          </li>
+          <li style={listItemStyle}>
+            <strong>PyJWT</strong> - <a href="https://pyjwt.readthedocs.io/" target="_blank" rel="noreferrer" style={linkStyle}>https://pyjwt.readthedocs.io/</a> (MIT License)
+          </li>
+          <li style={listItemStyle}>
+            <strong>python-dotenv</strong> - <a href="https://github.com/theskumar/python-dotenv" target="_blank" rel="noreferrer" style={linkStyle}>https://github.com/theskumar/python-dotenv</a> (BSD License)
           </li>
           <li style={listItemStyle}>
             <strong>PostgreSQL</strong> - <a href="https://www.postgresql.org/" target="_blank" rel="noreferrer" style={linkStyle}>https://www.postgresql.org/</a> (PostgreSQL License)
@@ -112,15 +106,15 @@ function CreditsPage() {
       </section>
 
       <section>
-        <h2 style={sectionTitleStyle}>{t('pages.credits.designInspiration')}</h2>
+        <h2 style={sectionTitleStyle}>{"Design & Inspiration"}</h2>
         <p style={{ fontSize: '14px', lineHeight: 1.7, color: 'var(--text-secondary)' }}>
-          {t('pages.credits.designDescription')}
+          {"The design system and UI patterns used in this application were created from scratch, inspired by modern web design principles and best practices. Color schemes and layout structures were developed specifically for this project."}
         </p>
       </section>
 
       <section style={{ marginTop: '32px', paddingTop: '24px', borderTop: '2px solid var(--border-color)' }}>
         <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-          {t('pages.credits.footerNote')}
+          {"All resources listed above are used in accordance with their respective licenses. This project does not claim ownership of any third-party libraries or icons."}
         </p>
       </section>
     </div>

@@ -1,4 +1,3 @@
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { TeacherEditableModule } from '../../model/types';
 import TeacherCourseModuleCard from './TeacherCourseModuleCard';
 
@@ -6,7 +5,6 @@ interface TeacherCourseModulesSectionProps {
   modules: TeacherEditableModule[];
   onAddModule: () => void;
   onModuleTitleChange: (moduleIndex: number, value: string) => void;
-  onEditModule: (moduleIndex: number) => void;
   onDeleteModule: (moduleIndex: number) => void;
   onAddTopic: (moduleIndex: number) => void;
   onTopicTitleChange: (moduleIndex: number, topicIndex: number, value: string) => void;
@@ -18,22 +16,20 @@ function TeacherCourseModulesSection({
   modules,
   onAddModule,
   onModuleTitleChange,
-  onEditModule,
   onDeleteModule,
   onAddTopic,
   onTopicTitleChange,
   onEditTopic,
   onDeleteTopic,
 }: TeacherCourseModulesSectionProps) {
-  const { t } = useLanguage();
 
   return (
     <div className="teacher-course-modules">
       <div className="teacher-modules-header">
-        <h2 className="teacher-modules-title">{t('pages.teacher.modules')}</h2>
+        <h2 className="teacher-modules-title">{"Modules"}</h2>
         <div className="teacher-modules-actions">
           <button className="teacher-add-module-btn" type="button" onClick={onAddModule}>
-            + {t('pages.teacher.addModule')}
+            + {"Add Module"}
           </button>
         </div>
       </div>
@@ -46,7 +42,6 @@ function TeacherCourseModulesSection({
               moduleItem={moduleItem}
               moduleIndex={moduleIndex}
               onModuleTitleChange={onModuleTitleChange}
-              onEditModule={onEditModule}
               onDeleteModule={onDeleteModule}
               onAddTopic={onAddTopic}
               onTopicTitleChange={onTopicTitleChange}
@@ -56,7 +51,7 @@ function TeacherCourseModulesSection({
           ))}
         </div>
       ) : (
-        <p className="teacher-empty-text">{t('pages.teacher.noModulesYet')}</p>
+        <p className="teacher-empty-text">{"No modules yet. Click \"Add Module\" to create one."}</p>
       )}
     </div>
   );

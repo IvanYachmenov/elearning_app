@@ -17,15 +17,11 @@ class CourseListView(generics.ListAPIView):
     serializer_class = CourseListSerializer
     permission_classes = (permissions.AllowAny,)
 
-    filterset_fields = ["author_id"]
-    search_fields = ["title", "description"]
-    ordering_fields = ["title", "id"]
-    ordering = ["id"]
-
     queryset = (
         Course.objects
         .select_related("author")
         .annotate(average_rating=Avg("reviews__rating"), reviews_count=Count("reviews"))
+        .order_by("id")
     )
 
 # GET /api/courses/<id>/

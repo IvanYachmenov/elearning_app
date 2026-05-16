@@ -1,11 +1,9 @@
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { TeacherEditableModule } from '../../model/types';
 
 interface TeacherCourseModuleCardProps {
   moduleItem: TeacherEditableModule;
   moduleIndex: number;
   onModuleTitleChange: (moduleIndex: number, value: string) => void;
-  onEditModule: (moduleIndex: number) => void;
   onDeleteModule: (moduleIndex: number) => void;
   onAddTopic: (moduleIndex: number) => void;
   onTopicTitleChange: (moduleIndex: number, topicIndex: number, value: string) => void;
@@ -17,14 +15,12 @@ function TeacherCourseModuleCard({
   moduleItem,
   moduleIndex,
   onModuleTitleChange,
-  onEditModule,
   onDeleteModule,
   onAddTopic,
   onTopicTitleChange,
   onEditTopic,
   onDeleteTopic,
 }: TeacherCourseModuleCardProps) {
-  const { t } = useLanguage();
 
   return (
     <div className="teacher-module-item">
@@ -36,27 +32,16 @@ function TeacherCourseModuleCard({
           onChange={(event) => onModuleTitleChange(moduleIndex, event.target.value)}
           placeholder={`Module ${moduleIndex + 1}`}
         />
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            className="teacher-module-edit-btn"
-            type="button"
-            onClick={() => onEditModule(moduleIndex)}
-            disabled={!moduleItem.id}
-            title={!moduleItem.id ? t('pages.teacher.saveCourseFirst') : ''}
-          >
-            {t('pages.teacher.edit')}
-          </button>
-          <button className="teacher-module-delete-btn" type="button" onClick={() => onDeleteModule(moduleIndex)}>
-            {t('pages.teacher.delete')}
-          </button>
-        </div>
+        <button className="teacher-module-delete-btn" type="button" onClick={() => onDeleteModule(moduleIndex)}>
+          {"Delete"}
+        </button>
       </div>
 
       <div className="teacher-topics-section">
         <div className="teacher-topics-header">
-          <h4 className="teacher-topics-title">{t('pages.teacher.topics')}</h4>
+          <h4 className="teacher-topics-title">{"Topics"}</h4>
           <button className="teacher-add-topic-btn" type="button" onClick={() => onAddTopic(moduleIndex)}>
-            + {t('pages.teacher.addTopic')}
+            + {"Add Topic"}
           </button>
         </div>
 
@@ -79,16 +64,16 @@ function TeacherCourseModuleCard({
                       type="button"
                       onClick={() => onEditTopic(moduleIndex, topicIndex)}
                       disabled={!moduleItem.id || !topic.id}
-                      title={!moduleItem.id || !topic.id ? t('pages.teacher.saveCourseFirst') : ''}
+                      title={!moduleItem.id || !topic.id ? "Save the course first to edit this module." : ''}
                     >
-                      {t('pages.teacher.edit')}
+                      {"Edit"}
                     </button>
                     <button
                       className="teacher-topic-delete-btn"
                       type="button"
                       onClick={() => onDeleteTopic(moduleIndex, topicIndex)}
                     >
-                      {t('pages.teacher.delete')}
+                      {"Delete"}
                     </button>
                   </div>
                 </div>
@@ -96,7 +81,7 @@ function TeacherCourseModuleCard({
             ))}
           </div>
         ) : (
-          <p className="teacher-empty-text">{t('pages.teacher.noTopicsYet')}</p>
+          <p className="teacher-empty-text">{"No topics yet. Click \"Add Topic\" to create one."}</p>
         )}
       </div>
     </div>

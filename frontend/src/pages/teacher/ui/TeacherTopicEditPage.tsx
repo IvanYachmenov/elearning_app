@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { LoadingIndicator } from '../../../shared/ui';
 import { getTeacherErrorMessage } from '../lib/errors';
 import { INITIAL_TOPIC_DATA } from '../lib/factories';
@@ -30,7 +29,6 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
   const { courseId, moduleId, topicId } = useParams<TeacherRouteParams>();
   const isEditMode = Boolean(topicId);
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
@@ -48,11 +46,11 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
       const response = await api.get(`/api/teacher/topics/${topicId}/`);
       setTopicData(normalizeTopicForm(response.data));
     } catch (requestError) {
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.failedToLoadTopic')));
+      setError(getTeacherErrorMessage(requestError, "Failed to load topic."));
     } finally {
       setLoading(false);
     }
-  }, [topicId, t]);
+  }, [topicId]);
 
   useEffect(() => {
     if (user.role !== 'teacher') {
@@ -115,7 +113,7 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
       navigate(`/teacher/courses/${courseId}/edit`);
     } catch (requestError) {
       console.error('Save error:', requestError);
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.failedToSaveTopic')));
+      setError(getTeacherErrorMessage(requestError, "Failed to save topic."));
     } finally {
       setSaving(false);
     }
@@ -128,22 +126,22 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
   if (loading) {
     return (
       <div className="page page-enter">
-        <h1 className="page__title">{isEditMode ? t('pages.teacher.editTopic') : t('pages.teacher.createTopic')}</h1>
-        <LoadingIndicator label={t('common.loading')} />
+        <h1 className="page__title">{isEditMode ? "Edit Topic" : "Create Topic"}</h1>
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
 
   return (
     <TeacherEditorPage
-      title={isEditMode ? t('pages.teacher.editTopic') : t('pages.teacher.createTopic')}
-      backLabel={t('pages.teacher.back')}
+      title={isEditMode ? "Edit Topic" : "Create Topic"}
+      backLabel={"Back"}
       onBack={() => navigate(`/teacher/courses/${courseId}/edit`)}
       backDisabled={saving}
       error={error}
       actions={(
         <button className="teacher-save-btn" type="button" onClick={handleSave} disabled={saving}>
-          {saving ? t('pages.teacher.saving') : t('pages.teacher.save')}
+          {saving ? "Saving..." : "Save"}
         </button>
       )}
     >
@@ -180,9 +178,6 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
         }
         onQuestionTypeChange={(questionIndex, value) =>
           updateQuestions((questions) => updateQuestionType(questions, questionIndex, value))
-        }
-        onQuestionScoreChange={(questionIndex, value) =>
-          updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'max_score', value))
         }
         onQuestionExpectedOutputChange={(questionIndex, value) =>
           updateQuestions((questions) => updateQuestionField(questions, questionIndex, 'expected_output', value))

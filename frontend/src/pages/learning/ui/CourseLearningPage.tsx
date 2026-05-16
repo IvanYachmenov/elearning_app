@@ -1,9 +1,8 @@
-﻿import { isAxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { LearningCourse } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
 import type { ExpandedModulesState, LearningRouteParams } from '../model/types';
@@ -12,7 +11,6 @@ import '../styles/learning.css';
 function CourseLearningPage() {
   const { id } = useParams<LearningRouteParams>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [course, setCourse] = useState<LearningCourse | null>(null);
   const [expandedModules, setExpandedModules] = useState<ExpandedModulesState>({});
   const [loading, setLoading] = useState(true);
@@ -24,7 +22,7 @@ function CourseLearningPage() {
     const loadCourse = async () => {
       if (!id) {
         if (isActive) {
-          setError(t('pages.learning.courseNotFoundOrNotEnrolled'));
+          setError("Course not found or you are not enrolled.");
           setLoading(false);
         }
         return;
@@ -52,11 +50,11 @@ function CourseLearningPage() {
 
         const status = isAxiosError(requestError) ? requestError.response?.status : undefined;
         if (status === 404) {
-          setError(t('pages.learning.courseNotFoundOrNotEnrolled'));
+          setError("Course not found or you are not enrolled.");
         } else if (status === 403) {
-          setError(t('pages.learning.notEnrolled'));
+          setError("You are not enrolled in this course.");
         } else {
-          setError(t('pages.learning.failedToLoadCourse'));
+          setError("Failed to load course.");
         }
       } finally {
         if (isActive) {
@@ -70,7 +68,7 @@ function CourseLearningPage() {
     return () => {
       isActive = false;
     };
-  }, [id, t]);
+  }, [id]);
 
   const toggleModule = (moduleId: number) => {
     setExpandedModules((previous) => ({
@@ -90,7 +88,7 @@ function CourseLearningPage() {
   if (loading) {
     return (
       <div className="page page-enter">
-        <LoadingIndicator label={t('common.loading')} />
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
@@ -98,9 +96,9 @@ function CourseLearningPage() {
   if (error || !course) {
     return (
       <div className="page page-enter">
-        <p style={{ color: '#dc2626' }}>{error || t('pages.learning.courseNotFound')}</p>
+        <p style={{ color: '#dc2626' }}>{error || "Course not found."}</p>
         <Link to="/learning" className="btn-primary" style={{ marginTop: '16px' }}>
-          {t('pages.learning.backToMyLearning')}
+          {"Back to My Learning"}
         </Link>
       </div>
     );
@@ -118,7 +116,7 @@ function CourseLearningPage() {
     <div className="page page-enter">
       <header className="learning-course-header">
         <button type="button" className="learning-back-link" onClick={() => navigate('/learning')}>
-          {t('pages.learning.backToMyLearning')}
+          {"Back to My Learning"}
         </button>
 
         <h1 className="page__title">{course.title}</h1>
@@ -128,7 +126,7 @@ function CourseLearningPage() {
             {shortDescription}{' '}
             {isLongDescription && (
               <Link to={`/courses/${course.id}`} className="learning-course-description__link">
-                {t('pages.learning.readMore')}
+                {"Read more"}
               </Link>
             )}
           </p>
@@ -136,9 +134,9 @@ function CourseLearningPage() {
 
         <div className="learning-course-progress">
           <div className="learning-course-progress__info">
-            <span className="learning-course-progress__label">{t('pages.learning.progress')}</span>
+            <span className="learning-course-progress__label">{"Progress:"}</span>
             <span className="learning-course-progress__value">
-              {course.completed_topics}/{course.total_topics} {t('pages.learning.topics')}
+              {course.completed_topics}/{course.total_topics} {"topics"}
             </span>
             <span className="learning-course-progress__percent">({progressPercent}%)</span>
           </div>
@@ -165,7 +163,7 @@ function CourseLearningPage() {
                   <div className="learning-module__header-left">
                     <div className="learning-module__title">{moduleItem.title}</div>
                     <div className="learning-module__meta">
-                      {moduleItem.topics.length} {t('pages.learning.topics')}
+                      {moduleItem.topics.length} {"topics"}
                     </div>
                   </div>
                   <div className={'learning-module__chevron' + (isOpen ? ' open' : '')} aria-hidden="true">
@@ -191,7 +189,7 @@ function CourseLearningPage() {
                             <div className="learning-topic__title">
                               <span>{topic.title}</span>
                               {topic.is_timed_test && (
-                                <span className="learning-topic__timed-badge" title={t('pages.learning.timedTest')}>
+                                <span className="learning-topic__timed-badge" title={"Timed test"}>
                                   TIMER
                                 </span>
                               )}
@@ -200,15 +198,15 @@ function CourseLearningPage() {
                             <div className="learning-topic__status">
                               <span className="learning-topic__status-pill">
                                 {topic.status === 'not_started'
-                                  ? t('pages.learning.statusNotStarted')
+                                  ? "Not started"
                                   : topic.status === 'in_progress'
-                                    ? t('pages.learning.statusInProgress')
+                                    ? "In progress"
                                     : topic.status === 'completed'
                                       ? topic.score != null && topic.score >= 100
-                                        ? t('pages.learning.statusPassed')
-                                        : t('pages.learning.statusCompleted')
+                                        ? "Passed"
+                                        : "Completed"
                                       : topic.status === 'failed'
-                                        ? t('pages.learning.statusFailed')
+                                        ? "Failed"
                                         : topic.status.replace('_', ' ')}
                               </span>
                               {visibleScore != null && <span className="learning-topic__score">{visibleScore}%</span>}
@@ -218,14 +216,14 @@ function CourseLearningPage() {
                       })}
                     </ul>
                   ) : (
-                    <p className="learning-topic-empty">{t('pages.learning.noTopicsYet')}</p>
+                    <p className="learning-topic-empty">{"No topics yet."}</p>
                   )}
                 </div>
               </article>
             );
           })
         ) : (
-          <p>{t('pages.learning.noModulesYet')}</p>
+          <p>{"No modules yet."}</p>
         )}
       </section>
     </div>

@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     RegisterView,
     MeView,
+    BecomeTeacherView,
     GoogleOAuthView,
     GitHubOAuthLoginView,
     GitHubOAuthCallbackView,
@@ -24,6 +25,7 @@ from .views import (
     TopicQuestionHintView,
     TopicPracticeHistoryView,
     TopicPracticeResetView,
+    PlaygroundRunView,
 )
 
 # Router for teacher viewsets
@@ -36,6 +38,8 @@ urlpatterns = [
     # auth
     path("auth/register/", RegisterView.as_view(), name="register"),
     path("auth/me/", MeView.as_view(), name="me"),
+    path("auth/become-teacher/", BecomeTeacherView.as_view(), name="become-teacher"),
+    path("playground/run/", PlaygroundRunView.as_view(), name="playground-run"),
     path("auth/google/", GoogleOAuthView.as_view(), name="google-oauth"),
     path("auth/github/login/", GitHubOAuthLoginView.as_view(), name="github-oauth-login"),
     path("auth/github/callback/", GitHubOAuthCallbackView.as_view(), name="github-oauth-callback"),

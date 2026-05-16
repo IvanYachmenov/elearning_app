@@ -18,15 +18,19 @@ class TeacherQuestionSerializer(serializers.ModelSerializer):
             "text",
             "order",
             "question_type",
-            "max_score",
             "expected_output",
             "options",
         )
 
+    CODE_TYPES = (
+        TopicQuestion.QuestionType.CODE,
+        TopicQuestion.QuestionType.JS_CODE,
+    )
+
     def create(self, validated_data):
         options_data = validated_data.pop('options', [])
         question = TopicQuestion.objects.create(**validated_data)
-        if question.question_type != TopicQuestion.QuestionType.CODE:
+        if question.question_type not in self.CODE_TYPES:
             for option_data in options_data:
                 TopicQuestionOption.objects.create(question=question, **option_data)
         return question
@@ -37,11 +41,10 @@ class TeacherQuestionSerializer(serializers.ModelSerializer):
         instance.text = validated_data.get('text', instance.text)
         instance.order = validated_data.get('order', instance.order)
         instance.question_type = validated_data.get('question_type', instance.question_type)
-        instance.max_score = validated_data.get('max_score', instance.max_score)
         instance.expected_output = validated_data.get('expected_output', instance.expected_output)
         instance.save()
 
-        if instance.question_type == TopicQuestion.QuestionType.CODE:
+        if instance.question_type in self.CODE_TYPES:
             instance.options.all().delete()
             return instance
         

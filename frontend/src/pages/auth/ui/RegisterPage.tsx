@@ -2,11 +2,9 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'r
 import { isAxiosError } from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { api } from '../../../shared/api';
 import type { ApiErrorResponse } from '../../../shared/types';
 import {
-  AuthDisplayControls,
   AuthSocialButtons,
   applyAuthSession,
   exchangeGoogleToken,
@@ -34,7 +32,6 @@ function RegisterPage({ onAuth }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const googleHiddenButtonRef = useRef<HTMLDivElement | null>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +66,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
       navigate('/courses');
     } catch (authError) {
       console.error(authError);
-      setError(t('pages.auth.registrationFailed'));
+      setError("Registration failed. Username or email may already be taken.");
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +90,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
       const providerError = isAxiosError<ApiErrorResponse>(authError)
         ? authError.response?.data?.detail
         : undefined;
-      setError(providerError || t('pages.auth.googleAuthFailed'));
+      setError(providerError || "Google authentication failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +103,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
     }
 
     if (response.error && response.error !== 'popup_closed_by_user' && response.error !== 'popup_blocked') {
-      setError(t('pages.auth.googleAuthFailed'));
+      setError("Google authentication failed. Please try again.");
     }
   };
 
@@ -114,7 +111,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
     try {
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
       if (!clientId) {
-        setError(t('pages.auth.googleOAuthNotConfigured'));
+        setError("Google OAuth is not configured. Please contact support.");
         return;
       }
 
@@ -126,12 +123,12 @@ function RegisterPage({ onAuth }: AuthPageProps) {
 
       const didStart = await triggerGoogleFedCmSignIn(googleHiddenButtonRef);
       if (!didStart) {
-        setError(t('pages.auth.googleSignInLoadFailed'));
+        setError("Google Sign-In failed to load. Please refresh the page.");
       }
     } catch (authError) {
       console.error('Google register error:', authError);
       if (!(authError instanceof DOMException && authError.name === 'AbortError')) {
-        setError(t('pages.auth.googleSignInFailed'));
+        setError("Failed to initialize Google Sign-In. Please try again.");
       }
     }
   };
@@ -149,8 +146,8 @@ function RegisterPage({ onAuth }: AuthPageProps) {
       navigate,
       setError,
       setIsLoading,
-      formatProviderError: (providerError) => `${t('pages.auth.githubAuthFailed')}: ${providerError}`,
-      genericError: t('pages.auth.githubAuthFailed'),
+      formatProviderError: (providerError) => `${"GitHub authentication failed. Please try again."}: ${providerError}`,
+      genericError: "GitHub authentication failed. Please try again.",
     });
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -164,19 +161,18 @@ function RegisterPage({ onAuth }: AuthPageProps) {
 
   return (
     <div className="auth-container auth-container--register">
-      <AuthDisplayControls />
       <div className="auth-left">
         <div className="auth-left__content">
           <div className="auth-left__logo"></div>
-          <h1 className="auth-left__title">{t('pages.auth.startJourney')}</h1>
-          <p className="auth-left__subtitle">{t('pages.auth.joinLearners')}</p>
+          <h1 className="auth-left__title">{"Start Your Learning Journey"}</h1>
+          <p className="auth-left__subtitle">{"Join thousands of learners and start mastering new skills today."}</p>
         </div>
       </div>
 
       <div className="auth-right">
         <div className="auth-form-wrapper">
-          <h1 className="auth-title">{t('pages.auth.createAccount')}</h1>
-          <p className="auth-subtitle">{t('pages.auth.chooseSignupMethod')}</p>
+          <h1 className="auth-title">{"Create Account"}</h1>
+          <p className="auth-subtitle">{"Choose your preferred signup method"}</p>
 
           {!showEmailForm ? (
             <>
@@ -184,13 +180,13 @@ function RegisterPage({ onAuth }: AuthPageProps) {
                 isLoading={isLoading}
                 onGoogleClick={handleGoogleRegister}
                 onGitHubClick={handleGitHubRegister}
-                googleLoadingLabel={t('pages.auth.signingUp')}
-                googleLabel={t('pages.auth.continueGoogle')}
-                githubLabel={t('pages.auth.continueGitHub')}
+                googleLoadingLabel={"Signing up..."}
+                googleLabel={"Continue with Google"}
+                githubLabel={"Continue with GitHub"}
               />
 
               <div className="auth-divider">
-                <span>{t('pages.auth.or')}</span>
+                <span>{"or"}</span>
               </div>
 
               <button
@@ -198,7 +194,7 @@ function RegisterPage({ onAuth }: AuthPageProps) {
                 className="auth-button auth-button--outline"
                 onClick={() => setShowEmailForm(true)}
               >
-                {t('pages.auth.useEmailPassword')}
+                {"Use email / password"}
               </button>
             </>
           ) : (
@@ -206,28 +202,29 @@ function RegisterPage({ onAuth }: AuthPageProps) {
               <form className="auth-form" onSubmit={handleSubmit}>
                 <div className="auth-field">
                   <label className="auth-label">
-                    {t('pages.auth.username')} <span className="auth-label-required">*</span>
+                    {"Username"} <span className="auth-label-required">*</span>
                   </label>
                   <input
                     className="auth-input"
                     type="text"
                     name="username"
-                    placeholder={t('pages.auth.chooseUsername')}
+                    placeholder={"Choose a username"}
                     value={form.username}
                     onChange={handleChange}
+                    maxLength={10}
                     required
                   />
                 </div>
 
                 <div className="auth-field">
                   <label className="auth-label">
-                    {t('pages.auth.email')} <span className="auth-label-required">*</span>
+                    {"Email"} <span className="auth-label-required">*</span>
                   </label>
                   <input
                     className="auth-input"
                     type="email"
                     name="email"
-                    placeholder={t('pages.auth.yourEmail')}
+                    placeholder={"Your email"}
                     value={form.email}
                     onChange={handleChange}
                     required
@@ -236,13 +233,13 @@ function RegisterPage({ onAuth }: AuthPageProps) {
 
                 <div className="auth-field">
                   <label className="auth-label">
-                    {t('pages.auth.password')} <span className="auth-label-required">*</span>
+                    {"Password"} <span className="auth-label-required">*</span>
                   </label>
                   <input
                     className="auth-input"
                     type="password"
                     name="password"
-                    placeholder={t('pages.auth.createPassword')}
+                    placeholder={"Create a password"}
                     value={form.password}
                     onChange={handleChange}
                     required
@@ -250,31 +247,33 @@ function RegisterPage({ onAuth }: AuthPageProps) {
                 </div>
 
                 <div className="auth-field">
-                  <label className="auth-label">{t('pages.auth.firstName')}</label>
+                  <label className="auth-label">{"First name"}</label>
                   <input
                     className="auth-input"
                     type="text"
                     name="first_name"
-                    placeholder={t('pages.auth.yourFirstName')}
+                    placeholder={"Your first name"}
                     value={form.first_name}
                     onChange={handleChange}
+                    maxLength={13}
                   />
                 </div>
 
                 <div className="auth-field">
-                  <label className="auth-label">{t('pages.auth.lastName')}</label>
+                  <label className="auth-label">{"Last name"}</label>
                   <input
                     className="auth-input"
                     type="text"
                     name="last_name"
-                    placeholder={t('pages.auth.yourLastName')}
+                    placeholder={"Your last name"}
                     value={form.last_name}
                     onChange={handleChange}
+                    maxLength={13}
                   />
                 </div>
 
                 <button type="submit" className="auth-button" disabled={isLoading}>
-                  {isLoading ? t('pages.auth.creatingAccount') : t('pages.auth.createAccountButton')}
+                  {isLoading ? "Creating account..." : "Create account"}
                 </button>
               </form>
 
@@ -285,16 +284,16 @@ function RegisterPage({ onAuth }: AuthPageProps) {
                 className="auth-button-back"
                 onClick={() => setShowEmailForm(false)}
               >
-                {t('pages.auth.backToOptions')}
+                {"Back to other options"}
               </button>
             </>
           )}
 
           {!showEmailForm && (
             <p className="auth-footer">
-              {t('pages.auth.alreadyHaveAccount')}{' '}
+              {"Already have an account?"}{' '}
               <Link to="/login" className="auth-link">
-                {t('pages.auth.login')}
+                {"Log in"}
               </Link>
             </p>
           )}

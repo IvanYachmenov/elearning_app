@@ -4,6 +4,7 @@ export { ProfilePage } from './profile';
 export { SettingsPage } from './settings';
 export { CreditsPage } from './credits';
 export { CourseDetailPage, CoursesPage } from './courses';
+export { PlaygroundPage } from './playground';
 export {
   CourseLearningPage,
   LearningPage,
@@ -11,8 +12,7 @@ export {
   TopicTheoryPage,
 } from './learning';
 export { 
-  TeacherCourseEditPage, 
+  TeacherCourseEditPage,
   TeacherCoursesPage,
-  TeacherModuleEditPage,
   TeacherTopicEditPage
 } from './teacher';

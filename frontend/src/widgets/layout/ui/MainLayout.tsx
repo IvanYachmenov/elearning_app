@@ -5,7 +5,6 @@ import '../../../shared/styles/layout.css';
 import type { User } from '../../../shared/types';
 import AppFooter from './AppFooter';
 import { useNavigationLock } from '../../../shared/lib/navigation-lock';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 
 const ANIM_MS = 80;
 
@@ -16,7 +15,6 @@ interface MainLayoutProps {
 
 function MainLayout({ user, onLogout }: MainLayoutProps) {
   const { isLocked, lockReason } = useNavigationLock();
-  const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMenuClosing, setIsMenuClosing] = useState(false);
 
@@ -120,12 +118,21 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
           <div className="app-header__right">
             <nav className="app-nav" aria-label="Main navigation">
               <NavLink
+                to="/playground"
+                className={getNavLinkClass('app-nav-link--playground')}
+                onClick={handlePreventNavigation}
+                aria-disabled={isLocked}
+              >
+                {"Playground"}
+              </NavLink>
+
+              <NavLink
                 to="/courses"
                 className={getNavLinkClass('app-nav-link--courses')}
                 onClick={handlePreventNavigation}
                 aria-disabled={isLocked}
               >
-                {t('nav.courses')}
+                {"Courses"}
               </NavLink>
 
               <NavLink
@@ -134,7 +141,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handlePreventNavigation}
                 aria-disabled={isLocked}
               >
-                {t('nav.learning')}
+                {"Learning"}
               </NavLink>
             </nav>
 
@@ -185,7 +192,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="app-menu__top">
-              <div className="app-menu__title">{t('nav.menu')}</div>
+              <div className="app-menu__title">{"Menu"}</div>
               <button type="button" className="app-menu__close" onClick={closeMenu} aria-label="Close menu">
                 x
               </button>
@@ -198,7 +205,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {t('nav.courses')}
+                {"Courses"}
               </NavLink>
               <NavLink
                 to="/learning"
@@ -206,23 +213,18 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {t('nav.learning')}
+                {"Learning"}
               </NavLink>
 
-              <div className="app-menu__divider" />
-
               {user.role === 'teacher' && (
-                <>
-                  <NavLink
-                    to="/teacher/courses"
-                    className={({ isActive }) => `app-menu__link${isActive ? ' active' : ''}`}
-                    onClick={handleMenuNavClick}
-                    aria-disabled={isLocked}
-                  >
-                    {t('nav.myCourses')}
-                  </NavLink>
-                  <div className="app-menu__divider" />
-                </>
+                <NavLink
+                  to="/teacher/courses"
+                  className={({ isActive }) => `app-menu__link${isActive ? ' active' : ''}`}
+                  onClick={handleMenuNavClick}
+                  aria-disabled={isLocked}
+                >
+                  {"My Courses"}
+                </NavLink>
               )}
 
               <NavLink
@@ -231,7 +233,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {t('nav.profile')}
+                {"Profile"}
               </NavLink>
               <NavLink
                 to="/settings"
@@ -239,7 +241,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {t('nav.settings')}
+                {"Settings"}
               </NavLink>
 
               <button
@@ -256,7 +258,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 }}
                 aria-disabled={isLocked}
               >
-                {t('nav.logout')}
+                {"Logout"}
               </button>
             </nav>
           </div>

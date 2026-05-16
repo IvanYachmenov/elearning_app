@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { CourseCard } from '../../../features/courses';
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { CourseListItem } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
 import type { CourseListResponse } from '../model/types';
@@ -13,7 +12,6 @@ function normalizeCourseList(data: CourseListResponse): CourseListItem[] {
 }
 
 function CoursesPage() {
-  const { t } = useLanguage();
   const [courses, setCourses] = useState<CourseListItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -34,7 +32,7 @@ function CoursesPage() {
       } catch (requestError) {
         console.error(requestError);
         if (isActive) {
-          setError(t('pages.courses.catalogNotFoundText'));
+          setError("The course catalog could not be loaded. The page may be unavailable or the server did not return courses.");
         }
       } finally {
         if (isActive) {
@@ -48,7 +46,7 @@ function CoursesPage() {
     return () => {
       isActive = false;
     };
-  }, [t]);
+  }, []);
 
   const filteredCourses = useMemo(() => {
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -65,19 +63,19 @@ function CoursesPage() {
     <div className={`page page-enter${showCatalogState ? ' courses-page--state' : ''}`}>
       {!showCatalogState && (
         <>
-          <h1 className="page__title">{t('pages.courses.title')}</h1>
-          <p className="page__subtitle">{t('pages.courses.subtitle')}</p>
+          <h1 className="page__title">{"Courses"}</h1>
+          <p className="page__subtitle">{"Browse available courses. After you enroll, they will appear on the Learning page."}</p>
         </>
       )}
 
-      {loading && <LoadingIndicator label={t('common.loading')} />}
+      {loading && <LoadingIndicator label={"Loading..."} />}
       {!loading && error && (
         <section className="courses-state courses-state--error" aria-live="polite">
           <div className="courses-state__code">404</div>
-          <h2 className="courses-state__title">{t('pages.courses.catalogNotFoundTitle')}</h2>
+          <h2 className="courses-state__title">{"Courses not found"}</h2>
           <p className="courses-state__text">{error}</p>
           <button type="button" className="courses-state__button" onClick={() => window.location.reload()}>
-            {t('pages.courses.tryAgain')}
+            {"Try again"}
           </button>
         </section>
       )}
@@ -85,17 +83,17 @@ function CoursesPage() {
       {!loading && !error && courses.length === 0 && (
         <section className="courses-state" aria-live="polite">
           <div className="courses-state__code">404</div>
-          <h2 className="courses-state__title">{t('pages.courses.catalogEmptyTitle')}</h2>
-          <p className="courses-state__text">{t('pages.courses.noCourses')}</p>
+          <h2 className="courses-state__title">{"Catalog is empty"}</h2>
+          <p className="courses-state__text">{"No courses available yet. Check back soon!"}</p>
         </section>
       )}
 
       {!loading && !error && courses.length > 0 && (
         <>
-          <section className="courses-filter-panel" aria-label={t('pages.courses.filters')}>
+          <section className="courses-filter-panel" aria-label={"Course filters"}>
             <div className="courses-filter-panel__field courses-filter-panel__field--search">
               <label className="courses-filter-panel__label" htmlFor="courses-search">
-                {t('pages.courses.searchByTitle')}
+                {"Search by title"}
               </label>
               <input
                 id="courses-search"
@@ -103,7 +101,7 @@ function CoursesPage() {
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t('pages.courses.searchPlaceholder')}
+                placeholder={"Search courses..."}
               />
             </div>
 
@@ -113,13 +111,13 @@ function CoursesPage() {
                 className="courses-filter-panel__reset"
                 onClick={() => setSearchQuery('')}
               >
-                {t('pages.courses.clearFilters')}
+                {"Clear filters"}
               </button>
             )}
           </section>
 
           {filteredCourses.length === 0 ? (
-            <p className="courses-filter-empty">{t('pages.courses.noFilteredCourses')}</p>
+            <p className="courses-filter-empty">{"No courses match these filters."}</p>
           ) : (
             <div className="courses-list">
               {filteredCourses.map((course) => (

@@ -68,11 +68,6 @@ body.theme-app {
   min-height: 100vh;
 }
 
-[data-theme="dark"] body.theme-app {
-  background: #0f172a !important;
-  min-height: 100vh;
-}
-
 .app-loading-screen {
   display: flex;
   align-items: center;
@@ -83,166 +78,14 @@ body.theme-app {
   background: var(--app-background);
 }
 
-[data-theme="dark"] .app-loading-screen {
-  background: #0f172a;
-  color: var(--text-primary);
-}
-
 /* === THEME SUPPORT === */
-[data-theme="light"] {
+:root {
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
-}
-
-[data-theme="dark"] {
-  --bg-primary: #1e293b;
-  --bg-secondary: #0f172a;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --app-background: #0f172a;
-  --app-surface-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
-  --app-header-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  --app-motion-duration: 160ms;
-}
-
-[data-theme="dark"] .page {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .page__title,
-[data-theme="dark"] .page__subtitle {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-header {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .app-header::before {
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .app-logo {
-  color: var(--text-primary);
-  background: var(--bg-primary);
-}
-
-[data-theme="dark"] .app-nav-link {
-    color: var(--text-primary);
-    background: var(--bg-primary);
-}
-
-[data-theme="dark"] .app-nav-link:hover,
-[data-theme="dark"] .app-nav-link:focus,
-[data-theme="dark"] .app-nav-link:active {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-nav-link--learning {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%) !important;
-  color: #0f172a !important;
-}
-
-[data-theme="dark"] .app-nav-link--learning:hover,
-[data-theme="dark"] .app-nav-link--learning:focus,
-[data-theme="dark"] .app-nav-link--learning:active {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
-  color: #0f172a !important;
-}
-
-[data-theme="dark"] .app-nav-link--learning.app-nav-link--active {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%) !important;
-  color: #0f172a !important;
-}
-
-[data-theme="dark"] .app-nav-link--learning.app-nav-link--active:hover,
-[data-theme="dark"] .app-nav-link--learning.app-nav-link--active:focus,
-[data-theme="dark"] .app-nav-link--learning.app-nav-link--active:active {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
-  color: #0f172a !important;
-}
-
-[data-theme="dark"] .app-nav-link--active {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-nav-link--active:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .profile-button {
-    color: var(--text-primary);
-    background: var(--bg-primary);
-}
-
-[data-theme="dark"] .profile-button:hover,
-[data-theme="dark"] .profile-button:hover .profile-name {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-menu__panel {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .app-menu__link {
-    color: var(--text-primary);
-    background: var(--bg-primary);
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .app-menu__link:hover {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-menu__link:hover::before {
-    opacity: 0.8;
-}
-
-[data-theme="dark"] .course-card,
-[data-theme="dark"] .course-detail-header,
-[data-theme="dark"] .course-content,
-[data-theme="dark"] .learning-course-header,
-[data-theme="dark"] .learning-module,
-[data-theme="dark"] .topic-theory,
-[data-theme="dark"] .topic-practice {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .course-card__title,
-[data-theme="dark"] .course-card__description,
-[data-theme="dark"] .module-item strong,
-[data-theme="dark"] .learning-module__title,
-[data-theme="dark"] .learning-topic__title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .course-card__author,
-[data-theme="dark"] .topic-item,
-[data-theme="dark"] .learning-module__meta {
-  color: var(--text-secondary);
-}
-
-[data-theme="dark"] body {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .app-root {
-  background: var(--app-background);
 }
 
 /* ---------- LINKS ---------- */
@@ -275,6 +118,57 @@ button {
   background: none;
 }
 
+/* Interactive chrome (buttons, nav, tabs, badges) must not be text-selectable.
+   Content text, inputs and code stay selectable. */
+button,
+select,
+[role="button"],
+.app-nav-link,
+.app-header,
+.app-menu,
+.app-menu__item,
+.landing-button,
+.topic-item__timed-badge,
+.app-select,
+nav a {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable="true"],
+.topic-theory__code-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
+/* ---------- SCROLLBAR (app style) ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nav-orange) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--nav-orange);
+  border: 2px solid #ffffff;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #ea770e;
+}
+
 /* ---------- LOADING ---------- */
 .loading-indicator {
   display: flex;
@@ -305,11 +199,6 @@ button {
   line-height: 1.4;
 }
 
-[data-theme="dark"] .loading-indicator__spinner {
-  border-color: rgba(241, 245, 249, 0.18);
-  border-top-color: #fb923c;
-}
-
 @keyframes loadingSpin {
   to {
     transform: rotate(360deg);
@@ -326,7 +215,7 @@ button {
   border: 2px solid black;
   border-radius: 0;
   box-shadow: var(--app-surface-shadow);
-  min-height: calc(100vh - 200px);
+  flex: 1 1 auto;
   animation: appPageIn var(--app-motion-duration) ease-out both;
   position: relative;
   z-index: 1;
@@ -368,12 +257,6 @@ button {
 .page__title:focus,
 .page__title:active {
   color: #0f172a;
-}
-
-[data-theme="dark"] .page__title:hover,
-[data-theme="dark"] .page__title:focus,
-[data-theme="dark"] .page__title:active {
-  color: var(--text-primary);
 }
 
 .page__subtitle {
@@ -485,16 +368,71 @@ body.theme-app :where(
   .learning-course-header,
   .learning-module,
   .learning-topic,
-  .settings-nav__item,
   .settings-account__connection,
-  .settings-option,
   .profile-avatar-large,
-  .profile-edit-appearance-btn,
-  .profile-gradient-nav,
   .teacher-course-card,
   .teacher-module-item,
-  .teacher-topic-item,
-  .profile-gradient-option
+  .teacher-topic-item
 ):hover {
   transform: none !important;
+}
+
+/* ---------- GLOBAL MOBILE RESPONSIVE LAYER ---------- */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+pre,
+table,
+video,
+canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-page-gutter: 12px;
+  }
+
+  .page {
+    margin: 16px auto 28px;
+    padding: 22px 16px;
+    min-height: calc(100vh - 150px);
+  }
+
+  .page__title {
+    font-size: 24px;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --app-page-gutter: 10px;
+  }
+
+  .page {
+    margin: 12px auto 22px;
+    padding: 18px 13px;
+    border-width: 1px;
+  }
+
+  .page__title {
+    font-size: 21px;
+  }
+
+  .page__subtitle {
+    font-size: 14px;
+  }
+
+  /* Long words / emails / code must never push the layout sideways. */
+  .page,
+  .profile-info,
+  .profile-info h2,
+  .profile-info p {
+    overflow-wrap: anywhere;
+  }
 }

@@ -2,10 +2,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { isAxiosError } from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { ApiErrorResponse } from '../../../shared/types';
 import {
-  AuthDisplayControls,
   AuthSocialButtons,
   applyAuthSession,
   exchangeGoogleToken,
@@ -26,7 +24,6 @@ function LoginPage({ onAuth }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const googleHiddenButtonRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -50,7 +47,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
       navigate('/courses');
     } catch (authError) {
       console.error(authError);
-      setError(t('pages.auth.loginFailed'));
+      setError("Login failed. Invalid username or password.");
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +71,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
       const providerError = isAxiosError<ApiErrorResponse>(authError)
         ? authError.response?.data?.detail
         : undefined;
-      setError(providerError || t('pages.auth.googleAuthFailed'));
+      setError(providerError || "Google authentication failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +84,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
     }
 
     if (response.error && response.error !== 'popup_closed_by_user' && response.error !== 'popup_blocked') {
-      setError(t('pages.auth.googleAuthFailed'));
+      setError("Google authentication failed. Please try again.");
     }
   };
 
@@ -95,7 +92,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
     try {
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
       if (!clientId) {
-        setError(t('pages.auth.googleOAuthNotConfigured'));
+        setError("Google OAuth is not configured. Please contact support.");
         return;
       }
 
@@ -107,12 +104,12 @@ function LoginPage({ onAuth }: AuthPageProps) {
 
       const didStart = await triggerGoogleFedCmSignIn(googleHiddenButtonRef);
       if (!didStart) {
-        setError(t('pages.auth.googleSignInLoadFailed'));
+        setError("Google Sign-In failed to load. Please refresh the page.");
       }
     } catch (authError) {
       console.error('Google login error:', authError);
       if (!(authError instanceof DOMException && authError.name === 'AbortError')) {
-        setError(t('pages.auth.googleSignInFailed'));
+        setError("Failed to initialize Google Sign-In. Please try again.");
       }
     }
   };
@@ -131,7 +128,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
       setError,
       setIsLoading,
       formatProviderError: (providerError) => `GitHub authentication failed: ${providerError}`,
-      genericError: t('pages.auth.githubAuthFailed'),
+      genericError: "GitHub authentication failed. Please try again.",
     });
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -145,19 +142,18 @@ function LoginPage({ onAuth }: AuthPageProps) {
 
   return (
     <div className="auth-container">
-      <AuthDisplayControls />
       <div className="auth-left">
         <div className="auth-left__content">
           <div className="auth-left__logo"></div>
-          <h1 className="auth-left__title">{t('pages.auth.welcomeBack')}</h1>
-          <p className="auth-left__subtitle">{t('pages.auth.continueLearning')}</p>
+          <h1 className="auth-left__title">{"Welcome Back!"}</h1>
+          <p className="auth-left__subtitle">{"Continue your learning journey and explore new courses to expand your knowledge."}</p>
         </div>
       </div>
 
       <div className="auth-right">
         <div className="auth-form-wrapper">
-          <h1 className="auth-title">{t('pages.auth.login')}</h1>
-          <p className="auth-subtitle">{t('pages.auth.chooseLoginMethod')}</p>
+          <h1 className="auth-title">{"Log in"}</h1>
+          <p className="auth-subtitle">{"Choose your preferred login method"}</p>
 
           {!showEmailForm ? (
             <>
@@ -165,13 +161,13 @@ function LoginPage({ onAuth }: AuthPageProps) {
                 isLoading={isLoading}
                 onGoogleClick={handleGoogleLogin}
                 onGitHubClick={handleGitHubLogin}
-                googleLoadingLabel={t('pages.auth.signingIn')}
-                googleLabel={t('pages.auth.continueGoogle')}
-                githubLabel={t('pages.auth.continueGitHub')}
+                googleLoadingLabel={"Signing in..."}
+                googleLabel={"Continue with Google"}
+                githubLabel={"Continue with GitHub"}
               />
 
               <div className="auth-divider">
-                <span>{t('pages.auth.or')}</span>
+                <span>{"or"}</span>
               </div>
 
               <button
@@ -179,18 +175,18 @@ function LoginPage({ onAuth }: AuthPageProps) {
                 className="auth-button auth-button--outline"
                 onClick={() => setShowEmailForm(true)}
               >
-                {t('pages.auth.useEmailPassword')}
+                {"Use email / password"}
               </button>
             </>
           ) : (
             <>
               <form className="auth-form" onSubmit={handleLogin}>
                 <div className="auth-field">
-                  <label className="auth-label">{t('pages.auth.usernameOrEmail')}</label>
+                  <label className="auth-label">{"Username or Email"}</label>
                   <input
                     className="auth-input"
                     type="text"
-                    placeholder={t('pages.auth.enterUsernameOrEmail')}
+                    placeholder={"Enter your username or email"}
                     value={username}
                     onChange={(event) => setUsername(event.target.value)}
                     required
@@ -198,11 +194,11 @@ function LoginPage({ onAuth }: AuthPageProps) {
                 </div>
 
                 <div className="auth-field">
-                  <label className="auth-label">{t('pages.auth.password')}</label>
+                  <label className="auth-label">{"Password"}</label>
                   <input
                     className="auth-input"
                     type="password"
-                    placeholder={t('pages.auth.enterPassword')}
+                    placeholder={"Enter your password"}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     required
@@ -210,7 +206,7 @@ function LoginPage({ onAuth }: AuthPageProps) {
                 </div>
 
                 <button type="submit" className="auth-button" disabled={isLoading}>
-                  {isLoading ? t('pages.auth.loggingIn') : t('pages.auth.login')}
+                  {isLoading ? "Logging in..." : "Log in"}
                 </button>
               </form>
 
@@ -221,16 +217,16 @@ function LoginPage({ onAuth }: AuthPageProps) {
                 className="auth-button-back"
                 onClick={() => setShowEmailForm(false)}
               >
-                {t('pages.auth.backToOptions')}
+                {"Back to other options"}
               </button>
             </>
           )}
 
           {!showEmailForm && (
             <p className="auth-footer">
-              {t('pages.auth.dontHaveAccount')}{' '}
+              {"Don't have an account?"}{' '}
               <Link to="/register" className="auth-link">
-                {t('pages.auth.register')}
+                {"Sign up"}
               </Link>
             </p>
           )}

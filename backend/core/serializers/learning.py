@@ -185,7 +185,6 @@ class TopicPracticeQuestionSerializer(serializers.ModelSerializer):
             "text",
             "order",
             "question_type",
-            "max_score",
             "options",
         )
 
@@ -201,6 +200,22 @@ class TopicQuestionAnswerSubmitSerializer(serializers.Serializer):
         default=list,
     )
     code = serializers.CharField(
+        allow_blank=True,
+        required=False,
+        default="",
+        max_length=20000,
+        trim_whitespace=False,
+    )
+    # For JavaScript questions the code runs in the browser; the client sends
+    # back the captured output for grading against the expected output.
+    client_stdout = serializers.CharField(
+        allow_blank=True,
+        required=False,
+        default="",
+        max_length=20000,
+        trim_whitespace=False,
+    )
+    client_stderr = serializers.CharField(
         allow_blank=True,
         required=False,
         default="",

@@ -1,4 +1,3 @@
-import { useLanguage } from '../../../../shared/lib/i18n/LanguageContext';
 import type { TeacherEditableTopic } from '../../model/types';
 
 interface TeacherModuleTopicsSectionProps {
@@ -16,20 +15,19 @@ function TeacherModuleTopicsSection({
   onEditTopic,
   onDeleteTopic,
 }: TeacherModuleTopicsSectionProps) {
-  const { t } = useLanguage();
 
   return (
     <div className="teacher-topics-section">
       <div className="teacher-topics-header">
-        <h4 className="teacher-topics-title">{t('pages.teacher.topics')}</h4>
+        <h4 className="teacher-topics-title">{"Topics"}</h4>
         <button
           className="teacher-add-topic-btn"
           type="button"
           onClick={onAddTopic}
           disabled={!canAddTopic}
-          title={!canAddTopic ? t('pages.teacher.saveModuleFirst') : ''}
+          title={!canAddTopic ? "Please save the module first before adding topics." : ''}
         >
-          + {t('pages.teacher.addTopic')}
+          + {"Add Topic"}
         </button>
       </div>
 
@@ -45,12 +43,12 @@ function TeacherModuleTopicsSection({
                     type="button"
                     onClick={() => onEditTopic(topicIndex)}
                     disabled={!canAddTopic || !topic.id}
-                    title={!canAddTopic || !topic.id ? t('pages.teacher.saveModuleFirst') : ''}
+                    title={!canAddTopic || !topic.id ? "Please save the module first before adding topics." : ''}
                   >
-                    {t('pages.teacher.edit')}
+                    {"Edit"}
                   </button>
                   <button className="teacher-topic-delete-btn" type="button" onClick={() => onDeleteTopic(topicIndex)}>
-                    {t('pages.teacher.delete')}
+                    {"Delete"}
                   </button>
                 </div>
               </div>
@@ -58,7 +56,7 @@ function TeacherModuleTopicsSection({
           ))}
         </div>
       ) : (
-        <p className="teacher-empty-text">{t('pages.teacher.noTopicsYet')}</p>
+        <p className="teacher-empty-text">{"No topics yet. Click \"Add Topic\" to create one."}</p>
       )}
     </div>
   );

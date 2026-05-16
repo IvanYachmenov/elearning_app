@@ -1,6 +1,7 @@
 from .auth import (
     RegisterView,
     MeView,
+    BecomeTeacherView,
     GoogleOAuthView,
     GitHubOAuthLoginView,
     GitHubOAuthCallbackView,
@@ -29,10 +30,12 @@ from .learning import (
     TopicPracticeHistoryView,
     TopicPracticeResetView,
 )
+from .playground import PlaygroundRunView
 
 __all__ = [
     "RegisterView",
     "MeView",
+    "BecomeTeacherView",
     "GoogleOAuthView",
     "GitHubOAuthLoginView",
     "GitHubOAuthCallbackView",
@@ -54,4 +57,5 @@ __all__ = [
     "TopicQuestionHintView",
     "TopicPracticeHistoryView",
     "TopicPracticeResetView",
+    "PlaygroundRunView",
 ]

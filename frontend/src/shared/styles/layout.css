@@ -52,15 +52,6 @@
     overflow: hidden;
 }
 
-[data-theme="dark"] .app-header {
-    background: transparent;
-}
-
-[data-theme="dark"] .app-header__container {
-    background: var(--bg-primary);
-    border-color: var(--border-color);
-}
-
 .app-header__left {
     display: flex;
     align-items: stretch;
@@ -119,7 +110,6 @@
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.1s ease;
 }
-
 
 .app-nav-link:hover,
 .app-nav-link:focus,
@@ -253,11 +243,6 @@
     color: var(--nav-black);
 }
 
-[data-theme="dark"] .profile-button:hover,
-[data-theme="dark"] .profile-button:hover .profile-name {
-    color: var(--text-primary);
-}
-
 .profile-button:hover .profile-avatar {
     box-shadow: 0 0 0 2px var(--nav-black), 0 4px 12px rgba(124, 58, 237, 0.2);
 }
@@ -274,7 +259,7 @@
     width: 34px;
     height: 34px;
     border-radius: 999px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
     color: #fff;
 
     display: flex;
@@ -315,16 +300,6 @@
     background: rgba(11, 11, 13, 0.03);
 }
 
-[data-theme="dark"] .burger-button {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border-left-color: var(--border-color);
-}
-
-[data-theme="dark"] .burger-button:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
 .burger-icon {
     width: 20px;
     height: 14px;
@@ -342,10 +317,6 @@
     transition: transform 0.1s ease, opacity 0.1s ease;
 }
 
-[data-theme="dark"] .burger-icon span {
-    background: var(--text-primary);
-}
-
 .burger-icon.open span:nth-child(1) {
     transform: translateY(6px) rotate(45deg);
 }
@@ -357,17 +328,19 @@
 }
 
 /* === Fullscreen menu === */
+/* Left slide-in drawer; the rest of the screen stays blurred behind it. */
 .app-menu {
     position: fixed;
     inset: 0;
     z-index: 400;
-    background: rgba(11, 11, 13, 0.55);
-    backdrop-filter: blur(6px);
-    animation: menuBackdropIn 0.08s ease-out both;
+    background: rgba(11, 11, 13, 0.42);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    animation: menuBackdropIn 0.12s ease-out both;
 }
 
 .app-menu.is-closing {
-    animation: menuBackdropOut 0.08s ease-in both;
+    animation: menuBackdropOut 0.12s ease-in both;
 }
 
 @keyframes menuBackdropIn {
@@ -381,37 +354,39 @@
 }
 
 .app-menu__panel {
-    position: absolute;
-    top: 72px;
-    left: 50%;
-    width: min(calc(100% - (var(--app-page-gutter) * 2)), var(--app-content-width));
-    max-width: var(--app-content-width);
-    max-height: calc(100vh - 96px);
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 320px;
+    max-width: 86vw;
+
+    display: flex;
+    flex-direction: column;
 
     background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-    border: 2px solid var(--nav-black);
+    border-left: 2px solid var(--nav-black);
     border-radius: 0;
 
-    box-shadow:
-        0 30px 80px rgba(11, 11, 13, 0.25),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 60px rgba(11, 11, 13, 0.28);
 
     overflow: auto;
-    animation: menuPanelIn 0.08s ease-out both;
+    animation: menuPanelIn 0.16s ease-out both;
 }
 
 .app-menu__panel.is-closing {
-    animation: menuPanelOut 0.08s ease-in both;
+    animation: menuPanelOut 0.16s ease-in both;
 }
 
 @keyframes menuPanelIn {
-    from { transform: translate(-50%, -6px); opacity: 0.95; }
-    to { transform: translate(-50%, 0); opacity: 1; }
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
 }
 
 @keyframes menuPanelOut {
-    from { transform: translate(-50%, 0); opacity: 1; }
-    to { transform: translate(-50%, -6px); opacity: 0.95; }
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
 }
 
 .app-menu__top {
@@ -422,14 +397,6 @@
     padding: 0 18px;
     border-bottom: 2px solid var(--nav-black);
     background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-}
-
-[data-theme="dark"] .app-menu__top {
-    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-}
-
-[data-theme="dark"] .app-menu__title {
-    color: #0f172a;
 }
 
 .app-menu__title {
@@ -456,19 +423,9 @@
     background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
 }
 
-[data-theme="dark"] .app-menu__close {
-    background: var(--bg-primary);
-    border-color: var(--border-color);
-    color: #ffffff;
-}
-
-[data-theme="dark"] .app-menu__close:hover {
-    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-    color: #ffffff;
-}
-
 .app-menu__nav {
-    padding: 14px;
+    flex: 1;
+    padding: 16px 14px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -476,11 +433,12 @@
 
 .app-menu__link {
     width: 100%;
-    padding: 14px 18px;
+    padding: 15px 18px;
     border-radius: 0;
 
     font-weight: 900;
-    letter-spacing: 0.08em;
+    font-size: 15px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 
     color: #0f172a;
@@ -545,11 +503,6 @@
     color: #0f172a;
 }
 
-.app-menu__divider {
-    height: 2px;
-    background: var(--nav-black);
-    margin: 10px 0;
-}
 
 .app-menu__link--danger {
     color: #b91c1c;
@@ -569,27 +522,14 @@
     box-shadow: -2px 0 0 0 #b91c1c;
 }
 
-[data-theme="dark"] .app-menu__link--danger {
-    color: #ffffff;
-    background: transparent;
-    border-color: #ef4444;
-    box-shadow: -2px 0 0 0 #ef4444;
-    transition: background-color 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
-}
-
-[data-theme="dark"] .app-menu__link--danger:hover {
-    color: #ef4444;
-    background: transparent;
-    border-color: #ef4444;
-    box-shadow: -2px 0 0 0 #ef4444;
-}
-
 /* === Main area helpers === */
 .app-main {
     flex: 1;
     width: 100%;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .app-navigation-lock {
@@ -628,12 +568,6 @@
     box-shadow: 0 0 0 2px rgba(11, 11, 13, 0.2);
 }
 
-[data-theme="dark"] .app-navigation-lock {
-    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-    border-color: var(--border-color);
-    color: #0b0b0d;
-}
-
 /* === Mobile: hide top nav links (Courses/Learning go into burger) === */
 @media (max-width: 768px) {
     .app-header__container {
@@ -645,14 +579,27 @@
     .profile-name {
         display: none;
     }
+    .app-logo {
+        padding: 0 14px;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 60vw;
+        display: block;
+        line-height: 52px;
+    }
     .profile-button {
         padding: 0 14px;
     }
+    /* Mobile: drawer takes the whole screen — nothing else visible. */
     .app-menu__panel {
-        top: 66px;
-        width: min(calc(100% - (var(--app-page-gutter) * 2)), var(--app-content-width));
-        max-height: calc(100vh - 86px);
-        border-radius: 0;
+        top: 0;
+        width: 100vw;
+        max-width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        border-left: none;
     }
     .profile-button {
         border-left: 0;

@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import { LoadingIndicator } from '../../../shared/ui';
 import { getTeacherErrorMessage } from '../lib/errors';
 import { normalizeTeacherCourseList } from '../lib/normalize';
 import type { TeacherCourseListItem, TeacherPageProps } from '../model/types';
-import TeacherCourseActionsOverlay, { type TeacherFloatingCardPosition } from './components/TeacherCourseActionsOverlay';
 import TeacherCourseGrid from './components/TeacherCourseGrid';
 import '../styles/teacher.css';
 
@@ -15,13 +13,9 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   const [courses, setCourses] = useState<TeacherCourseListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [cardPosition, setCardPosition] = useState<TeacherFloatingCardPosition | null>(null);
   const [deleteModalCourseId, setDeleteModalCourseId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const cardRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
@@ -30,11 +24,11 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
       const response = await api.get('/api/teacher/courses/');
       setCourses(normalizeTeacherCourseList(response.data));
     } catch (requestError) {
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.loadFailed')));
+      setError(getTeacherErrorMessage(requestError, "Failed to load your courses. Please try again."));
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     if (user.role !== 'teacher') {
@@ -44,49 +38,6 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
 
     void fetchCourses();
   }, [user.role, navigate, fetchCourses]);
-
-  useLayoutEffect(() => {
-    if (!openDropdownId || !cardRef.current) {
-      setCardPosition(null);
-      return;
-    }
-
-    const measure = () => {
-      if (!cardRef.current) {
-        return;
-      }
-
-      const rect = cardRef.current.getBoundingClientRect();
-      setCardPosition({ top: rect.top, left: rect.left, width: rect.width, height: rect.height });
-    };
-
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(cardRef.current);
-    window.addEventListener('scroll', measure, true);
-    window.addEventListener('resize', measure);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', measure, true);
-      window.removeEventListener('resize', measure);
-      setCardPosition(null);
-    };
-  }, [openDropdownId]);
-
-  useEffect(() => {
-    if (!openDropdownId) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [openDropdownId]);
-
-  const openCourse = openDropdownId ? courses.find((course) => course.id === openDropdownId) || null : null;
 
   const handleDeleteConfirm = async () => {
     if (!deleteModalCourseId) {
@@ -99,7 +50,7 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
       setCourses((previous) => previous.filter((course) => course.id !== deleteModalCourseId));
       setDeleteModalCourseId(null);
     } catch (requestError) {
-      setError(getTeacherErrorMessage(requestError, t('pages.teacher.deleteFailed')));
+      setError(getTeacherErrorMessage(requestError, "Failed to delete course. Please try again."));
     } finally {
       setDeleting(false);
     }
@@ -112,58 +63,82 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   if (loading) {
     return (
       <div className="page page-enter">
-        <h1 className="page__title">{t('pages.teacher.title')}</h1>
-        <LoadingIndicator label={t('common.loading')} />
+        <h1 className="page__title">{"My Courses"}</h1>
+        <LoadingIndicator label={"Loading..."} />
       </div>
     );
   }
 
   if (error) {
-    return <div className="page page-enter"><h1 className="page__title">{t('pages.teacher.title')}</h1><p className="teacher-error-inline">{error}</p></div>;
+    return (
+      <div className="page page-enter">
+        <h1 className="page__title">{"My Courses"}</h1>
+        <p className="teacher-error-inline">{error}</p>
+      </div>
+    );
   }
 
   return (
     <div className="page page-enter">
       <div className="teacher-courses-header">
-        <h1 className="page__title">{t('pages.teacher.title')}</h1>
+        <h1 className="page__title">{"My Courses"}</h1>
         <button type="button" className="teacher-create-btn" onClick={() => navigate('/teacher/courses/new')}>
-          + {t('pages.teacher.createCourse')}
+          + {"Create New Course"}
         </button>
       </div>
 
       {courses.length === 0 ? (
         <div className="teacher-empty">
-          <p>{t('pages.teacher.noCourses')}</p>
+          <p>{"You haven't created any courses yet."}</p>
           <button type="button" className="teacher-create-btn" onClick={() => navigate('/teacher/courses/new')}>
-            {t('pages.teacher.createFirst')}
+            {"Create Your First Course"}
           </button>
         </div>
       ) : (
         <TeacherCourseGrid
           courses={courses}
-          openDropdownId={openDropdownId}
-          activeCardRef={cardRef}
-          onOpenCourse={setOpenDropdownId}
+          onEdit={(courseId) => navigate(`/teacher/courses/${courseId}/edit`)}
+          onRequestDelete={(courseId) => setDeleteModalCourseId(courseId)}
         />
       )}
 
-      <TeacherCourseActionsOverlay
-        openCourse={openCourse}
-        cardPosition={cardPosition}
-        deleteModalCourseId={deleteModalCourseId}
-        deleting={deleting}
-        onEditCourse={(courseId) => {
-          setOpenDropdownId(null);
-          navigate(`/teacher/courses/${courseId}/edit`);
-        }}
-        onRequestDelete={(courseId) => {
-          setOpenDropdownId(null);
-          setDeleteModalCourseId(courseId);
-        }}
-        onCloseDropdown={() => setOpenDropdownId(null)}
-        onCloseDeleteModal={() => setDeleteModalCourseId(null)}
-        onDeleteConfirm={handleDeleteConfirm}
-      />
+      {deleteModalCourseId !== null && (
+        <div
+          className="teacher-delete-modal-overlay"
+          onClick={() => !deleting && setDeleteModalCourseId(null)}
+          role="presentation"
+        >
+          <div
+            className="teacher-delete-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="teacher-delete-modal-title"
+          >
+            <h3 id="teacher-delete-modal-title" className="teacher-delete-modal__title">
+              {"Do you really want to delete this course?"}
+            </h3>
+            <div className="teacher-delete-modal__actions">
+              <button
+                type="button"
+                className="teacher-delete-modal__btn teacher-delete-modal__btn--cancel"
+                onClick={() => setDeleteModalCourseId(null)}
+                disabled={deleting}
+              >
+                {"Cancel"}
+              </button>
+              <button
+                type="button"
+                className="teacher-delete-modal__btn teacher-delete-modal__btn--confirm"
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+              >
+                {deleting ? '...' : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

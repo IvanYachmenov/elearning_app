@@ -1,4 +1,3 @@
-import { useLanguage } from '../../../shared/lib/i18n/LanguageContext';
 import type { PracticeCompletionPanelProps } from '../types';
 
 function formatDuration(seconds: number | null | undefined) {
@@ -25,7 +24,6 @@ function PracticeCompletionPanel({
   onViewHistory,
   isReviewMode,
 }: PracticeCompletionPanelProps) {
-  const { t } = useLanguage();
   const accuracy =
     typeof scorePercent === 'number' ? scorePercent : Math.round((correctAnswers * 100) / (totalQuestions || 1));
   const resolvedPassed = !timedOut && (passed || accuracy >= 100);
@@ -42,10 +40,10 @@ function PracticeCompletionPanel({
   ].join(' ');
 
   const statusLabel = timedOut
-    ? t('pages.learning.testFailedTimeUp')
+    ? "Test failed – time is up"
     : resolvedPassed
-      ? t('pages.learning.testPassed')
-      : t('pages.learning.testNotPassed');
+      ? "Test passed"
+      : "Test not passed";
 
   return (
     <div className="topic-practice__completed-block">
@@ -53,34 +51,34 @@ function PracticeCompletionPanel({
 
       <div className={summaryClassName}>
         <div className="practice-summary__item">
-          <div className="practice-summary__label">{t('pages.learning.correct')}</div>
+          <div className="practice-summary__label">{"Correct"}</div>
           <div className="practice-summary__value">{correctAnswers}/{totalQuestions}</div>
         </div>
         <div className="practice-summary__item">
-          <div className="practice-summary__label">{t('pages.learning.accuracy')}</div>
+          <div className="practice-summary__label">{"Accuracy"}</div>
           <div className="practice-summary__value">{accuracy}%</div>
         </div>
         {isTimed && (
           <div className="practice-summary__item">
-            <div className="practice-summary__label">{t('pages.learning.time')}</div>
+            <div className="practice-summary__label">{"Time"}</div>
             <div className="practice-summary__value">{formatDuration(durationSeconds)}</div>
           </div>
         )}
       </div>
 
       {shouldShowPracticeStats && practiceStats && (
-        <div className="practice-community-stats" aria-label={t('pages.learning.communityStats')}>
-          <p className="practice-community-stats__title">{t('pages.learning.communityStats')}</p>
+        <div className="practice-community-stats" aria-label={"Community statistics"}>
+          <p className="practice-community-stats__title">{"Community statistics"}</p>
           <div className="practice-community-stats__item">
-            <span>{t('pages.learning.averageSuccess')}</span>
+            <span>{"Average user success"}</span>
             <strong>{practiceStats.average_success_percent ?? 0}%</strong>
           </div>
           <div className="practice-community-stats__item">
-            <span>{t('pages.learning.completedUsers')}</span>
+            <span>{"Users completed"}</span>
             <strong>{practiceStats.completed_users}</strong>
           </div>
           <div className="practice-community-stats__item">
-            <span>{t('pages.learning.passRate')}</span>
+            <span>{"Pass rate"}</span>
             <strong>{practiceStats.pass_rate_percent ?? 0}%</strong>
           </div>
         </div>
@@ -94,13 +92,13 @@ function PracticeCompletionPanel({
             onClick={onViewHistory}
             disabled={isReviewMode}
           >
-            {isReviewMode ? t('pages.auth.historyOpened') : t('pages.auth.viewTestHistory')}
+            {isReviewMode ? "History opened" : "View test history"}
           </button>
         )}
 
         {shouldShowRetry && (
           <button type="button" className="topic-practice__secondary-btn" onClick={onRetry}>
-            {t('pages.auth.retry')}
+            {"Retry"}
           </button>
         )}
       </div>

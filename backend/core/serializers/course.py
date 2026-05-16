@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.conf import settings
 from django.db.models import Avg, Count
 
 from ..models import Course, CourseReview, Module, Topic
@@ -82,7 +81,6 @@ class CourseRatingMixin:
 class CourseListSerializer(CourseRatingMixin, serializers.ModelSerializer):
     author_name = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
-    image_url = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
 
@@ -95,18 +93,9 @@ class CourseListSerializer(CourseRatingMixin, serializers.ModelSerializer):
             "description",
             "author_name",
             "is_enrolled",
-            "image_url",
             "average_rating",
             "reviews_count",
         )
-
-    def get_image_url(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return f"{settings.MEDIA_URL}{obj.image.url}" if obj.image else None
-        return None
 
     def get_author_name(self, obj):
         author = obj.author
@@ -127,7 +116,6 @@ class CourseDetailSerializer(CourseRatingMixin, serializers.ModelSerializer):
     author_name = serializers.SerializerMethodField()
     modules = ModuleSerializer(many=True, read_only=True)
     is_enrolled = serializers.SerializerMethodField()
-    image_url = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     reviews = CourseReviewSerializer(many=True, read_only=True)
@@ -142,19 +130,10 @@ class CourseDetailSerializer(CourseRatingMixin, serializers.ModelSerializer):
             "author_name",
             "is_enrolled",
             "modules",
-            "image_url",
             "average_rating",
             "reviews_count",
             "reviews",
         )
-
-    def get_image_url(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return f"{settings.MEDIA_URL}{obj.image.url}" if obj.image else None
-        return None
 
     def get_author_name(self, obj):
         author = obj.author
