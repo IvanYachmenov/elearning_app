@@ -182,8 +182,8 @@ class GoogleOAuthView(APIView):
         
         # Try to find by email (for linking accounts)
         if email:
-            try:
-                user = User.objects.get(email=email)
+            user = User.objects.filter(email=email).order_by('id').first()
+            if user is not None:
                 # Link social account if not already linked
                 if not SocialAccount.objects.filter(user=user, provider='google').exists():
                     SocialAccount.objects.create(
@@ -194,8 +194,6 @@ class GoogleOAuthView(APIView):
                     )
                 self._update_user_from_data(user, user_data)
                 return user
-            except User.DoesNotExist:
-                pass
         
         # Create new user
         username_base = email.split('@')[0] if email else slugify(user_data.get('name', 'user'))
@@ -412,8 +410,8 @@ class GitHubOAuthCallbackView(APIView):
 
         # Try to find by email (for linking accounts)
         if email:
-            try:
-                user = User.objects.get(email=email)
+            user = User.objects.filter(email=email).order_by("id").first()
+            if user is not None:
                 if not SocialAccount.objects.filter(user=user, provider="github").exists():
                     SocialAccount.objects.create(
                         user=user,
@@ -423,8 +421,6 @@ class GitHubOAuthCallbackView(APIView):
                     )
                 self._update_user_from_github(user, github_id=github_id, email=email, email_verified=email_verified, name=name)
                 return user
-            except User.DoesNotExist:
-                pass
 
         # Create new user
         username_base = login or (email.split("@")[0] if email else "githubuser")
