@@ -21,6 +21,12 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 0;
+}
+
+.profile-info {
+  min-width: 0;
+  flex: 1;
 }
 
 .profile-header-content {
@@ -54,6 +60,7 @@
   margin: 0;
   font-size: 14px;
   color: var(--text-primary);
+  overflow-wrap: anywhere;
 }
 
 .profile-section-header {

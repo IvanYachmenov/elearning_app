@@ -60,6 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 14px 4px;
   border-bottom: 1px solid rgba(11, 11, 13, 0.15);
@@ -74,6 +75,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settings-account__connection-main {
+  min-width: 0;
 }
 
 .settings-account__provider-icon {
@@ -91,6 +98,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .settings-account__status-icon {
@@ -186,5 +194,30 @@
   .settings-become-teacher__form {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .settings-account__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .settings-account__value {
+    text-align: left;
+  }
+
+  .settings-account__connection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .settings-account__connection-actions {
+    width: 100%;
+  }
+
+  .settings-account__btn {
+    width: 100%;
+    min-width: 0;
   }
 }
