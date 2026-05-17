@@ -489,19 +489,27 @@ web_application_thesis/
 
 ### Environment Variables
 
-**Backend (`backend/.env`):**
-- `DJANGO_SECRET_KEY` - Django secret key (generate with: `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`)
-- `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` - PostgreSQL settings
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
+All variables live in a single `backend/.env` file (git-ignored, created by hand — there is no committed example file).
 
-**Frontend (`frontend/.env`):**
-- `VITE_API_URL` - Backend base URL (default in this project: `http://127.0.0.1:8000`)
-- `VITE_GOOGLE_CLIENT_ID` - Google OAuth Client ID (same as backend)
+| Variable | Purpose | Local value | Production value |
+|---|---|---|---|
+| `BACKEND_URL` | Backend base URL | `http://localhost:8000` | `https://your-domain.com` |
+| `FRONTEND_URL` | Frontend base URL | `http://localhost:5173` | `https://your-domain.com` |
+| `DJANGO_SECRET_KEY` | Django secret (generate: `python -c "import secrets;print(secrets.token_urlsafe(64))"`) | any non-empty value | unique generated value |
+| `DJANGO_DEBUG` | Debug mode | `True` | `False` (prod compose forces it) |
+| `DJANGO_ALLOWED_HOSTS` | Allowed hosts, comma-separated, no scheme | `127.0.0.1,localhost,0.0.0.0,backend` | add `your-domain.com` |
+| `CSRF_TRUSTED_ORIGINS` | Trusted origins for CSRF, **with** scheme | `https://localhost` | `https://your-domain.com` |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | PostgreSQL credentials (`DB_PASSWORD` must be non-empty) | set them | set them |
+| `DB_HOST`, `DB_PORT` | DB host/port (prod compose overrides host to `postgres`) | `localhost` / `5432` | n/a |
+| `CODE_RUNNER_URL` | Code sandbox URL | `http://code-runner:8080` | same |
+| `TEACHER_ACCESS_CODE` | Code to upgrade a student to teacher (empty = disabled) | optional | your code |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth (optional) | blank to disable | real credentials |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth (optional) | blank to disable | real credentials |
+| `SITE_ADDRESS` | Caddy site address (prod stack) | `localhost` | `your-domain.com` |
+| `VITE_API_URL` | API URL baked into the frontend at build time | `https://localhost` | `https://your-domain.com` |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth client id for the frontend | blank to disable | same as `GOOGLE_CLIENT_ID` |
 
-**Frontend template (`frontend/.env.example`):**
-- Contains non-secret placeholder values for quick onboarding
-
-**Important:** Never commit `.env` files to Git. They are already in `.gitignore`.
+**Important:** Never commit `.env` to Git. It is already in `.gitignore`.
 
 ## Development Notes
 

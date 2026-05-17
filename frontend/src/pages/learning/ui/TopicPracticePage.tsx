@@ -797,6 +797,16 @@ function TopicPracticePage() {
   const showTimedNextButton = isTimedMode && timedAnswerSaved && !showFinishButton;
   const canPostHint = Boolean(practiceQuestion && answerFeedback && answerFeedback.score === 100);
 
+  const completedScorePercent =
+    typeof scorePercent === 'number'
+      ? scorePercent
+      : Math.round((correctAnswers * 100) / (totalQuestions || 1));
+  const barPercent = practiceCompleted
+    ? passed
+      ? 100
+      : Math.min(100, Math.max(0, completedScorePercent))
+    : topicProgressPercent;
+
   if (loadingTopic && !topic) {
     return (
       <div className="page page-enter">
@@ -857,7 +867,7 @@ function TopicPracticePage() {
         <header className="topic-practice__header">
           <div className="topic-practice__progress">
             <div className="learning-progress-bar">
-              <div className="learning-progress-bar__fill" style={{ width: `${topicProgressPercent}%` }} />
+              <div className="learning-progress-bar__fill" style={{ width: `${barPercent}%` }} />
             </div>
           </div>
 

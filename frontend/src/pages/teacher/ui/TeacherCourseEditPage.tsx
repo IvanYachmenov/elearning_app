@@ -127,7 +127,7 @@ function TeacherCourseEditPage({ user }: TeacherPageProps) {
 
   if (loading) {
     return (
-      <div className="page page-enter">
+      <div className="page page-enter teacher-page">
         <h1 className="page__title">{isEditMode ? "Edit Course" : "Create Course"}</h1>
         <LoadingIndicator label={"Loading..."} />
       </div>

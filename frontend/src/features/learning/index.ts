@@ -1,3 +1,4 @@
+export { default as CourseCompletionReviewModal } from './ui/CourseCompletionReviewModal';
 export { default as PracticeCompletionPanel } from './ui/PracticeCompletionPanel';
 export { default as PracticeHistorySection } from './ui/PracticeHistorySection';
 export { default as PracticeQuestionCard } from './ui/PracticeQuestionCard';

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 
+import { HelpTooltip } from '../../../../shared/ui';
 import type { TeacherTimeParts, TeacherTopicFormData } from '../../model/types';
 
 interface TeacherTopicDetailsSectionProps {
@@ -64,7 +65,16 @@ function TeacherTopicDetailsSection({
       </div>
 
       <div className="teacher-form-group">
-        <label className="teacher-form-label">{"Theory Text"}</label>
+        <label className="teacher-form-label">
+          {"Theory Text"}
+          <HelpTooltip
+            text={
+              'To show code on the theory page, wrap it in triple backticks with the language name. Text outside the backticks is shown as normal theory text.\n\n' +
+              'Python:\n```python\nprint("Hello")\n```\n\n' +
+              'JavaScript:\n```javascript\nconsole.log("Hello");\n```'
+            }
+          />
+        </label>
         <textarea
           ref={theoryTextareaRef}
           className="teacher-form-textarea teacher-form-textarea--autogrow teacher-form-textarea--theory"

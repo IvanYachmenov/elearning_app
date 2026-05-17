@@ -1,0 +1,103 @@
+name: elearning_prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: elearning_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-elearning}
+      POSTGRES_USER: ${DB_USER:-elearn_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-strong_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  code-runner:
+    build:
+      context: ./code_runner
+    container_name: elearning_code_runner
+    restart: unless-stopped
+    expose:
+      - "8080"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 64
+    mem_limit: 256m
+
+  backend:
+    build:
+      context: ./backend
+    container_name: elearning_backend
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      DJANGO_DEBUG: "False"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      CODE_RUNNER_URL: http://code-runner:8080
+    expose:
+      - "8000"
+    volumes:
+      - backend_media:/app/media
+      - backend_static:/app/staticfiles
+    depends_on:
+      postgres:
+        condition: service_healthy
+      code-runner:
+        condition: service_started
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn elearn_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+
+  frontend-build:
+    build:
+      context: ./frontend
+      target: prod-build
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://localhost}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    container_name: elearning_frontend_build
+    restart: "no"
+    command: sh -c "rm -rf /out/* && cp -r /app/dist/. /out/"
+    volumes:
+      - frontend_dist:/out
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: elearning_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - frontend_dist:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_started
+      frontend-build:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
+  backend_media:
+  backend_static:
+  frontend_dist:
+  caddy_data:
+  caddy_config:

@@ -20,7 +20,7 @@ function TeacherEditorPage({
   children,
 }: TeacherEditorPageProps) {
   return (
-    <div className="page page-enter">
+    <div className="page page-enter teacher-page">
       <div className="teacher-course-edit-top">
         <h1 className="teacher-course-edit-title">{title}</h1>
         {onBack ? (

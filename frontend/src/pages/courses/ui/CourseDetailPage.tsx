@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
@@ -52,11 +52,6 @@ function CourseDetailPage() {
   const [enrolling, setEnrolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enrolled, setEnrolled] = useState(false);
-  const [reviewRating, setReviewRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState('');
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewError, setReviewError] = useState<string | null>(null);
-  const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -79,9 +74,6 @@ function CourseDetailPage() {
 
         setCourse(response.data);
         setEnrolled(Boolean(response.data.is_enrolled));
-        const ownReview = response.data.reviews?.find((review) => review.is_current_user);
-        setReviewRating(ownReview?.rating || 0);
-        setReviewComment(ownReview?.comment || '');
       } catch (requestError) {
         console.error(requestError);
         if (isActive) {
@@ -144,40 +136,6 @@ function CourseDetailPage() {
     }
   };
 
-  const handleReviewSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!id) {
-      setReviewError("Failed to save review. Please try again.");
-      return;
-    }
-
-    if (reviewRating < 1 || reviewRating > MAX_RATING) {
-      setReviewError("Choose a rating from 1 to 5 stars.");
-      return;
-    }
-
-    setReviewError(null);
-    setReviewSuccess(null);
-    setReviewSubmitting(true);
-
-    try {
-      const response = await api.post<CourseDetailPageData>(`/api/courses/${id}/reviews/`, {
-        rating: reviewRating,
-        comment: reviewComment.trim(),
-      });
-      setCourse(response.data);
-      const ownReview = response.data.reviews.find((review) => review.is_current_user);
-      setReviewRating(ownReview?.rating || reviewRating);
-      setReviewComment(ownReview?.comment || reviewComment.trim());
-      setReviewSuccess("Review saved.");
-    } catch (requestError) {
-      console.error(requestError);
-      setReviewError("Failed to save review. Please try again.");
-    } finally {
-      setReviewSubmitting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -227,7 +185,7 @@ function CourseDetailPage() {
             <div className="course-detail-actions">
               {enrolled ? (
                 <Link to="/learning" className="btn-primary">
-                  {"Go to learning →"}
+                  {"Go to learning"}
                 </Link>
               ) : (
                 <button type="button" className="btn-primary" onClick={handleEnroll} disabled={enrolling}>
@@ -274,49 +232,6 @@ function CourseDetailPage() {
         <div className="course-reviews__header">
           <h2 className="section-title">{"Course reviews"}</h2>
         </div>
-
-        <form className="course-review-form" onSubmit={handleReviewSubmit}>
-          <label className="course-review-form__label">{"Your rating"}</label>
-          <div className="course-review-stars" role="radiogroup" aria-label={"Your rating"}>
-            {Array.from({ length: MAX_RATING }, (_, index) => {
-              const value = index + 1;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  className={`course-review-stars__button ${value <= reviewRating ? 'is-active' : ''}`}
-                  onClick={() => setReviewRating(value)}
-                  role="radio"
-                  aria-checked={value === reviewRating}
-                  aria-label={`${value} ${"stars"}`}
-                >
-                  {FILLED_STAR}
-                </button>
-              );
-            })}
-          </div>
-
-          <label className="course-review-form__label" htmlFor="course-review-comment">
-            {"Your comment"}
-          </label>
-          <textarea
-            id="course-review-comment"
-            className="course-review-form__textarea"
-            value={reviewComment}
-            onChange={(event) => setReviewComment(event.target.value)}
-            placeholder={"Share what helped, what was difficult, or who this course is best for."}
-            rows={4}
-            maxLength={1000}
-          />
-
-          <div className="course-review-form__footer">
-            <button type="submit" className="btn-primary" disabled={reviewSubmitting}>
-              {reviewSubmitting ? "Posting..." : "Post review"}
-            </button>
-            {reviewError && <span className="course-review-form__message course-review-form__message--error">{reviewError}</span>}
-            {reviewSuccess && <span className="course-review-form__message course-review-form__message--success">{reviewSuccess}</span>}
-          </div>
-        </form>
 
         <div className="course-review-thread" aria-live="polite">
           {course.reviews.length === 0 ? (

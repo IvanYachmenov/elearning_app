@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { isAxiosError } from 'axios';
 
 import { api } from '../../../shared/api';
@@ -18,17 +18,20 @@ const STARTER: Record<Language, string> = {
 
 function PlaygroundPage() {
   const [language, setLanguage] = useState<Language>('python');
-  const [code, setCode] = useState<string>(STARTER.python);
+  const [codeByLanguage, setCodeByLanguage] = useState<Record<Language, string>>({
+    python: STARTER.python,
+    javascript: STARTER.javascript,
+  });
   const [result, setResult] = useState<RunResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
-  const touchedRef = useRef(false);
+
+  const code = codeByLanguage[language];
 
   const handleLanguageChange = (next: Language) => {
     setLanguage(next);
-    if (!touchedRef.current) {
-      setCode(STARTER[next]);
-    }
+    setResult(null);
+    setError(null);
   };
 
   const handleRun = async () => {
@@ -90,8 +93,8 @@ function PlaygroundPage() {
           spellCheck={false}
           value={code}
           onChange={(event) => {
-            touchedRef.current = true;
-            setCode(event.target.value);
+            const value = event.target.value;
+            setCodeByLanguage((prev) => ({ ...prev, [language]: value }));
           }}
           placeholder="Write your code here…"
         />
@@ -109,10 +112,7 @@ function PlaygroundPage() {
             </div>
             <pre className="playground__stream">{result.stdout || '(no output)'}</pre>
             {result.stderr && (
-              <>
-                <div className="playground__output-head playground__output-head--err">Errors</div>
-                <pre className="playground__stream playground__stream--err">{result.stderr}</pre>
-              </>
+              <div className="playground__output-head playground__output-head--err">Error</div>
             )}
           </div>
         )}

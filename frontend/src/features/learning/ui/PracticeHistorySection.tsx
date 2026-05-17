@@ -1,3 +1,4 @@
+import { renderHighlightedCode } from '../../../shared/lib/highlightCode';
 import { LoadingIndicator } from '../../../shared/ui';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeHistorySectionProps } from '../types';
@@ -36,22 +37,28 @@ function PracticeHistorySection({ historyQuestions, loading, error }: PracticeHi
 
               {(question.question_type === 'code' || question.question_type === 'javascript_code') ? (
                 <div className="topic-practice__code-output topic-practice__code-output--history">
-                  <div className="topic-practice__code-output-row">
-                    <span className="topic-practice__code-output-label">{"Python code"}</span>
-                    <pre className="topic-practice__code-output-box">{question.submitted_code || ''}</pre>
-                  </div>
+                  <figure className="topic-theory__code-block">
+                    <figcaption>
+                      <span className="topic-theory__code-window-dots" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                      <span>{question.question_type === 'javascript_code' ? 'javascript' : 'python'}</span>
+                    </figcaption>
+                    <pre>
+                      <code>{renderHighlightedCode(question.submitted_code || '')}</code>
+                    </pre>
+                  </figure>
                   <div className="topic-practice__code-output-row">
                     <span className="topic-practice__code-output-label">{"Output"}</span>
-                    <pre className="topic-practice__code-output-box">
+                    <pre className="topic-practice__code-output-box topic-practice__code-output-box--muted">
                       {question.stdout || "No output"}
                     </pre>
                   </div>
                   {question.stderr && (
                     <div className="topic-practice__code-output-row">
-                      <span className="topic-practice__code-output-label">{"Errors"}</span>
-                      <pre className="topic-practice__code-output-box topic-practice__code-output-box--error">
-                        {question.stderr}
-                      </pre>
+                      <span className="topic-practice__code-output-label">{"Error"}</span>
                     </div>
                   )}
                 </div>

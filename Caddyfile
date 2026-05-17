@@ -1,0 +1,14 @@
+{$SITE_ADDRESS:localhost} {
+	encode gzip
+
+	@backend path /api/* /accounts/* /admin/* /static/*
+	handle @backend {
+		reverse_proxy backend:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

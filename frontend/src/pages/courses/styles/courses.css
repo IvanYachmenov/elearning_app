@@ -290,6 +290,20 @@
   font-size: 14px;
 }
 
+.course-card__completed-badge {
+  align-self: flex-start;
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 4px 12px;
+  border: 2px solid var(--accent-green);
+  background: #e9f9f0;
+  color: #047857;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .course-card__description {
   font-size: 15px;
   color: #475569;

@@ -48,6 +48,9 @@ export interface CourseListItem {
 export interface CourseReview {
   id: number;
   rating: number;
+  app_rating: number | null;
+  design_rating: number | null;
+  delivery_rating: number | null;
   comment: string;
   user_name: string;
   is_current_user: boolean;

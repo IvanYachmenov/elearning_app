@@ -57,6 +57,9 @@ class CourseReviewView(APIView):
             user=request.user,
             defaults={
                 "rating": serializer.validated_data["rating"],
+                "app_rating": serializer.validated_data.get("app_rating"),
+                "design_rating": serializer.validated_data.get("design_rating"),
+                "delivery_rating": serializer.validated_data.get("delivery_rating"),
                 "comment": serializer.validated_data.get("comment", ""),
             },
         )

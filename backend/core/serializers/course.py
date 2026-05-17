@@ -39,6 +39,9 @@ class CourseReviewSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "rating",
+            "app_rating",
+            "design_rating",
+            "delivery_rating",
             "comment",
             "user_name",
             "is_current_user",
@@ -61,7 +64,18 @@ class CourseReviewSerializer(serializers.ModelSerializer):
 class CourseReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseReview
-        fields = ("rating", "comment")
+        fields = (
+            "rating",
+            "app_rating",
+            "design_rating",
+            "delivery_rating",
+            "comment",
+        )
+
+    def validate_comment(self, value):
+        if value and not value.isascii():
+            raise serializers.ValidationError("Comments must be written in English.")
+        return value
 
 
 class CourseRatingMixin:

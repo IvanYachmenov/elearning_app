@@ -42,7 +42,7 @@ function PracticeQuestionCard({
   const hasMoreHints = hints.length > 1 && activeHintIndex < hints.length - 1;
   const isLastHint = hints.length > 1 && activeHintIndex === hints.length - 1;
   const isCode = isCodeQuestion(question.question_type);
-  const codeLabel = question.question_type === 'javascript_code' ? 'JavaScript code' : 'Python code';
+  const codeLang = question.question_type === 'javascript_code' ? 'javascript' : 'python';
 
   const renderFeedback = () => {
     if (!answerFeedback) {
@@ -84,9 +84,6 @@ function PracticeQuestionCard({
 
       {isCode ? (
         <div className="topic-practice__code-area">
-          <label className="topic-practice__code-label" htmlFor={`code-question-${question.id}`}>
-            {codeLabel}
-          </label>
           <div className="topic-practice__code-editor-window">
             <div className="topic-practice__code-editor-titlebar">
               <span className="topic-theory__code-window-dots" aria-hidden="true">
@@ -94,7 +91,7 @@ function PracticeQuestionCard({
                 <span />
                 <span />
               </span>
-              <span>python</span>
+              <span>{codeLang}</span>
             </div>
             <textarea
               id={`code-question-${question.id}`}
@@ -117,10 +114,7 @@ function PracticeQuestionCard({
               </div>
               {(codeRunResult.stderr || codeRunResult.timed_out || codeRunResult.exit_code !== 0) && (
                 <div className="topic-practice__code-output-row">
-                  <span className="topic-practice__code-output-label">{"Errors"}</span>
-                  <pre className="topic-practice__code-output-box topic-practice__code-output-box--error">
-                    {codeRunResult.timed_out ? 'Execution timed out.' : codeRunResult.stderr || `Exit code ${codeRunResult.exit_code}`}
-                  </pre>
+                  <span className="topic-practice__code-output-label">{"Error"}</span>
                 </div>
               )}
             </div>

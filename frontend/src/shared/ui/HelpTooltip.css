@@ -1,0 +1,48 @@
+.help-tip {
+  position: relative;
+  display: inline-flex;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.help-tip__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.help-tip__button:hover,
+.help-tip__button:focus-visible {
+  border-color: #94a3b8;
+  color: #334155;
+  outline: none;
+}
+
+.help-tip__bubble {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: max-content;
+  max-width: 340px;
+  padding: 10px 12px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: pre-line;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.28);
+}

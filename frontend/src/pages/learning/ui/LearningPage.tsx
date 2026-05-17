@@ -73,6 +73,9 @@ function LearningPage() {
             <article key={course.id} className="course-card">
               <div className="course-card__content">
                 <h3 className="course-card__title">{course.title}</h3>
+                {course.progress_percent >= 100 && (
+                  <span className="course-card__completed-badge">{"Completed"}</span>
+                )}
                 {course.description && (
                   <p className="course-card__description">
                     {course.description.length > 160

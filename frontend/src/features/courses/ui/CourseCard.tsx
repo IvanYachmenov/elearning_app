@@ -69,7 +69,7 @@ function CourseCard({ course }: CourseCardProps) {
 
         <div className="course-card__footer">
           <Link to={`/courses/${course.id}`} className="btn-primary">
-            {"View details →"}
+            {"View details"}
           </Link>
         </div>
       </div>

@@ -36,10 +36,12 @@
 /* Make the language dropdown the same height as the Run button */
 .playground__controls .app-select {
   display: flex;
+  width: 150px;
 }
 
 .playground__controls .app-select__control {
   height: 100%;
+  width: 100%;
   padding: 10px 16px;
   font-size: 14px;
 }
@@ -117,6 +119,7 @@
 
 .playground__output-head--err {
   border-top: 2px solid var(--nav-black);
+  border-bottom: 0;
   background: #fdecec;
   color: #b91c1c;
 }

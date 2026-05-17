@@ -4,15 +4,16 @@
   margin: 0 auto;
 }
 
-.profile-header,
-.profile-section {
+.profile-header {
   background: #fff;
   border: 2px solid var(--nav-black);
   padding: 24px;
+  margin-bottom: 16px;
 }
 
-.profile-header {
-  margin-bottom: 24px;
+.profile-section {
+  background: #fff;
+  padding: 4px 0 0;
 }
 
 .profile-header-content,
@@ -59,8 +60,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 2px solid var(--nav-black);
 }
 
@@ -136,7 +137,7 @@
 .profile-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 
 .profile-field {

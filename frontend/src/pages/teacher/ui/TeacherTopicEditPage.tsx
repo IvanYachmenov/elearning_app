@@ -108,9 +108,12 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
       if (isEditMode && topicId) {
         await api.put(`/api/teacher/topics/${topicId}/`, payload);
       } else {
-        await api.post('/api/teacher/topics/', payload);
+        const response = await api.post('/api/teacher/topics/', payload);
+        const newTopicId = response.data?.id;
+        if (newTopicId) {
+          navigate(`/teacher/courses/${courseId}/modules/${moduleId}/topics/${newTopicId}/edit`);
+        }
       }
-      navigate(`/teacher/courses/${courseId}/edit`);
     } catch (requestError) {
       console.error('Save error:', requestError);
       setError(getTeacherErrorMessage(requestError, "Failed to save topic."));
@@ -125,7 +128,7 @@ function TeacherTopicEditPage({ user }: TeacherPageProps) {
 
   if (loading) {
     return (
-      <div className="page page-enter">
+      <div className="page page-enter teacher-page">
         <h1 className="page__title">{isEditMode ? "Edit Topic" : "Create Topic"}</h1>
         <LoadingIndicator label={"Loading..."} />
       </div>

@@ -77,7 +77,8 @@
   background: rgba(249, 115, 22, 0.14);
 }
 
-.app-select__option--active {
+.app-select__option--active,
+.app-select__option--active:hover {
   background: var(--nav-orange);
   color: #0f172a;
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '../../../shared/api';
+import { CourseCompletionReviewModal } from '../../../features/learning';
 import type { LearningCourse } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
 import type { ExpandedModulesState, LearningRouteParams } from '../model/types';
@@ -15,6 +16,7 @@ function CourseLearningPage() {
   const [expandedModules, setExpandedModules] = useState<ExpandedModulesState>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [justReviewed, setJustReviewed] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -105,6 +107,8 @@ function CourseLearningPage() {
   }
 
   const progressPercent = course.progress_percent ?? 0;
+  const alreadyReviewed = course.reviews?.some((review) => review.is_current_user) ?? false;
+  const mustReview = progressPercent >= 100 && !alreadyReviewed && !justReviewed;
   const fullDescription = course.description || '';
   const maxDescLength = 260;
   const isLongDescription = fullDescription.length > maxDescLength;
@@ -226,6 +230,13 @@ function CourseLearningPage() {
           <p>{"No modules yet."}</p>
         )}
       </section>
+
+      {mustReview && (
+        <CourseCompletionReviewModal
+          courseId={course.id}
+          onReviewed={() => setJustReviewed(true)}
+        />
+      )}
     </div>
   );
 }
