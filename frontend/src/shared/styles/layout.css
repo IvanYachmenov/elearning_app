@@ -248,11 +248,11 @@
 }
 
 .profile-button--active {
-    background: rgba(11, 11, 13, 0.03);
+    background: #fff;
 }
 
 .profile-button--active::before {
-    opacity: 0.06;
+    opacity: 0;
 }
 
 .profile-avatar {
@@ -409,13 +409,16 @@
 
 .app-menu__close {
     height: 40px;
-    width: 40px;
+    padding: 0 16px;
     border-radius: 0;
     border: 2px solid var(--nav-black);
     background: #fff;
     color: var(--nav-black);
     cursor: pointer;
     font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 13px;
     transition: background-color 0.05s ease;
 }
 

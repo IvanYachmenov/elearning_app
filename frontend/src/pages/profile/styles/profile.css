@@ -209,3 +209,33 @@
     margin-right: 0;
   }
 }
+
+@media (max-width: 600px) {
+  .profile-header {
+    padding: 16px;
+  }
+
+  .profile-avatar-large {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+  }
+
+  .profile-header-main {
+    gap: 14px;
+  }
+
+  .profile-info h2 {
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-info p {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

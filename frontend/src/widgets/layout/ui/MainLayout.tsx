@@ -194,7 +194,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
             <div className="app-menu__top">
               <div className="app-menu__title">{"Menu"}</div>
               <button type="button" className="app-menu__close" onClick={closeMenu} aria-label="Close menu">
-                x
+                {"Close"}
               </button>
             </div>
 

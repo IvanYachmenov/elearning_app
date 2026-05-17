@@ -1,9 +1,8 @@
 /* Settings — flat, app style: white surfaces, 2px black borders, no gradients. */
 .settings-section {
   background: #fff;
-  padding: 22px;
-  margin-bottom: 24px;
-  border: 2px solid var(--nav-black);
+  padding: 0;
+  margin-bottom: 28px;
 }
 
 .settings-section__title {
@@ -11,28 +10,29 @@
   font-weight: 900;
   letter-spacing: -0.02em;
   color: #0f172a;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--nav-black);
 }
 
 .settings-account__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 28px;
 }
 
 .settings-account__card {
-  border: 2px solid var(--nav-black);
   background: #fff;
-  padding: 16px;
+  padding: 0;
 }
 
 .settings-account__card-title {
   font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.02em;
-  margin: 0 0 12px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--nav-black);
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--nav-black);
 }
 
 .settings-account__row {

@@ -714,14 +714,14 @@
 .teacher-questions-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 
 .teacher-question-item {
-  padding: 12px;
-  border: none;
+  padding: 16px;
+  border: 2px solid var(--nav-black);
   background: #ffffff;
-  margin-left: 20px; /* deeper indentation (inside topic) */
+  margin-left: 20px;
 }
 
 .teacher-question-header {
