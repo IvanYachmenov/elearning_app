@@ -59,6 +59,8 @@ CODE_RUNNER_URL = os.getenv("CODE_RUNNER_URL", "http://code-runner:8080")
 # (entered on the Settings page). Empty by default = teacher upgrade disabled.
 TEACHER_ACCESS_CODE = os.getenv("TEACHER_ACCESS_CODE", "")
 
+TOPIC_PASS_THRESHOLD = int(os.getenv("TOPIC_PASS_THRESHOLD", "70"))
+
 default_cors_allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",

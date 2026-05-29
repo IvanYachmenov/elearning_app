@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -122,9 +123,8 @@ class TopicNextQuestionView(APIView):
             score_percent = calculate_score_percent(correct_count, total_questions)
             passed = (
                     completed
-                    and not timed_out
                     and total_questions > 0
-                    and correct_count == total_questions
+                    and score_percent >= settings.TOPIC_PASS_THRESHOLD
             )
 
             if timed_out and not progress.timed_out:
@@ -539,9 +539,8 @@ class TopicQuestionAnswerView(APIView):
             )
             passed = (
                     completed
-                    and not timed_out
                     and all_q_count > 0
-                    and correct_answers_qs.count() == all_q_count
+                    and score_percent >= settings.TOPIC_PASS_THRESHOLD
             )
 
             if timed_out and not progress.timed_out:
@@ -785,8 +784,7 @@ class TopicPracticeFinishView(APIView):
         timed_out = bool(limit_seconds) and elapsed_seconds >= limit_seconds
         passed = (
             total_questions > 0
-            and correct_count == total_questions
-            and not timed_out
+            and score_percent >= settings.TOPIC_PASS_THRESHOLD
         )
         status_value = (
             TopicProgress.Status.COMPLETED if passed
