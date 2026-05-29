@@ -37,6 +37,7 @@ export interface PracticeApiPayload {
   last_answer?: PracticeLastAnswer | null;
   score?: number;
   is_correct?: boolean;
+  viewer_has_reviewed_course?: boolean;
 }
 
 export type LearningCoursesResponse = ApiListResponse<LearningCourse> | LearningCourse[];

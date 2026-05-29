@@ -592,6 +592,37 @@
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.16);
 }
 
+.topic-practice__timer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topic-practice__finish-btn {
+  padding: 10px 18px;
+  border: 2px solid var(--nav-black);
+  background: #fff;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.topic-practice__finish-btn:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.topic-practice__finish-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .practice-timer {
   min-width: 120px;
   padding: 12px 20px;
@@ -1511,8 +1542,13 @@
   font-weight: 700;
 }
 
+.course-review-modal__actions {
+  display: flex;
+  gap: 10px;
+}
+
 .course-review-modal__submit {
-  width: 100%;
+  flex: 1;
   padding: 12px 20px;
   border: 2px solid var(--nav-black);
   background: var(--nav-orange);
@@ -1526,6 +1562,28 @@
 }
 
 .course-review-modal__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.course-review-modal__skip {
+  padding: 12px 20px;
+  border: 2px solid var(--nav-black);
+  background: #fff;
+  color: var(--nav-black);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.course-review-modal__skip:hover:not(:disabled) {
+  background: rgba(11, 11, 13, 0.05);
+}
+
+.course-review-modal__skip:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

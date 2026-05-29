@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ...models import (
+    CourseReview,
     Topic,
     TopicProgress,
     TopicQuestion,
@@ -11,6 +14,10 @@ from ...models import (
     TopicQuestionAnswer,
     TopicQuestionHint,
 )
+
+
+def viewer_has_reviewed_course(user, course) -> bool:
+    return CourseReview.objects.filter(user=user, course=course).exists()
 from ...learning_stats import get_topic_practice_stats, get_topic_progress_duration_seconds
 from ...serializers import (
     TopicQuestionHintSerializer,
@@ -132,7 +139,11 @@ class TopicNextQuestionView(APIView):
                 progress.status = status_value
                 progress.score = score_percent
                 if not progress.completed_at:
-                    progress.completed_at = now
+                    if timed_out and progress.started_at and limit_seconds:
+                        expiry_at = progress.started_at + timedelta(seconds=limit_seconds)
+                        progress.completed_at = min(now, expiry_at) if now < expiry_at else expiry_at
+                    else:
+                        progress.completed_at = now
                 progress.is_timed = True
                 progress.time_limit_seconds = limit_seconds
                 progress.save(
@@ -166,6 +177,7 @@ class TopicNextQuestionView(APIView):
                     "duration_seconds": get_topic_progress_duration_seconds(progress),
                     "question": None,
                     "last_answer": None,
+                    "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
                 })
 
             next_question = None
@@ -249,6 +261,7 @@ class TopicNextQuestionView(APIView):
                 "duration_seconds": None,
                 "question": None,
                 "last_answer": None,
+                "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
             })
 
         serializer = TopicPracticeQuestionSerializer(next_question)
@@ -429,7 +442,12 @@ class TopicQuestionAnswerView(APIView):
                         progress.status = TopicProgress.Status.FAILED
                         progress.timed_out = True
                         progress.score = score_percent
-                        progress.completed_at = progress.completed_at or now
+                        if not progress.completed_at:
+                            if progress.started_at and limit_seconds:
+                                expiry_at = progress.started_at + timedelta(seconds=limit_seconds)
+                                progress.completed_at = min(now, expiry_at) if now < expiry_at else expiry_at
+                            else:
+                                progress.completed_at = now
                         progress.save(
                             update_fields=[
                                 "status",
@@ -458,6 +476,7 @@ class TopicQuestionAnswerView(APIView):
                                 "time_limit_seconds": limit_seconds,
                                 "duration_seconds": get_topic_progress_duration_seconds(progress),
                                 "is_timed": True,
+                                "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
                             },
                             status=status.HTTP_200_OK,
                         )
@@ -603,6 +622,7 @@ class TopicQuestionAnswerView(APIView):
                 "time_limit_seconds": None,
                 "remaining_seconds": None,
                 "duration_seconds": None,
+                "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
             }
         )
 
@@ -717,3 +737,105 @@ class TopicQuestionHintView(APIView):
             ).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class TopicPracticeFinishView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, pk):
+        try:
+            topic = Topic.objects.select_related("module__course").get(pk=pk)
+        except Topic.DoesNotExist:
+            return Response(
+                {"detail": "Topic not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        course = topic.module.course
+        if not course.students.filter(pk=request.user.pk).exists():
+            return Response(
+                {"detail": "You are not enrolled in this course."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        time_limit_seconds = get_topic_time_limit_seconds(topic)
+        is_timed = bool(time_limit_seconds)
+        progress = ensure_topic_progress(request.user, topic, is_timed, time_limit_seconds)
+
+        if progress.status in (TopicProgress.Status.COMPLETED, TopicProgress.Status.FAILED):
+            return Response(
+                {"detail": "Test already finished."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        now = timezone.now()
+        total_questions = TopicQuestion.objects.filter(topic=topic).count()
+        answers_qs = TopicQuestionAnswer.objects.filter(
+            user=request.user, question__topic=topic,
+        )
+        answered_count = answers_qs.count()
+        correct_count = answers_qs.filter(is_correct=True).count()
+        score_percent = calculate_score_percent(correct_count, total_questions)
+
+        limit_seconds = progress.time_limit_seconds or time_limit_seconds or 0
+        elapsed_seconds = (
+            int((now - progress.started_at).total_seconds())
+            if progress.started_at else 0
+        )
+        timed_out = bool(limit_seconds) and elapsed_seconds >= limit_seconds
+        passed = (
+            total_questions > 0
+            and correct_count == total_questions
+            and not timed_out
+        )
+        status_value = (
+            TopicProgress.Status.COMPLETED if passed
+            else TopicProgress.Status.FAILED
+        )
+
+        if not progress.completed_at:
+            if is_timed and progress.started_at and limit_seconds:
+                expiry_at = progress.started_at + timedelta(seconds=limit_seconds)
+                progress.completed_at = min(now, expiry_at) if now < expiry_at else expiry_at
+            else:
+                progress.completed_at = now
+
+        progress.status = status_value
+        progress.score = score_percent
+        progress.timed_out = progress.timed_out or timed_out
+        if is_timed:
+            progress.is_timed = True
+            progress.time_limit_seconds = limit_seconds
+        progress.save(
+            update_fields=[
+                "status",
+                "score",
+                "completed_at",
+                "timed_out",
+                "is_timed",
+                "time_limit_seconds",
+            ],
+        )
+
+        remaining_seconds = max(limit_seconds - elapsed_seconds, 0) if is_timed else None
+
+        return Response({
+            "completed": True,
+            "is_timed": is_timed,
+            "timed_out": progress.timed_out,
+            "passed": passed,
+            "topic_id": topic.id,
+            "topic_title": topic.title,
+            "total_questions": total_questions,
+            "answered_questions": answered_count,
+            "correct_answers": correct_count,
+            "progress_percent": calculate_score_percent(answered_count, total_questions),
+            "score_percent": score_percent,
+            "practice_stats": get_topic_practice_stats(topic),
+            "remaining_seconds": remaining_seconds,
+            "time_limit_seconds": limit_seconds if is_timed else None,
+            "duration_seconds": get_topic_progress_duration_seconds(progress),
+            "question": None,
+            "last_answer": None,
+            "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
+        })

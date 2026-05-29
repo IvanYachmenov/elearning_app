@@ -55,6 +55,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         max_length=NAME_MAX_LENGTH, required=False, allow_blank=True
     )
 
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                "A user with this username already exists."
+            )
+        return value
+
     class Meta:
         model = User
         fields = (

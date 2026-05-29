@@ -14,7 +14,7 @@ interface MainLayoutProps {
 }
 
 function MainLayout({ user, onLogout }: MainLayoutProps) {
-  const { isLocked, lockReason } = useNavigationLock();
+  const { isLocked, lockReason, lockAction } = useNavigationLock();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMenuClosing, setIsMenuClosing] = useState(false);
 
@@ -269,7 +269,17 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
         {isLocked && (
           <div className="app-navigation-lock">
             <span className="app-navigation-lock__dot" />
-            <span>{lockReason || 'Navigation is temporarily locked.'}</span>
+            <span className="app-navigation-lock__text">{lockReason || 'Navigation is temporarily locked.'}</span>
+            {lockAction && (
+              <button
+                type="button"
+                className="app-navigation-lock__action"
+                onClick={lockAction.onAction}
+                disabled={lockAction.disabled}
+              >
+                {lockAction.label}
+              </button>
+            )}
           </div>
         )}
         <Outlet />

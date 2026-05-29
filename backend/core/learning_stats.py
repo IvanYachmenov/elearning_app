@@ -24,4 +24,7 @@ def get_topic_practice_stats(topic: Topic) -> dict:
 def get_topic_progress_duration_seconds(progress: TopicProgress) -> int | None:
     if not progress.started_at or not progress.completed_at:
         return None
-    return max(0, int((progress.completed_at - progress.started_at).total_seconds()))
+    raw = max(0, int((progress.completed_at - progress.started_at).total_seconds()))
+    if progress.is_timed and progress.time_limit_seconds:
+        return min(raw, progress.time_limit_seconds)
+    return raw

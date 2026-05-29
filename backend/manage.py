@@ -2,6 +2,12 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+TESTS_DIR = BASE_DIR.parent / "tests"
+if TESTS_DIR.is_dir():
+    sys.path.insert(0, str(TESTS_DIR))
 
 
 def main():

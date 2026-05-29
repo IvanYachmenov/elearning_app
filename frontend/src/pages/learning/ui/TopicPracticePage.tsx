@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
+  CourseCompletionReviewModal,
   PracticeCompletionPanel,
   PracticeHistorySection,
   PracticeQuestionCard,
@@ -43,7 +44,8 @@ const resolvePassedState = (passed: boolean | undefined, score: number | null | 
 function TopicPracticePage() {
   const { courseId, topicId } = useParams<TopicRouteParams>();
   const navigate = useNavigate();
-  const { lockNavigation, unlockNavigation } = useNavigationLock();
+  const { lockNavigation, unlockNavigation, setLockAction } = useNavigationLock();
+  const handleFinishTestRef = useRef<() => void>(() => {});
 
   const [topic, setTopic] = useState<TopicTheory | null>(null);
   const [loadingTopic, setLoadingTopic] = useState(true);
@@ -58,6 +60,8 @@ function TopicPracticePage() {
   const [scorePercent, setScorePercent] = useState<number | null>(null);
   const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null);
+  const [hasReviewedCourse, setHasReviewedCourse] = useState<boolean | null>(null);
+  const [reviewModalDismissed, setReviewModalDismissed] = useState(false);
 
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [codeAnswer, setCodeAnswer] = useState('');
@@ -210,6 +214,9 @@ function TopicPracticePage() {
       setPracticeCompleted(completedFlag);
       setTimedOut(nextTimedOut);
       setPassed(resolvePassedState(data.passed, data.score_percent, nextTimedOut));
+      if (typeof data.viewer_has_reviewed_course === 'boolean') {
+        setHasReviewedCourse(data.viewer_has_reviewed_course);
+      }
 
       if (completedFlag) {
         unlockNavigation();
@@ -364,7 +371,11 @@ function TopicPracticePage() {
 
   useEffect(() => {
     if (isTimedTestActive) {
-      lockNavigation("Timed test in progress. Navigation is locked until you finish.", [`/learning/courses/${courseId}/topics/${topicId}/practice`]);
+      lockNavigation(
+        "Timed test in progress. Navigation is locked until you finish.",
+        [`/learning/courses/${courseId}/topics/${topicId}/practice`],
+        { label: 'Finish test', onAction: () => handleFinishTestRef.current() },
+      );
     } else {
       unlockNavigation();
     }
@@ -373,6 +384,16 @@ function TopicPracticePage() {
       unlockNavigation();
     };
   }, [isTimedTestActive, lockNavigation, unlockNavigation, courseId, topicId]);
+
+  useEffect(() => {
+    if (isTimedTestActive) {
+      setLockAction({
+        label: 'Finish test',
+        onAction: () => handleFinishTestRef.current(),
+        disabled: practiceLoading,
+      });
+    }
+  }, [isTimedTestActive, practiceLoading, setLockAction]);
 
   useEffect(() => {
     return () => {
@@ -409,6 +430,25 @@ function TopicPracticePage() {
 
     void handleExpiration();
   }, [fetchNextQuestion, isTimedMode, practiceCompleted, remainingSeconds]);
+
+  useEffect(() => {
+    if (!isTimedMode || practiceCompleted) {
+      return undefined;
+    }
+
+    const resync = () => {
+      if (document.visibilityState === 'visible') {
+        void fetchNextQuestion();
+      }
+    };
+
+    document.addEventListener('visibilitychange', resync);
+    window.addEventListener('focus', resync);
+    return () => {
+      document.removeEventListener('visibilitychange', resync);
+      window.removeEventListener('focus', resync);
+    };
+  }, [isTimedMode, practiceCompleted, fetchNextQuestion]);
 
   const handleBackToTheory = () => {
     if (isTimedTestActive) {
@@ -747,6 +787,52 @@ function TopicPracticePage() {
     await fetchNextQuestion();
   };
 
+  const handleFinishTest: () => Promise<void> = async () => {
+    if (!topicId || practiceLoading) {
+      return;
+    }
+    if (!window.confirm('Finish the test now? Your answers so far will be submitted as your result.')) {
+      return;
+    }
+
+    setPracticeLoading(true);
+    try {
+      const response = await api.post(`/api/learning/topics/${topicId}/practice/finish/`);
+      const data = response.data || {};
+      unlockNavigation();
+      setRemainingSeconds(null);
+      timerExpiredRef.current = false;
+      setPracticeQuestion(null);
+      setSelectedOptions([]);
+      setCodeAnswer('');
+      setCodeRunResult(null);
+      setAnswerFeedback(null);
+      setPracticeCompleted(true);
+      setTimedOut(Boolean(data.timed_out));
+      setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
+      if (typeof data.score_percent === 'number') setScorePercent(data.score_percent);
+      if (typeof data.correct_answers === 'number') setCorrectAnswers(data.correct_answers);
+      if (typeof data.answered_questions === 'number') setAnsweredCount(data.answered_questions);
+      if (typeof data.total_questions === 'number') setTotalQuestions(data.total_questions);
+      if (typeof data.duration_seconds === 'number') setDurationSeconds(data.duration_seconds);
+      if (data.practice_stats) setPracticeStats(data.practice_stats);
+      if (typeof data.progress_percent === 'number') setTopicProgressPercent(data.progress_percent);
+      if (typeof data.viewer_has_reviewed_course === 'boolean') {
+        setHasReviewedCourse(data.viewer_has_reviewed_course);
+      }
+    } catch (requestError) {
+      console.error(requestError);
+      setAnswerFeedback({
+        type: 'error',
+        message: 'Failed to finish the test. Please try again.',
+      });
+    } finally {
+      setPracticeLoading(false);
+    }
+  };
+
+  handleFinishTestRef.current = () => { void handleFinishTest(); };
+
   const handleRetry = async () => {
     if (!topicId) {
       return;
@@ -768,6 +854,7 @@ function TopicPracticePage() {
       setDurationSeconds(null);
       setPracticeStats(null);
       setIsReviewMode(false);
+      setReviewModalDismissed(false);
       await fetchNextQuestion();
     } catch (requestError) {
       console.error(requestError);
@@ -959,6 +1046,17 @@ function TopicPracticePage() {
           </>
         )}
       </section>
+
+      {practiceCompleted && hasReviewedCourse === false && !reviewModalDismissed && courseId && (
+        <CourseCompletionReviewModal
+          courseId={Number(courseId)}
+          onReviewed={() => {
+            setHasReviewedCourse(true);
+            setReviewModalDismissed(true);
+          }}
+          onSkip={() => setReviewModalDismissed(true)}
+        />
+      )}
     </div>
   );
 }

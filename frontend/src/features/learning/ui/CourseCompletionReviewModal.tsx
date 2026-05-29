@@ -6,6 +6,7 @@ import { api } from '../../../shared/api';
 type CourseCompletionReviewModalProps = {
   courseId: number;
   onReviewed: () => void;
+  onSkip?: () => void;
 };
 
 const STAR_QUESTIONS = [
@@ -26,7 +27,7 @@ function isEnglishOnly(text: string): boolean {
   return true;
 }
 
-function CourseCompletionReviewModal({ courseId, onReviewed }: CourseCompletionReviewModalProps) {
+function CourseCompletionReviewModal({ courseId, onReviewed, onSkip }: CourseCompletionReviewModalProps) {
   const [ratings, setRatings] = useState<Record<RatingKey, number>>({
     rating: 0,
     app_rating: 0,
@@ -118,14 +119,26 @@ function CourseCompletionReviewModal({ courseId, onReviewed }: CourseCompletionR
 
         {error && <p className="course-review-modal__error">{error}</p>}
 
-        <button
-          type="button"
-          className="course-review-modal__submit"
-          onClick={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? 'Submitting...' : 'Submit review'}
-        </button>
+        <div className="course-review-modal__actions">
+          <button
+            type="button"
+            className="course-review-modal__submit"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? 'Submitting...' : 'Submit review'}
+          </button>
+          {onSkip && (
+            <button
+              type="button"
+              className="course-review-modal__skip"
+              onClick={onSkip}
+              disabled={submitting}
+            >
+              {'Maybe later'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

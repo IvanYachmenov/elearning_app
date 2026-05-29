@@ -569,6 +569,37 @@
     border-radius: 999px;
     background: #0b0b0d;
     box-shadow: 0 0 0 2px rgba(11, 11, 13, 0.2);
+    flex-shrink: 0;
+}
+
+.app-navigation-lock__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.app-navigation-lock__action {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border: 2px solid var(--nav-black);
+    background: #fff;
+    color: var(--nav-black);
+    font-weight: 900;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.app-navigation-lock__action:hover:not(:disabled) {
+    background: #fef2f2;
+    border-color: #b91c1c;
+    color: #b91c1c;
+}
+
+.app-navigation-lock__action:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* === Mobile: hide top nav links (Courses/Learning go into burger) === */

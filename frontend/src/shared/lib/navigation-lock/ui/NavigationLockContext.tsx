@@ -8,17 +8,26 @@ import {
   type ReactNode,
 } from 'react';
 
+interface LockAction {
+  label: string;
+  onAction: () => void;
+  disabled?: boolean;
+}
+
 interface NavigationLockState {
   isLocked: boolean;
   reason: string;
   allowedPaths: string[];
+  action: LockAction | null;
 }
 
 interface NavigationLockContextValue {
   isLocked: boolean;
   lockReason: string;
   allowedPaths: string[];
-  lockNavigation: (reason?: string, allowedPaths?: string[]) => void;
+  lockAction: LockAction | null;
+  lockNavigation: (reason?: string, allowedPaths?: string[], action?: LockAction | null) => void;
+  setLockAction: (action: LockAction | null) => void;
   unlockNavigation: () => void;
 }
 
@@ -30,6 +39,7 @@ export function NavigationLockProvider({ children }: { children: ReactNode }) {
     isLocked: false,
     reason: '',
     allowedPaths: [],
+    action: null,
   });
 
   useEffect(() => {
@@ -46,16 +56,24 @@ export function NavigationLockProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [lockState.isLocked, lockState.reason]);
 
-  const lockNavigation = useCallback((reason?: string, allowedPaths?: string[]) => {
-    setLockState({
-      isLocked: true,
-      reason: reason || DEFAULT_REASON,
-      allowedPaths: allowedPaths?.length ? allowedPaths : [],
-    });
+  const lockNavigation = useCallback(
+    (reason?: string, allowedPaths?: string[], action?: LockAction | null) => {
+      setLockState({
+        isLocked: true,
+        reason: reason || DEFAULT_REASON,
+        allowedPaths: allowedPaths?.length ? allowedPaths : [],
+        action: action ?? null,
+      });
+    },
+    [],
+  );
+
+  const setLockAction = useCallback((action: LockAction | null) => {
+    setLockState((previous) => ({ ...previous, action }));
   }, []);
 
   const unlockNavigation = useCallback(() => {
-    setLockState({ isLocked: false, reason: '', allowedPaths: [] });
+    setLockState({ isLocked: false, reason: '', allowedPaths: [], action: null });
   }, []);
 
   const value = useMemo<NavigationLockContextValue>(
@@ -63,10 +81,12 @@ export function NavigationLockProvider({ children }: { children: ReactNode }) {
       isLocked: lockState.isLocked,
       lockReason: lockState.reason,
       allowedPaths: lockState.allowedPaths,
+      lockAction: lockState.action,
       lockNavigation,
+      setLockAction,
       unlockNavigation,
     }),
-    [lockState, lockNavigation, unlockNavigation],
+    [lockState, lockNavigation, setLockAction, unlockNavigation],
   );
 
   return (
