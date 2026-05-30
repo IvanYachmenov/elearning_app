@@ -19,30 +19,28 @@ function PracticeCompletionPanel({
   correctAnswers,
   totalQuestions,
   durationSeconds,
-  practiceStats,
   onRetry,
   onViewHistory,
   isReviewMode,
 }: PracticeCompletionPanelProps) {
   const accuracy =
     typeof scorePercent === 'number' ? scorePercent : Math.round((correctAnswers * 100) / (totalQuestions || 1));
-  const resolvedPassed = !timedOut && (passed || accuracy >= 100);
-  const shouldShowPracticeStats = Boolean(isTimed && practiceStats && practiceStats.completed_users > 0);
+  const resolvedPassed = Boolean(passed);
   const shouldShowRetry = Boolean(onRetry && isTimed && !resolvedPassed);
   const summaryClassName = ['practice-summary', isTimed ? 'practice-summary--timed' : ''].filter(Boolean).join(' ');
   const statusClassName = [
     'topic-practice__completed',
-    timedOut
-      ? 'topic-practice__completed--timeout'
-      : resolvedPassed
-        ? 'topic-practice__completed--passed'
+    resolvedPassed
+      ? 'topic-practice__completed--passed'
+      : timedOut
+        ? 'topic-practice__completed--timeout'
         : 'topic-practice__completed--failed',
   ].join(' ');
 
-  const statusLabel = timedOut
-    ? "Test failed – time is up"
-    : resolvedPassed
-      ? "Test passed"
+  const statusLabel = resolvedPassed
+    ? "Test passed"
+    : timedOut
+      ? "Test failed – time is up"
       : "Test not passed";
 
   return (
@@ -65,24 +63,6 @@ function PracticeCompletionPanel({
           </div>
         )}
       </div>
-
-      {shouldShowPracticeStats && practiceStats && (
-        <div className="practice-community-stats" aria-label={"Community statistics"}>
-          <p className="practice-community-stats__title">{"Community statistics"}</p>
-          <div className="practice-community-stats__item">
-            <span>{"Average user success"}</span>
-            <strong>{practiceStats.average_success_percent ?? 0}%</strong>
-          </div>
-          <div className="practice-community-stats__item">
-            <span>{"Users completed"}</span>
-            <strong>{practiceStats.completed_users}</strong>
-          </div>
-          <div className="practice-community-stats__item">
-            <span>{"Pass rate"}</span>
-            <strong>{practiceStats.pass_rate_percent ?? 0}%</strong>
-          </div>
-        </div>
-      )}
 
       <div className="topic-practice__buttons-row topic-practice__completed-actions">
         {onViewHistory && (

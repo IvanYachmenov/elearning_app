@@ -20,7 +20,6 @@ import type {
   PracticeQuestion,
   PracticeQuestionHint,
   PracticeQuestionHintsResponse,
-  PracticeStats,
   TopicTheory,
 } from '../../../shared/types';
 import { LoadingIndicator } from '../../../shared/ui';
@@ -59,7 +58,6 @@ function TopicPracticePage() {
   const [passed, setPassed] = useState(false);
   const [scorePercent, setScorePercent] = useState<number | null>(null);
   const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
-  const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null);
   const [hasReviewedCourse, setHasReviewedCourse] = useState<boolean | null>(null);
   const [reviewModalDismissed, setReviewModalDismissed] = useState(false);
 
@@ -124,7 +122,6 @@ function TopicPracticePage() {
         setAnsweredCount(data.answered_questions ?? 0);
         setCorrectAnswers(data.correct_answers ?? data.answered_questions ?? 0);
         setTotalQuestions(data.total_questions ?? 0);
-        setPracticeStats(data.practice_stats ?? null);
 
         const topicScore = typeof data.score === 'number' ? data.score : data.progress_percent ?? null;
         setScorePercent(topicScore);
@@ -186,9 +183,6 @@ function TopicPracticePage() {
       }
       if (typeof data.score_percent === 'number') {
         setScorePercent(data.score_percent);
-      }
-      if (data.practice_stats) {
-        setPracticeStats(data.practice_stats);
       }
       if ('duration_seconds' in data) {
         setDurationSeconds(typeof data.duration_seconds === 'number' ? data.duration_seconds : null);
@@ -699,9 +693,6 @@ function TopicPracticePage() {
       if (typeof data.score_percent === 'number') {
         setScorePercent(data.score_percent);
       }
-      if (data.practice_stats) {
-        setPracticeStats(data.practice_stats);
-      }
 
       if (completed && data.test_completed && !isLastQuestionAnswer) {
         setPracticeCompleted(true);
@@ -815,7 +806,6 @@ function TopicPracticePage() {
       if (typeof data.answered_questions === 'number') setAnsweredCount(data.answered_questions);
       if (typeof data.total_questions === 'number') setTotalQuestions(data.total_questions);
       if (typeof data.duration_seconds === 'number') setDurationSeconds(data.duration_seconds);
-      if (data.practice_stats) setPracticeStats(data.practice_stats);
       if (typeof data.progress_percent === 'number') setTopicProgressPercent(data.progress_percent);
       if (typeof data.viewer_has_reviewed_course === 'boolean') {
         setHasReviewedCourse(data.viewer_has_reviewed_course);
@@ -852,7 +842,6 @@ function TopicPracticePage() {
       setCodeRunResult(null);
       setScorePercent(null);
       setDurationSeconds(null);
-      setPracticeStats(null);
       setIsReviewMode(false);
       setReviewModalDismissed(false);
       await fetchNextQuestion();
@@ -987,7 +976,6 @@ function TopicPracticePage() {
                 correctAnswers={correctAnswers}
                 totalQuestions={totalQuestions}
                 durationSeconds={durationSeconds}
-                practiceStats={practiceStats}
                 onRetry={handleRetry}
                 onViewHistory={() => setIsReviewMode(true)}
                 isReviewMode={isReviewMode}

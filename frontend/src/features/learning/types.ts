@@ -3,7 +3,6 @@ import type {
   PracticeHistoryQuestion,
   PracticeQuestion,
   PracticeQuestionHint,
-  PracticeStats,
 } from '../../shared/types';
 
 export type PracticeFeedbackType = 'success' | 'fail' | 'error' | 'neutral';
@@ -71,7 +70,6 @@ export interface PracticeCompletionPanelProps {
   correctAnswers: number;
   totalQuestions: number;
   durationSeconds?: number | null;
-  practiceStats?: PracticeStats | null;
   onRetry?: () => void;
   onViewHistory?: () => void;
   isReviewMode: boolean;
