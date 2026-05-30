@@ -585,6 +585,7 @@ class TopicQuestionAnswerView(APIView):
                     "time_limit_seconds": limit_seconds,
                     "duration_seconds": get_topic_progress_duration_seconds(progress) if completed else None,
                     "is_timed": True,
+                    "viewer_has_reviewed_course": viewer_has_reviewed_course(request.user, course),
                 }
             )
 

@@ -694,6 +694,10 @@ function TopicPracticePage() {
         setScorePercent(data.score_percent);
       }
 
+      if (typeof data.viewer_has_reviewed_course === 'boolean') {
+        setHasReviewedCourse(data.viewer_has_reviewed_course);
+      }
+
       if (completed && data.test_completed && !isLastQuestionAnswer) {
         setPracticeCompleted(true);
         setPassed(resolvePassedState(data.passed, data.score_percent, Boolean(data.timed_out)));
