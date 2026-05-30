@@ -18,15 +18,6 @@ const STAR_QUESTIONS = [
 
 type RatingKey = (typeof STAR_QUESTIONS)[number]['key'];
 
-function isEnglishOnly(text: string): boolean {
-  for (let i = 0; i < text.length; i += 1) {
-    if (text.charCodeAt(i) > 127) {
-      return false;
-    }
-  }
-  return true;
-}
-
 function CourseCompletionReviewModal({ courseId, onReviewed, onSkip }: CourseCompletionReviewModalProps) {
   const [ratings, setRatings] = useState<Record<RatingKey, number>>({
     rating: 0,
@@ -47,11 +38,6 @@ function CourseCompletionReviewModal({ courseId, onReviewed, onSkip }: CourseCom
 
     if (!allRated) {
       setError('Please answer every rating question.');
-      return;
-    }
-
-    if (comment && !isEnglishOnly(comment)) {
-      setError('Please write your comment in English.');
       return;
     }
 

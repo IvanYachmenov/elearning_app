@@ -72,11 +72,6 @@ class CourseReviewCreateSerializer(serializers.ModelSerializer):
             "comment",
         )
 
-    def validate_comment(self, value):
-        if value and not value.isascii():
-            raise serializers.ValidationError("Comments must be written in English.")
-        return value
-
 
 class CourseRatingMixin:
     def get_average_rating(self, obj):
