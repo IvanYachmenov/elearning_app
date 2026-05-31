@@ -158,6 +158,72 @@ class CodeQuestionTests(APITestCase):
         self.assertFalse(answer.is_correct)
 
 
+class TeacherEditReevaluatesAnswersTests(APITestCase):
+    """
+    When the teacher changes which option is marked as correct, the
+    stored is_correct on existing TopicQuestionAnswer rows must be
+    refreshed -- otherwise the history panel keeps showing the answer
+    as wrong (or right) based on the now-outdated question definition.
+    """
+
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username="stu", email="s@x.sk", password="Strong#Pass1",
+        )
+        self.course, self.topic, self.question = _build_course_with_question()
+        # Re-use the teacher that _build_course_with_question already
+        # created as the course author.
+        self.teacher = self.course.author
+        self.wrong_initially = TopicQuestionOption.objects.create(
+            question=self.question, text="A", is_correct=True,
+        )
+        self.right_eventually = TopicQuestionOption.objects.create(
+            question=self.question, text="B", is_correct=False,
+        )
+        self.course.students.add(self.student)
+        # Student picks option B (which is currently marked wrong).
+        self.client.force_authenticate(self.student)
+        response = self.client.post(
+            f"/api/learning/questions/{self.question.pk}/answer/",
+            {"selected_options": [self.right_eventually.id]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                         msg=response.content)
+        answer = TopicQuestionAnswer.objects.get(
+            user=self.student, question=self.question,
+        )
+        self.assertFalse(answer.is_correct)
+
+    def test_flipping_correct_option_reevaluates_stored_answer(self):
+        # Teacher fixes the question: option B is the real correct one.
+        self.client.force_authenticate(self.teacher)
+        url = f"/api/teacher/topics/{self.topic.pk}/"
+        payload = {
+            "title": self.topic.title,
+            "questions": [{
+                "id": self.question.id,
+                "text": self.question.text,
+                "question_type": self.question.question_type,
+                "options": [
+                    {"id": self.wrong_initially.id, "text": "A",
+                     "is_correct": False},
+                    {"id": self.right_eventually.id, "text": "B",
+                     "is_correct": True},
+                ],
+            }],
+        }
+        response = self.client.put(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                         msg=response.content)
+
+        answer = TopicQuestionAnswer.objects.get(
+            user=self.student, question=self.question,
+        )
+        self.assertTrue(answer.is_correct)
+        self.assertEqual(answer.score, 100)
+
+
 class ResetTopicProgressTests(APITestCase):
     def setUp(self):
         self.student = User.objects.create_user(
