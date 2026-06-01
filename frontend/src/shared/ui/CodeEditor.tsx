@@ -1,4 +1,4 @@
-import { useMemo, useRef, type ChangeEvent, type KeyboardEvent, type UIEvent } from 'react';
+import { useLayoutEffect, useMemo, useRef, type CSSProperties, type ChangeEvent, type KeyboardEvent, type UIEvent } from 'react';
 
 import { tokenizeCodeLine } from '../lib/highlightCode';
 
@@ -42,9 +42,22 @@ export function CodeEditor({
   const overlayRef = useRef<HTMLPreElement | null>(null);
   const gutterRef = useRef<HTMLPreElement | null>(null);
 
-  const lineNumbers = useMemo(() => {
+  const { lineNumbers, gutterStyle } = useMemo(() => {
     const count = Math.max(1, value.split('\n').length);
-    return Array.from({ length: count }, (_, i) => i + 1).join('\n');
+    const numbers = Array.from({ length: count }, (_, i) => i + 1).join('\n');
+    const digits = Math.max(2, String(count).length);
+    const style = { '--code-editor-gutter-width': `calc(${digits}ch + 12px)` } as CSSProperties;
+    return { lineNumbers: numbers, gutterStyle: style };
+  }, [value]);
+
+  // Auto-grow textarea with its content; cap at 2x viewport height, then scroll.
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const cap = typeof window === 'undefined' ? Infinity : window.innerHeight * 2;
+    const next = Math.min(el.scrollHeight, cap);
+    el.style.height = `${next}px`;
   }, [value]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -84,7 +97,7 @@ export function CodeEditor({
   };
 
   return (
-    <div className="code-editor">
+    <div className="code-editor" style={gutterStyle}>
       <pre className="code-editor__gutter" ref={gutterRef} aria-hidden="true">
         {lineNumbers}
       </pre>
@@ -104,6 +117,7 @@ export function CodeEditor({
         placeholder={placeholder}
         rows={minRows}
         aria-label={ariaLabel}
+        style={{ minHeight: `calc(${minRows} * 1.5em + 28px)` }}
       />
     </div>
   );

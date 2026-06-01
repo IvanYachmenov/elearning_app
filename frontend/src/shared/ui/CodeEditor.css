@@ -1,19 +1,26 @@
 .code-editor {
-  --code-editor-gutter-width: 44px;
+  --code-editor-gutter-width: 28px;
   --code-editor-pad-y: 14px;
   --code-editor-pad-x: 16px;
+  --code-editor-gap: 12px;
   position: relative;
   display: block;
   width: 100%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
   font-size: 14px;
   line-height: 1.5;
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .code-editor__gutter,
 .code-editor__overlay,
 .code-editor__textarea {
   margin: 0;
+  border: 0;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
@@ -21,7 +28,6 @@
   word-spacing: 0;
   letter-spacing: 0;
   tab-size: 4;
-  border: 1px solid rgba(15, 23, 42, 0.18);
   box-sizing: border-box;
 }
 
@@ -31,13 +37,12 @@
   bottom: 0;
   left: 0;
   width: var(--code-editor-gutter-width);
-  padding: var(--code-editor-pad-y) 8px;
+  padding: var(--code-editor-pad-y) 6px;
   overflow: hidden;
   text-align: right;
-  color: #1e293b;
+  color: #475569;
   background: #e2e8f0;
-  border-right: 1px solid rgba(15, 23, 42, 0.18);
-  border-radius: 6px 0 0 6px;
+  border-right: 1px solid rgba(15, 23, 42, 0.12);
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -46,35 +51,32 @@
 
 .code-editor__overlay {
   position: absolute;
-  inset: 0;
-  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) calc(var(--code-editor-gutter-width) + 8px);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--code-editor-gutter-width);
+  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) var(--code-editor-gap);
   overflow: auto;
   pointer-events: none;
-  background: #f8fafc;
-  color: #0f172a;
-  border-radius: 6px;
+  background: transparent;
 }
 
 .code-editor__textarea {
   position: relative;
   display: block;
   width: 100%;
-  min-height: 100%;
-  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) calc(var(--code-editor-gutter-width) + 8px);
-  resize: vertical;
+  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) calc(var(--code-editor-gutter-width) + var(--code-editor-gap));
+  resize: none;
   background: transparent;
   color: transparent;
   caret-color: #0f172a;
-  border-color: transparent;
   outline: none;
   overflow: auto;
   z-index: 1;
-  border-radius: 6px;
 }
 
 .code-editor__textarea:focus {
-  outline: 2px solid var(--accent-orange, #f97316);
-  outline-offset: 0;
+  outline: none;
 }
 
 .code-editor__textarea::selection {
@@ -108,4 +110,13 @@
 .code-editor__token--comment {
   color: #6b7280;
   font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .code-editor {
+    --code-editor-gutter-width: 26px;
+    --code-editor-pad-x: 10px;
+    --code-editor-gap: 8px;
+    font-size: 13px;
+  }
 }
