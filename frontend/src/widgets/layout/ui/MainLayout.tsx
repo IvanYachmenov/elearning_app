@@ -132,7 +132,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handlePreventNavigation}
                 aria-disabled={isLocked}
               >
-                {"Courses"}
+                {"Catalog"}
               </NavLink>
 
               <NavLink
@@ -141,7 +141,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handlePreventNavigation}
                 aria-disabled={isLocked}
               >
-                {"Learning"}
+                {"My courses"}
               </NavLink>
             </nav>
 
@@ -205,7 +205,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {"Courses"}
+                {"Catalog"}
               </NavLink>
               <NavLink
                 to="/learning"
@@ -213,7 +213,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                 onClick={handleMenuNavClick}
                 aria-disabled={isLocked}
               >
-                {"Learning"}
+                {"My courses"}
               </NavLink>
 
               {user.role === 'teacher' && (
@@ -223,7 +223,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                   onClick={handleMenuNavClick}
                   aria-disabled={isLocked}
                 >
-                  {"My Courses"}
+                  {"Teacher's cabinet"}
                 </NavLink>
               )}
 

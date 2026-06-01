@@ -50,7 +50,7 @@ function LearningPage() {
 
   return (
     <div className="page page-enter">
-      <h1 className="page__title">{"My Learning"}</h1>
+      <h1 className="page__title">{"My courses"}</h1>
       <p className="page__subtitle">{"Courses you're currently enrolled in"}</p>
 
       {loading && <LoadingIndicator label={"Loading..."} />}

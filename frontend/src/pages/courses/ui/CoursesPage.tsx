@@ -63,8 +63,8 @@ function CoursesPage() {
     <div className={`page page-enter${showCatalogState ? ' courses-page--state' : ''}`}>
       {!showCatalogState && (
         <>
-          <h1 className="page__title">{"Courses"}</h1>
-          <p className="page__subtitle">{"Browse available courses. After you enroll, they will appear on the Learning page."}</p>
+          <h1 className="page__title">{"Catalog"}</h1>
+          <p className="page__subtitle">{"Browse available courses. After you enroll, they will appear on the My courses page."}</p>
         </>
       )}
 

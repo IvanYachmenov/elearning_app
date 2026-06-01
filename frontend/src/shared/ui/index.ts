@@ -3,3 +3,4 @@ export { default as AutoGrowTextarea } from './AutoGrowTextarea';
 export { default as AppSelect } from './AppSelect';
 export type { AppSelectOption } from './AppSelect';
 export { default as HelpTooltip } from './HelpTooltip';
+export { CodeEditor } from './CodeEditor';

@@ -3,7 +3,8 @@ import { isAxiosError } from 'axios';
 
 import { api } from '../../../shared/api';
 import { runJavaScriptInWorker } from '../../../shared/lib/js-runner';
-import { AppSelect } from '../../../shared/ui';
+import { parseRunError } from '../../../shared/lib/parseRunError';
+import { AppSelect, CodeEditor } from '../../../shared/ui';
 import type { ApiErrorResponse, CodeRunResult } from '../../../shared/types';
 import '../styles/playground.css';
 
@@ -88,16 +89,17 @@ function PlaygroundPage() {
           </div>
         </div>
 
-        <textarea
-          className="playground__editor"
-          spellCheck={false}
-          value={code}
-          onChange={(event) => {
-            const value = event.target.value;
-            setCodeByLanguage((prev) => ({ ...prev, [language]: value }));
-          }}
-          placeholder="Write your code here…"
-        />
+        <div className="playground__editor">
+          <CodeEditor
+            value={code}
+            onChange={(next) => {
+              setCodeByLanguage((prev) => ({ ...prev, [language]: next }));
+            }}
+            placeholder="Write your code here…"
+            minRows={14}
+            ariaLabel="Playground code editor"
+          />
+        </div>
 
         {error && <div className="playground__error">{error}</div>}
 
@@ -111,9 +113,35 @@ function PlaygroundPage() {
               )}
             </div>
             <pre className="playground__stream">{result.stdout || '(no output)'}</pre>
-            {result.stderr && (
-              <div className="playground__output-head playground__output-head--err">Error</div>
-            )}
+            {result.stderr && (() => {
+              const parsed = parseRunError(result.stderr);
+              return (
+                <div className="playground__error-block">
+                  <div className="playground__output-head playground__output-head--err">Error</div>
+                  {parsed.type ? (
+                    <div className="playground__error-detail">
+                      <div className="playground__error-title">
+                        <strong>{parsed.type}</strong>
+                        {parsed.message ? `: ${parsed.message}` : ''}
+                      </div>
+                      {parsed.line !== undefined && (
+                        <div className="playground__error-line">
+                          on line {parsed.line}
+                          {parsed.codeLine ? (
+                            <>
+                              {': '}
+                              <code>{parsed.codeLine}</code>
+                            </>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <pre className="playground__stream playground__stream--err">{result.stderr}</pre>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>

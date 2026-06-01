@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 const codeTokenPattern =
   /(\/\/.*|#.*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b(?:const|let|var|function|return|if|else|for|while|class|import|from|export|default|async|await|try|catch|finally|throw|new|true|false|null|undefined|def|print|in|not|and|or|elif|None|True|False|self|public|private|protected|static|void|int|string|boolean|number)\b|\b\d+(?:\.\d+)?\b)/g;
 
-function getCodeTokenClass(token: string) {
+function getCodeTokenClass(token: string, classPrefix: string) {
   if (token.startsWith('//') || token.startsWith('#') || token.startsWith('/*')) {
-    return 'topic-theory__code-token--comment';
+    return `${classPrefix}--comment`;
   }
 
   if (
@@ -13,17 +13,21 @@ function getCodeTokenClass(token: string) {
     token.startsWith("'") ||
     token.startsWith('`')
   ) {
-    return 'topic-theory__code-token--string';
+    return `${classPrefix}--string`;
   }
 
   if (/^\d/.test(token)) {
-    return 'topic-theory__code-token--number';
+    return `${classPrefix}--number`;
   }
 
-  return 'topic-theory__code-token--keyword';
+  return `${classPrefix}--keyword`;
 }
 
-function renderHighlightedCodeLine(line: string, lineIndex: number): ReactNode[] {
+export function tokenizeCodeLine(
+  line: string,
+  lineIndex: number,
+  classPrefix = 'topic-theory__code-token',
+): ReactNode[] {
   const nodes: ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -36,7 +40,7 @@ function renderHighlightedCodeLine(line: string, lineIndex: number): ReactNode[]
     }
 
     nodes.push(
-      <span className={getCodeTokenClass(match[0])} key={`token-${lineIndex}-${match.index}`}>
+      <span className={getCodeTokenClass(match[0], classPrefix)} key={`token-${lineIndex}-${match.index}`}>
         {match[0]}
       </span>,
     );
@@ -58,7 +62,7 @@ export function renderHighlightedCode(code: string) {
     <span className="topic-theory__code-line" key={`line-${index}`}>
       <span className="topic-theory__code-ln" aria-hidden="true">{index + 1}</span>
       <span className="topic-theory__code-content">
-        {renderHighlightedCodeLine(line, index)}
+        {tokenizeCodeLine(line, index)}
       </span>
     </span>
   ));

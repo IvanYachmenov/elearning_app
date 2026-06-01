@@ -1,4 +1,5 @@
-import { LoadingIndicator } from '../../../shared/ui';
+import { CodeEditor, LoadingIndicator } from '../../../shared/ui';
+import { parseRunError } from '../../../shared/lib/parseRunError';
 import { isCodeQuestion } from '../../../shared/types';
 import { cleanOptionText } from '../lib/text';
 import type { PracticeQuestionCardProps } from '../types';
@@ -93,15 +94,16 @@ function PracticeQuestionCard({
               </span>
               <span>{codeLang}</span>
             </div>
-            <textarea
-              id={`code-question-${question.id}`}
-              className="topic-practice__code-editor"
-              value={codeAnswer}
-              onChange={(event) => onCodeChange(event.target.value)}
-              spellCheck={false}
-              rows={10}
-              disabled={isAnswerLocked || submitLoading || practiceLoading}
-            />
+            <div className="topic-practice__code-editor">
+              <CodeEditor
+                id={`code-question-${question.id}`}
+                value={codeAnswer}
+                onChange={onCodeChange}
+                minRows={10}
+                disabled={isAnswerLocked || submitLoading || practiceLoading}
+                ariaLabel="Code answer editor"
+              />
+            </div>
           </div>
 
           {codeRunResult && (
@@ -112,11 +114,39 @@ function PracticeQuestionCard({
                   {codeRunResult.stdout || "No output"}
                 </pre>
               </div>
-              {(codeRunResult.stderr || codeRunResult.timed_out || codeRunResult.exit_code !== 0) && (
-                <div className="topic-practice__code-output-row">
-                  <span className="topic-practice__code-output-label">{"Error"}</span>
-                </div>
-              )}
+              {(codeRunResult.stderr || codeRunResult.timed_out || codeRunResult.exit_code !== 0) && (() => {
+                const parsed = parseRunError(codeRunResult.stderr ?? '');
+                return (
+                  <div className="topic-practice__code-output-row">
+                    <span className="topic-practice__code-output-label">{"Error"}</span>
+                    {parsed.type ? (
+                      <div className="topic-practice__code-error">
+                        <div className="topic-practice__code-error-title">
+                          <strong>{parsed.type}</strong>
+                          {parsed.message ? `: ${parsed.message}` : ''}
+                        </div>
+                        {parsed.line !== undefined && (
+                          <div className="topic-practice__code-error-line">
+                            on line {parsed.line}
+                            {parsed.codeLine ? (
+                              <>
+                                {': '}
+                                <code>{parsed.codeLine}</code>
+                              </>
+                            ) : null}
+                          </div>
+                        )}
+                      </div>
+                    ) : codeRunResult.stderr ? (
+                      <pre className="topic-practice__code-output-box">{codeRunResult.stderr}</pre>
+                    ) : codeRunResult.timed_out ? (
+                      <div className="topic-practice__code-error">Time limit exceeded.</div>
+                    ) : (
+                      <div className="topic-practice__code-error">Process exited with code {codeRunResult.exit_code}.</div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
