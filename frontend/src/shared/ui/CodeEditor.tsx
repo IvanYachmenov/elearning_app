@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent, type KeyboardEvent, type UIEvent } from 'react';
+import { useMemo, useRef, type ChangeEvent, type KeyboardEvent, type UIEvent } from 'react';
 
 import { tokenizeCodeLine } from '../lib/highlightCode';
 
@@ -40,6 +40,12 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const overlayRef = useRef<HTMLPreElement | null>(null);
+  const gutterRef = useRef<HTMLPreElement | null>(null);
+
+  const lineNumbers = useMemo(() => {
+    const count = Math.max(1, value.split('\n').length);
+    return Array.from({ length: count }, (_, i) => i + 1).join('\n');
+  }, [value]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== 'Tab') return;
@@ -62,9 +68,14 @@ export function CodeEditor({
   };
 
   const handleScroll = (event: UIEvent<HTMLTextAreaElement>) => {
+    const top = event.currentTarget.scrollTop;
+    const left = event.currentTarget.scrollLeft;
     if (overlayRef.current) {
-      overlayRef.current.scrollTop = event.currentTarget.scrollTop;
-      overlayRef.current.scrollLeft = event.currentTarget.scrollLeft;
+      overlayRef.current.scrollTop = top;
+      overlayRef.current.scrollLeft = left;
+    }
+    if (gutterRef.current) {
+      gutterRef.current.scrollTop = top;
     }
   };
 
@@ -74,6 +85,9 @@ export function CodeEditor({
 
   return (
     <div className="code-editor">
+      <pre className="code-editor__gutter" ref={gutterRef} aria-hidden="true">
+        {lineNumbers}
+      </pre>
       <pre className="code-editor__overlay" ref={overlayRef} aria-hidden="true">
         {renderOverlay(value)}
       </pre>

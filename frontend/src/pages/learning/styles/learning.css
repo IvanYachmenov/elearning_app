@@ -966,28 +966,6 @@
   box-sizing: border-box;
 }
 
-.topic-practice__code-editor-window {
-  overflow: hidden;
-  border: 2px solid var(--nav-black);
-  border-radius: 0;
-  background: #fff;
-  color: #0f172a;
-}
-
-.topic-practice__code-editor-titlebar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 34px;
-  padding: 7px 13px;
-  border-bottom: 2px solid var(--nav-black);
-  background: #eef0f3;
-  color: #0f172a;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: none;
-}
-
 .topic-practice__code-output {
   display: grid;
   gap: 12px;

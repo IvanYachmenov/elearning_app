@@ -223,7 +223,7 @@ function MainLayout({ user, onLogout }: MainLayoutProps) {
                   onClick={handleMenuNavClick}
                   aria-disabled={isLocked}
                 >
-                  {"Teacher's cabinet"}
+                  {"Teacher dashboard"}
                 </NavLink>
               )}
 

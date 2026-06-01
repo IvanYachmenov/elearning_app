@@ -1,4 +1,7 @@
 .code-editor {
+  --code-editor-gutter-width: 44px;
+  --code-editor-pad-y: 14px;
+  --code-editor-pad-x: 16px;
   position: relative;
   display: block;
   width: 100%;
@@ -7,29 +10,48 @@
   line-height: 1.5;
 }
 
+.code-editor__gutter,
 .code-editor__overlay,
 .code-editor__textarea {
   margin: 0;
-  padding: 14px 16px;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   white-space: pre;
   word-spacing: 0;
   letter-spacing: 0;
-  tab-size: 2;
+  tab-size: 4;
   border: 1px solid rgba(15, 23, 42, 0.18);
-  border-radius: 6px;
   box-sizing: border-box;
+}
+
+.code-editor__gutter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--code-editor-gutter-width);
+  padding: var(--code-editor-pad-y) 8px;
+  overflow: hidden;
+  text-align: right;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 6px 0 0 6px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .code-editor__overlay {
   position: absolute;
   inset: 0;
+  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) calc(var(--code-editor-gutter-width) + 8px);
   overflow: auto;
   pointer-events: none;
   background: #f8fafc;
   color: #0f172a;
+  border-radius: 6px;
 }
 
 .code-editor__textarea {
@@ -37,6 +59,7 @@
   display: block;
   width: 100%;
   min-height: 100%;
+  padding: var(--code-editor-pad-y) var(--code-editor-pad-x) var(--code-editor-pad-y) calc(var(--code-editor-gutter-width) + 8px);
   resize: vertical;
   background: transparent;
   color: transparent;
@@ -45,6 +68,7 @@
   outline: none;
   overflow: auto;
   z-index: 1;
+  border-radius: 6px;
 }
 
 .code-editor__textarea:focus {

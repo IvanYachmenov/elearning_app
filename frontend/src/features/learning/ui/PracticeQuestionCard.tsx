@@ -85,25 +85,15 @@ function PracticeQuestionCard({
 
       {isCode ? (
         <div className="topic-practice__code-area">
-          <div className="topic-practice__code-editor-window">
-            <div className="topic-practice__code-editor-titlebar">
-              <span className="topic-theory__code-window-dots" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </span>
-              <span>{codeLang}</span>
-            </div>
-            <div className="topic-practice__code-editor">
-              <CodeEditor
-                id={`code-question-${question.id}`}
-                value={codeAnswer}
-                onChange={onCodeChange}
-                minRows={10}
-                disabled={isAnswerLocked || submitLoading || practiceLoading}
-                ariaLabel="Code answer editor"
-              />
-            </div>
+          <div className="topic-practice__code-editor">
+            <CodeEditor
+              id={`code-question-${question.id}`}
+              value={codeAnswer}
+              onChange={onCodeChange}
+              minRows={10}
+              disabled={isAnswerLocked || submitLoading || practiceLoading}
+              ariaLabel="Code answer editor"
+            />
           </div>
 
           {codeRunResult && (

@@ -63,7 +63,7 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   if (loading) {
     return (
       <div className="page page-enter teacher-page">
-        <h1 className="page__title">{"Teacher's cabinet"}</h1>
+        <h1 className="page__title">{"Teacher dashboard"}</h1>
         <LoadingIndicator label={"Loading..."} />
       </div>
     );
@@ -72,7 +72,7 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   if (error) {
     return (
       <div className="page page-enter teacher-page">
-        <h1 className="page__title">{"Teacher's cabinet"}</h1>
+        <h1 className="page__title">{"Teacher dashboard"}</h1>
         <p className="teacher-error-inline">{error}</p>
       </div>
     );
@@ -81,7 +81,7 @@ function TeacherCoursesPage({ user }: TeacherPageProps) {
   return (
     <div className="page page-enter teacher-page">
       <div className="teacher-courses-header">
-        <h1 className="page__title">{"Teacher's cabinet"}</h1>
+        <h1 className="page__title">{"Teacher dashboard"}</h1>
         <button type="button" className="teacher-create-btn" onClick={() => navigate('/teacher/courses/new')}>
           + {"Create New Course"}
         </button>
